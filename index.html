@@ -12,13 +12,13 @@ header{background:#193b63;color:white;padding:15px 12px}
 header h2{margin:0 0 4px;font-size:18px}
 header p{margin:0;font-size:12px;color:#dbeafe}
 main{max-width:1100px;margin:auto;padding:8px}
-.panel{background:white;padding:12px;border-radius:12px;margin-bottom:12px;box-shadow:0 2px 8px #0000000a}
+.panel{background:white;padding:10px;border-radius:12px;margin-bottom:12px;box-shadow:0 2px 8px #0000000a}
 h3{font-size:16px;margin:0 0 10px}
 label{display:block;font-size:12px;margin:8px 0 4px}
 input,select,textarea,button{font:inherit}
-input,select,textarea{width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:6px;background:white;font-size:12px}
+input,select,textarea{width:100%;padding:6px 4px;border:1px solid #cbd5e1;border-radius:6px;background:white;font-size:11px}
 textarea{min-height:150px;resize:vertical}
-button{border:0;border-radius:6px;padding:10px 12px;background:#193b63;color:white;cursor:pointer;font-size:12px}
+button{border:0;border-radius:6px;padding:9px 10px;background:#193b63;color:white;cursor:pointer;font-size:12px}
 button.secondary{background:#e2e8f0;color:#172033}
 button.danger{background:#b91c1c}
 button.green{background:#047857}
@@ -37,10 +37,10 @@ button.green{background:#047857}
 .muted{color:#64748b;font-size:12px;line-height:1.5}
 .notice{padding:10px;background:#eff6ff;border-radius:6px;font-size:12px;line-height:1.5;margin:8px 0}
 .warning{padding:10px;background:#fff7ed;color:#9a3412;border-radius:6px;font-size:12px;margin:8px 0}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{padding:8px 6px;text-align:left;border-bottom:1px solid #e2e8f0;vertical-align:middle}
-th{background:#f8fafc;font-size:12px}
-.tablewrap{width:100%;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed}
+th,td{padding:6px 2px;text-align:left;border-bottom:1px solid #e2e8f0;vertical-align:middle;overflow:hidden;text-overflow:ellipsis}
+th{background:#f8fafc;font-size:11px}
+.tablewrap{width:100%;overflow-x:hidden}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 footer{text-align:center;color:#64748b;font-size:11px;padding:14px}
 @media(min-width:600px){.cards{grid-template-columns:repeat(4,minmax(0,1fr))}.menu{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -97,7 +97,7 @@ footer{text-align:center;color:#64748b;font-size:11px;padding:14px}
 <section class="panel">
 <h3>📚 အဓိကလုပ်ဆောင်ချက်များ</h3>
 <div class="menu">
-<button onclick="showPage('students')">👨‍🎓 ကျောင်းသားစာရင်း<span>အတန်းလိုက် စာရင်းစီမံရန်</span></button>
+<button onclick="showPage('students')">👨‍🎓 ကျောင်းသားစာရင်း<span>အတန်းလိုက် ဇယားဖြင့် စီမံရန်</span></button>
 <button onclick="showPage('sms')">📩 အတန်းပိုင်စာတို လက်ခံရန်<span>စာတိုကူးထည့်ပြီး စစ်ဆေးရန်</span></button>
 <button onclick="showPage('monthly')">📅 လစဉ်အစီရင်ခံစာ<span>လအလိုက် စာရင်းကြည့်ရန်</span></button>
 <button onclick="showPage('missing')">⚠️ စာရင်းမရောက်သေးသည့်အတန်း<span>မရောက်သေးသောအတန်းများ</span></button>
@@ -105,99 +105,44 @@ footer{text-align:center;color:#64748b;font-size:11px;padding:14px}
 </section>
 
 <section id="students" class="panel hidden">
-<h3>👨‍🎓 ကျောင်းသားစာရင်း စီမံရန်</h3>
-
+<h3>👨‍🎓 ကျောင်းသားစာရင်း ဇယား</h3>
 <div class="row">
 <div>
-<label>အတန်း</label>
-<select id="studentClass" onchange="renderStudents()"></select>
+<label>အတန်းရွေးရန်</label>
+<select id="studentClass"></select>
 </div>
 <div>
 <label>အမည် / ကျောင်းဝင်အမှတ် ရှာရန်</label>
-<input id="studentSearch" placeholder="ရှာရန်..." oninput="renderStudents()">
+<input id="studentSearch" placeholder="ရှာရန်">
 </div>
 </div>
 
 <div class="actions" style="margin: 10px 0;">
-<button onclick="openStudentForm()">+ ကျောင်းသားအသစ် ထည့်ရန်</button>
+<button onclick="addNewRow()">+ ကျောင်းသားအသစ် ထည့်ရန်</button>
+<button class="green" onclick="saveAllStudents()">ပြောင်းလဲမှုများ သိမ်းဆည်းရန်</button>
 <button class="secondary" onclick="backupData()">Backup ထုတ်ရန်</button>
 <button class="secondary" onclick="document.getElementById('restoreFile').click()">Backup ပြန်သွင်းရန်</button>
-<input id="restoreFile" class="hidden" type="file" accept=".json,application/json" onchange="restoreData(event)">
+<input id="restoreFile" class="hidden" type="file" accept=".json,application/json">
 </div>
 
-<!-- ကျောင်းသားအသစ်ထည့်ရန် Form (ပုံပါအတိုင်း) -->
-<div id="studentFormPanel" class="panel hidden" style="border:1px solid #cbd5e1; margin-top:10px; background:#f8fafc;">
-<h3 id="formTitle">ကျောင်းသားအသစ် ထည့်ရန်</h3>
-<div class="row">
-<div>
-<label>အတန်း</label>
-<select id="fClass"></select>
-</div>
-<div>
-<label>ကျောင်းဝင်အမှတ်</label>
-<input id="fSid" placeholder="ဥပမာ- 0001">
-</div>
-</div>
-<div class="row">
-<div>
-<label>ကျောင်းသားအမည်</label>
-<input id="fName" placeholder="အမည်ထည့်ရန်">
-</div>
-<div>
-<label>ကျား / မ</label>
-<select id="fGender">
-<option value="ကျား">ကျား</option>
-<option value="မ">မ</option>
-</select>
-</div>
-</div>
-<div class="row">
-<div>
-<label>မွေးသက္ကရာဇ်</label>
-<input id="fDob" type="date">
-</div>
-<div>
-<label>ဖုန်းနံပါတ်</label>
-<input id="fPhone" placeholder="09...">
-</div>
-</div>
-<div class="row">
-<div>
-<label>မိဘအမည်</label>
-<input id="fParent" placeholder="မိဘအမည်">
-</div>
-<div>
-<label>နေရပ်လိပ်စာ</label>
-<input id="fAddress" placeholder="လိပ်စာ">
-</div>
-</div>
-<div class="actions">
-<button class="green" onclick="saveStudentForm()">သိမ်းမည်</button>
-<button class="secondary" onclick="closeStudentForm()">မလုပ်တော့ပါ</button>
-</div>
-</div>
+<div class="notice">ကျား ကျောင်းသားများ အပေါ်ဆုံးတွင် ငယ်စဉ်ကြီးလိုက်၊ မ ကျောင်းသားများ အောက်ပိုင်းတွင် ငယ်စဉ်ကြီးလိုက် ပေါ်မည်[span_1](start_span)[span_1](end_span)။ ပြင်ဆင်ပြီး <b>"ပြောင်းလဲမှုများ သိမ်းဆည်းရန်"</b> ကို နှိပ်ပါ။</div>
 
-<div style="margin-top:15px;">
-<h4>သိမ်းပြီးနောက် ကျောင်းသားစာရင်းဇယား:</h4>
 <div class="tablewrap">
 <table>
 <thead>
 <tr>
-<th>စဉ်</th>
-<th>ကျောင်းဝင်အမှတ်</th>
-<th>အမည်</th>
-<th>ကျား/မ</th>
-<th>မွေးရက်</th>
-<th>မိဘအမည်</th>
-<th>ဖုန်း</th>
-<th>လိပ်စာ</th>
-<th>လုပ်ဆောင်ချက်</th>
+<th style="width:6%;">စဉ်</th>
+<th style="width:14%;">အမှတ်</th>
+<th style="width:18%;">အမည်</th>
+<th style="width:12%;">ကျား/မ</th>
+<th style="width:18%;">မွေးရက်</th>
+<th style="width:18%;">ဖုန်း</th>
+<th style="width:14%;">ဖျက်</th>
 </tr>
 </thead>
 <tbody id="studentTableBody">
 </tbody>
 </table>
-</div>
 </div>
 </section>
 
@@ -231,7 +176,7 @@ footer{text-align:center;color:#64748b;font-size:11px;padding:14px}
 <footer>CFBS Principal Attendance · Offline</footer>
 </main>
 
-<script[span_1](start_span)[span_1](end_span)>
+<script>
 "use strict";
 const KEY="CFBS_PRINCIPAL_ATTENDANCE_V1";
 const classes=["KG",...Array.from({length:12},(_,i)=>"Grade "+(i+1))];
@@ -247,7 +192,7 @@ function loadDB(){
  }catch(e){}
  return emptyDB();
 }
-let db=loadDB(),review=null,editingStudentId=null;
+let db=loadDB(),review=null;
 const $=id=>document.getElementById(id);
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function today(){
@@ -267,9 +212,7 @@ function showPage(id){
  $(id).scrollIntoView({behavior:"smooth",block:"start"});
 }
 function fillClasses(){
- const opts=classes.map(c=>`<option>${esc(c)}</option>`).join("");
- $("studentClass").innerHTML=opts;
- $("fClass").innerHTML=opts;
+ $("studentClass").innerHTML=classes.map(c=>`<option>${esc(c)}</option>`).join("");
 }
 
 // ကျား အပေါ်၊ မ အောက်၊ ကျောင်းဝင်အမှတ် ငယ်စဉ်ကြီးလိုက် စီမံခြင်း[span_2](start_span)[span_2](end_span)
@@ -285,116 +228,89 @@ function sortStudents(arr){
  });
 }
 
-function openStudentForm(id=null){
- editingStudentId=id;
- if(id){
-  const s=db.students.find(x=>x.id===id);
-  if(!s)return;
-  $("formTitle").textContent="ကျောင်းသားအချက်အလက် ပြင်ဆင်ရန်";
-  $("fClass").value=s.className||$("studentClass").value;
-  $("fSid").value=s.sid||"";
-  $("fName").value=s.name||"";
-  $("fGender").value=s.gender||"ကျား";
-  $("fDob").value=s.dob||"";
-  $("fPhone").value=s.phone||"";
-  $("fParent").value=s.parent||"";
-  $("fAddress").value=s.address||"";
- }else{
-  $("formTitle").textContent="ကျောင်းသားအသစ် ထည့်ရန်";
-  $("fClass").value=$("studentClass").value;
-  $("fSid").value="";
-  $("fName").value="";
-  $("fGender").value="ကျား";
-  $("fDob").value="";
-  $("fPhone").value="";
-  $("fParent").value="";
-  $("fAddress").value="";
- }
- $("studentFormPanel").classList.remove("hidden");
- $("studentFormPanel").scrollIntoView({behavior:"smooth"});
-}
-
-function closeStudentForm(){
- $("studentFormPanel").classList.add("hidden");
- editingStudentId=null;
-}
-
-function saveStudentForm(){
- const className=$("fClass").value;
- const sid=$("fSid").value.trim();
- const name=$("fName").value.trim();
- const gender=$("fGender").value;
- const dob=$("fDob").value;
- const phone=$("fPhone").value.trim();
- const parent=$("fParent").value.trim();
- const address=$("fAddress").value.trim();
-
- if(!sid||!name){
-  alert("ကျောင်းဝင်အမှတ်နှင့် အမည်ကို ဖြည့်သွင်းရန် လိုအပ်ပါသည်။");
-  return;
- }
-
- if(editingStudentId){
-  const s=db.students.find(x=>x.id===editingStudentId);
-  if(s){
-   s.className=className;
-   s.sid=sid;
-   s.name=name;
-   s.gender=gender;
-   s.dob=dob;
-   s.phone=phone;
-   s.parent=parent;
-   s.address=address;
-  }
- }else{
-  const newS={
-   id:"s"+Date.now()+Math.random().toString(16).slice(2),
-   className,sid,name,gender,dob,phone,parent,address,active:true
-  };
-  db.students.push(newS);
- }
-
- saveDB();
- closeStudentForm();
+function addNewRow(){
+ const cls=$("studentClass").value;
+ const newS={
+  id:"s"+Date.now()+Math.random().toString(16).slice(2),
+  sid:"",name:"",gender:"ကျား",dob:"",parent:"",phone:"",address:"",className:cls,active:true
+ };
+ db.students.push(newS);
  renderStudents();
- alert("အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
 }
 
 function deleteStudent(id){
  if(!confirm("ဒီကျောင်းသားကို ဖျက်မှာ သေချာပါသလား။"))return;
  db.students=db.students.filter(s=>s.id!==id);
- saveDB();
- renderStudents();
+ saveDB();renderStudents();
 }
 
 function renderStudents(){
- const cls=$("studentClass").value;
- const q=$("studentSearch").value.trim().toLowerCase();
+ const cls=$("studentClass").value,q=$("studentSearch").value.trim().toLowerCase();
  const arr=sortStudents(db.students.filter(s=>s.className===cls&&
  (!q||s.name.toLowerCase().includes(q)||s.sid.toLowerCase().includes(q))));
  
  const tbody=$("studentTableBody");
  if(!arr.length){
-   tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:15px;" class="notice">ကျောင်းသားစာရင်း မရှိသေးပါ။ "+ ကျောင်းသားအသစ် ထည့်ရန်" ကိုနှိပ်ပါ။</td></tr>`;
+   tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:15px;" class="notice">ကျောင်းသားစာရင်း မရှိသေးပါ။ "+ ကျောင်းသားအသစ် ထည့်ရန်" ကိုနှိပ်ပါ။</td></tr>`;
    return;
  }
 
  tbody.innerHTML=arr.map((s,i)=>`
- <tr>
+ <tr data-id="${s.id}">
    <td>${i+1}</td>
-   <td>${esc(s.sid)}</td>
-   <td>${esc(s.name)}</td>
-   <td>${esc(s.gender)}</td>
-   <td>${esc(s.dob)}</td>
-   <td>${esc(s.parent)}</td>
-   <td>${esc(s.phone)}</td>
-   <td>${esc(s.address)}</td>
+   <td><input type="text" class="row-sid" value="${esc(s.sid)}" placeholder="အမှတ်"></td>
+   <td><input type="text" class="row-name" value="${esc(s.name)}" placeholder="အမည်"></td>
    <td>
-     <button class="secondary" style="padding:3px 6px;font-size:10px;" onclick="openStudentForm('${s.id}')">ပြင်</button>
-     <button class="danger" style="padding:3px 6px;font-size:10px;" onclick="deleteStudent('${s.id}')">ဖျက်</button>
+     <select class="row-gender" onchange="updateGenderSort()">
+       <option value="ကျား" ${s.gender==="ကျား"?"selected":""}>ကျား</option>
+       <option value="မ" ${s.gender==="မ"?"selected":""}>မ</option>
+     </select>
    </td>
+   <td><input type="date" class="row-dob" value="${esc(s.dob)}"></td>
+   <td><input type="text" class="row-phone" value="${esc(s.phone)}" placeholder="ဖုန်း"></td>
+   <td><button class="danger" style="padding:4px 6px;font-size:10px;" onclick="deleteStudent('${s.id}')">ဖျက်</button></td>
  </tr>`).join("");
 }
+
+function updateGenderSort(){
+ const rows=document.querySelectorAll("#studentTableBody tr[data-id]");
+ rows.forEach(row=>{
+  const id=row.getAttribute("data-id");
+  const student=db.students.find(s=>s.id===id);
+  if(student){
+    student.gender=row.querySelector(".row-gender").value;
+  }
+ });
+}
+
+function saveAllStudents(){
+ const rows=document.querySelectorAll("#studentTableBody tr[data-id]");
+
+ rows.forEach(row=>{
+  const id=row.getAttribute("data-id");
+  const sid=row.querySelector(".row-sid").value.trim();
+  const name=row.querySelector(".row-name").value.trim();
+  const gender=row.querySelector(".row-gender").value;
+  const dob=row.querySelector(".row-dob").value;
+  const phone=row.querySelector(".row-phone").value.trim();
+
+  const student=db.students.find(s=>s.id===id);
+  if(student){
+    student.sid=sid;
+    student.name=name;
+    student.gender=gender;
+    student.dob=dob;
+    student.phone=phone;
+  }
+ });
+
+ saveDB();
+ alert("ကျောင်းသားစာရင်း အပြောင်းအလဲများကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+ renderStudents();
+}
+
+$("studentClass").addEventListener("change",renderStudents);
+$("studentSearch").addEventListener("input",renderStudents);
 
 /* SMS reader */
 function field(text,label){
@@ -551,6 +467,7 @@ function restoreData(event){
  };
  reader.readAsText(f);
 }
+$("restoreFile").addEventListener("change",restoreData);
 $("period").addEventListener("change",renderDashboard);
 $("dashDate").addEventListener("change",renderDashboard);
 $("dashMonth").addEventListener("change",renderDashboard);
