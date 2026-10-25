@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#193b63">
+<title>CHINDWIN FUTURE BRIGHT - Class Teacher</title>
+
+<style>
+:root{
+  --navy:#193b63;
+  --blue:#2563eb;
+  --bg:#f1f5f9;
+  --white:#fff;
+  --text:#172033;
+  --muted:#64748b;
+  --green:#15803d;
+  --red:#dc2626;
+  --orange:#c2410c;
+  --border:#dbe3ee;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,"Noto Sans Myanmar",sans-serif;
+  font-size:14px;
+}
+header{
+  background:linear-gradient(135deg,#193b63,#2563eb);
+  color:white;
+  padding:20px 15px;
+  text-align:center;
+}
+header h1{font-size:21px;margin:0 0 7px}
+header p{margin:0;font-size:13px;opacity:.9}
+.container{max-width:1200px;margin:auto;padding:14px}
+.notice{
+  padding:11px 13px;
+  background:#fff7ed;
+  color:#9a3412;
+  border:1px solid #fed7aa;
+  border-radius:10px;
+  margin-bottom:14px;
+  line-height:1.7;
+}
+nav{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+  margin-bottom:16px;
+}
+nav button{
+  border:1px solid var(--border);
+  background:white;
+  color:var(--navy);
+  border-radius:11px;
+  padding:14px 7px;
+  font-size:14px;
+  font-weight:bold;
+  min-height:58px;
+}
+nav button.active{
+  color:white;
+  background:var(--navy);
+  border-color:var(--navy);
+}
+.panel{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:15px;
+  margin-bottom:15px;
+  box-shadow:0 2px 8px #0f172a08;
+}
+h2{font-size:19px;color:var(--navy);margin:0 0 15px}
+h3{font-size:16px;margin:15px 0 10px;color:var(--navy)}
+label{display:block;font-weight:bold;margin:9px 0 5px}
+input,select,textarea{
+  width:100%;
+  padding:11px;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  font:inherit;
+  background:white;
+  color:var(--text);
+}
+input:focus,select:focus,textarea:focus{
+  outline:2px solid #93c5fd;
+  border-color:var(--blue);
+}
+button{cursor:pointer;font:inherit}
+.btn{
+  border:0;
+  border-radius:8px;
+  padding:11px 14px;
+  font-weight:bold;
+  margin:5px 4px 5px 0;
+}
+.primary{background:var(--blue);color:white}
+.success{background:var(--green);color:white}
+.danger{background:var(--red);color:white}
+.secondary{background:#e2e8f0;color:#1e293b}
+.small{padding:7px 9px;font-size:12px}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.field{min-width:0}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+  margin:12px 0;
+}
+.stat{
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px;
+  background:#f8fafc;
+}
+.stat strong{display:block;font-size:23px;color:var(--navy);margin-top:7px}
+.stat span{font-size:12px;color:var(--muted)}
+.tablewrap{
+  width:100%;
+  overflow-x:auto;
+  border:1px solid var(--border);
+  border-radius:9px;
+  margin-top:12px;
+}
+table{
+  border-collapse:collapse;
+  width:100%;
+  min-width:850px;
+  background:white;
+}
+th,td{
+  border-bottom:1px solid var(--border);
+  padding:9px;
+  text-align:left;
+  vertical-align:middle;
+  line-height:1.6;
+}
+th{background:#eaf1f9;color:var(--navy);white-space:nowrap}
+td select{min-width:105px;padding:8px}
+td .btn{white-space:nowrap}
+.badge{
+  display:inline-block;
+  padding:4px 7px;
+  border-radius:6px;
+  background:#e2e8f0;
+  font-size:12px;
+}
+.muted{color:var(--muted);line-height:1.7}
+.hidden{display:none!important}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
+.row>.field{flex:1;min-width:130px}
+#message{
+  display:none;
+  padding:12px;
+  margin-bottom:12px;
+  border-radius:9px;
+  background:#dcfce7;
+  color:#166534;
+  line-height:1.7;
+}
+footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
+@media(min-width:700px){
+  nav{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .stats{grid-template-columns:repeat(5,minmax(0,1fr))}
+}
+@media print{
+  header,nav,.no-print,footer,.notice{display:none!important}
+  body{background:white}
+  .container{max-width:none;padding:0}
+  .panel{box-shadow:none;border:0;padding:0}
+  .hidden{display:none!important}
+  table{min-width:0;font-size:10px}
+  th,td{padding:5px}
+}
+</style>
+</head>
+
+<body>
+<header>
+  <h1>CHINDWIN FUTURE BRIGHT</h1>
+  <p>CLASS TEACHER ATTENDANCE SYSTEM</p>
+  <p>Budalin Township</p>
+</header>
+
+<div class="container">
+  <div class="notice">
+    📱 <b>Offline စနစ်</b> — ထည့်သွင်းထားသော အချက်အလက်များကို
+    ဤဖုန်း၏ Browser/App Storage ထဲတွင် သိမ်းဆည်းပါသည်။
+    ဖုန်းပျောက်ခြင်း၊ App Data ဖျက်ခြင်းတို့ကြောင့် အချက်အလက်ဆုံးရှုံးနိုင်သဖြင့်
+    ပုံမှန် Backup ပြုလုပ်ပါ။
+  </div>
+
+  <div id="message" role="status"></div>
+
+  <nav class="no-print">
+    <button class="active" data-tab="students">👨‍🎓 ကျောင်းသားစာရင်း</button>
+    <button data-tab="attendance">📋 နေ့စဉ်တက်ရောက်မှု</button>
+    <button data-tab="monthly">📊 လစဉ်အစီရင်ခံစာ</button>
+    <button data-tab="principal">📨 ကျောင်းအုပ်ဆီပို့ရန်</button>
+  </nav>
+
+  <!-- STUDENTS -->
+  <section id="students" class="tab">
+    <div class="panel">
+      <h2>ကျောင်းသားစာရင်း</h2>
+
+      <div class="row no-print">
+        <div class="field">
+          <label>အတန်းရွေးပါ</label>
+          <select id="studentClass"></select>
+        </div>
+        <div class="field">
+          <label>အမည် / ကျောင်းဝင်အမှတ် ရှာရန်</label>
+          <input id="studentSearch" placeholder="ရှာဖွေရန်...">
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span>လက်ရှိကျောင်းသား</span><strong id="totalStudents">0</strong></div>
+        <div class="stat"><span>ကျား</span><strong id="totalBoys">0</strong></div>
+        <div class="stat"><span>မ</span><strong id="totalGirls">0</strong></div>
+      </div>
+
+      <button class="btn primary no-print" id="showStudentForm">
+        ＋ ကျောင်းသားအသစ်ထည့်ရန်
+      </button>
+
+      <div id="studentFormBox" class="panel hidden no-print">
+        <h3 id="studentFormTitle">ကျောင်းသားအသစ်</h3>
+        <form id="studentForm">
+          <input type="hidden" id="editStudentId">
+
+          <div class="grid">
+            <div class="field">
+              <label>ကျောင်းဝင်အမှတ် *</label>
+              <input id="sid" required maxlength="50">
+            </div>
+            <div class="field">
+              <label>ကျောင်းသားအမည် *</label>
+              <input id="sname" required maxlength="120">
+            </div>
+            <div class="field">
+              <label>မွေးသက္ကရာဇ် *</label>
+              <input id="sdob" type="date" required>
+            </div>
+            <div class="field">
+              <label>မိဘအမည် *</label>
+              <input id="sparent" required maxlength="120">
+            </div>
+            <div class="field">
+              <label>ကျား/မ *</label>
+              <select id="sgender" required>
+                <option value="">ရွေးပါ</option>
+                <option value="ကျား">ကျား</option>
+                <option value="မ">မ</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>ဖုန်းနံပါတ်</label>
+              <input id="sphone" type="tel" maxlength="40">
+            </div>
+            <div class="field">
+              <label>နေရပ်လိပ်စာ</label>
+              <input id="saddress" maxlength="200">
+            </div>
+            <div class="field">
+              <label>ကျောင်းသားအခြေအနေ</label>
+              <select id="sactive">
+                <option value="yes">လက်ရှိတက်ရောက်နေသည်</option>
+                <option value="no">ကျောင်းမှထွက် / ယာယီမရှိ</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn success" type="submit">သိမ်းမည်</button>
+          <button class="btn secondary" type="button" id="cancelStudentForm">မလုပ်တော့ပါ</button>
+        </form>
+      </div>
+
+      <p class="muted">
+        ကျောင်းသားစာရင်းကို ကျားအရင်၊ မနောက် စီထားပါသည်။
+        ကျောင်းသားကို ဖယ်ရှားလိုပါက “ကျောင်းမှထွက်” ဟု ပြောင်းပါ။
+        ယခင်တက်ရောက်မှုမှတ်တမ်းများကို မဖျက်ပါ။
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>စဉ်</th>
+              <th>ကျောင်းဝင်အမှတ်</th>
+              <th>ကျောင်းသားအမည်</th>
+              <th>ကျား/မ</th>
+              <th>မွေးသက္ကရာဇ်</th>
+              <th>မိဘအမည်</th>
+              <th>ဖုန်း</th>
+              <th>အခြေအနေ</th>
+              <th class="no-print">လုပ်ဆောင်ချက်</th>
+            </tr>
+          </thead>
+          <tbody id="studentRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- DAILY ATTENDANCE -->
+  <section id="attendance" class="tab hidden">
+    <div class="panel">
+      <h2>နေ့စဉ်တက်ရောက်မှု</h2>
+
+      <div class="grid no-print">
+        <div class="field">
+          <label>အတန်း</label>
+          <select id="attClass"></select>
+        </div>
+        <div class="field">
+          <label>ရက်စွဲ</label>
+          <input id="attDate" type="date">
+        </div>
+        <div class="field">
+          <label>ကျောင်းသားရှာရန်</label>
+          <input id="attSearch" placeholder="အမည် / ကျောင်းဝင်အမှတ်">
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span>ကျောင်းသားစုစုပေါင်း</span><strong id="attTotal">0</strong></div>
+        <div class="stat"><span>တက်</span><strong id="attPresent">0</strong></div>
+        <div class="stat"><span>ပျက်</span><strong id="attAbsent">0</strong></div>
+        <div class="stat"><span>ခွင့်</span><strong id="attLeave">0</strong></div>
+        <div class="stat"><span>ခွင့်မဲ့ / နောက်ကျ</span><strong id="attOther">0</strong></div>
+      </div>
+
+      <p id="attStatusMessage" class="muted"></p>
+
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>စဉ်</th>
+              <th>ကျောင်းဝင်အမှတ်</th>
+              <th>အမည်</th>
+              <th>ကျား/မ</th>
+              <th>တက်ရောက်မှု</th>
+            </tr>
+          </thead>
+          <tbody id="attendanceRows"></tbody>
+        </table>
+      </div>
+
+      <button class="btn success no-print" id="saveAttendance">တက်ရောက်မှု သိမ်းမည်</button>
+      <button class="btn secondary no-print" id="printAttendance">ပုံနှိပ် / PDF</button>
+    </div>
+  </section>
+
+  <!-- MONTHLY REPORT -->
+  <section id="monthly" class="tab hidden">
+    <div class="panel">
+      <h2>လစဉ်တက်ရောက်မှုအစီရင်ခံစာ</h2>
+
+      <div class="row no-print">
+        <div class="field">
+          <label>အတန်း</label>
+          <select id="monthClass"></select>
+        </div>
+        <div class="field">
+          <label>လရွေးပါ</label>
+          <input id="monthValue" type="month">
+        </div>
+      </div>
+
+      <p class="muted">
+        အောက်ပါစာရင်းသည် သိမ်းဆည်းပြီးသော နေ့စဉ်မှတ်တမ်းများကိုသာ ရေတွက်ပါသည်။
+        မှတ်တမ်းမရှိသောနေ့ကို “တက်” ဟု အလိုအလျောက်မတွက်ပါ။
+      </p>
+
+      <div class="stats">
+        <div class="stat"><span>တက်</span><strong id="mPresent">0</strong></div>
+        <div class="stat"><span>ပျက်</span><strong id="mAbsent">0</strong></div>
+        <div class="stat"><span>ခွင့်</span><strong id="mLeave">0</strong></div>
+        <div class="stat"><span>ခွင့်မဲ့</span><strong id="mUnauthorized">0</strong></div>
+        <div class="stat"><span>နောက်ကျ</span><strong id="mLate">0</strong></div>
+      </div>
+
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>စဉ်</th>
+              <th>ကျောင်းဝင်အမှတ်</th>
+              <th>အမည်</th>
+              <th>ကျား/မ</th>
+              <th>တက်</th>
+              <th>ပျက်</th>
+              <th>ခွင့်</th>
+              <th>ခွင့်မဲ့</th>
+              <th>နောက်ကျ</th>
+            </tr>
+          </thead>
+          <tbody id="monthlyRows"></tbody>
+        </table>
+      </div>
+
+      <button class="btn secondary no-print" id="printMonthly">ပုံနှိပ် / PDF သိမ်းရန်</button>
+    </div>
+  </section>
+
+  <!-- REPORT TO PRINCIPAL -->
+  <section id="principal" class="tab hidden">
+    <div class="panel">
+      <h2>ကျောင်းအုပ်ဆီပို့ရန်</h2>
+
+      <div class="grid no-print">
+        <div class="field">
+          <label>အတန်း</label>
+          <select id="principalClass"></select>
+        </div>
+        <div class="field">
+          <label>ရက်စွဲ</label>
+          <input id="principalDate" type="date">
+        </div>
+      </div>
+
+      <p class="muted">
+        အစီရင်ခံစာတွင် တက်ရောက်သူအမည်များ မပါဝင်ပါ။
+        ပျက်၊ ခွင့်၊ ခွင့်မဲ့၊ နောက်ကျသူများ၏ အမည်နှင့် ကျောင်းဝင်အမှတ်ကိုသာ ဖော်ပြပါသည်။
+        အစီရင်ခံစာမထုတ်မီ ကျောင်းသားအားလုံးကို တက်ရောက်မှုသတ်မှတ်ပြီး သိမ်းဆည်းထားရပါမည်။
+      </p>
+
+      <button class="btn primary no-print" id="generatePrincipal">
+        အစီရင်ခံစာ ပြုလုပ်မည်
+      </button>
+
+      <label for="principalOutput">အစီရင်ခံစာစာသား</label>
+      <textarea id="principalOutput" rows="18" placeholder="အစီရင်ခံစာကို ဒီနေရာမှာ ပြပါမည်။"></textarea>
+
+      <button class="btn success no-print" id="copyPrincipal">စာသားကူးယူမည်</button>
+      <button class="btn secondary no-print" id="sharePrincipal">Share / မျှဝေမည်</button>
+    </div>
+  </section>
+
+  <!-- BACKUP -->
+  <section class="panel no-print">
+    <h2>အချက်အလက် Backup / Restore</h2>
+    <p class="muted">
+      Backup ဖိုင်ကို လုံခြုံသောနေရာတွင် သိမ်းထားပါ။
+      Restore လုပ်သောအခါ ဤဖုန်းထဲရှိ လက်ရှိအချက်အလက်များကို Backup ထဲရှိအချက်အလက်ဖြင့် အစားထိုးမည်။
+      ကျောင်းသားအချက်အလက်များကို အခြားသူများထံ မမျှဝေပါနှင့်။
+    </p>
+    <button class="btn primary" id="backupButton">Backup ဖိုင်ထုတ်ရန်</button>
+    <label for="restoreFile">Backup ဖိုင်မှ ပြန်ယူရန်</label>
+    <input type="file" id="restoreFile" accept=".json,application/json">
+    <button class="btn danger" id="restoreButton">Backup ပြန်ထည့်ရန်</button>
+  </section>
+
+  <footer>
+    CHINDWIN FUTURE BRIGHT · Class Teacher Attendance System
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+const CLASSES = [
+  "KG","Grade 1","Grade 2","Grade 3","Grade 4","Grade 5",
+  "Grade 6","Grade 7","Grade 8","Grade 9","Grade 10",
+  "Grade 11","Grade 12"
+];
+
+const STATUSES = ["တက်","ပျက်","ခွင့်","ခွင့်မဲ့","နောက်ကျ"];
+const STORAGE_KEY = "cfbs_teacher_attendance_v1";
+
+let db = {students:[],attendance:{}};
+
+const $ = id => document.getElementById(id);
+
+function today(){
+  const d = new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function currentMonth(){return today().slice(0,7)}
+function makeId(){return "s_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)}
+function esc(value){
+  return String(value ?? "").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+function saveDB(){
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
+    return true;
+  }catch(e){
+    alert("အချက်အလက်သိမ်းမရပါ။ ဖုန်း Storage နေရာလွတ်ကို စစ်ဆေးပါ။");
+    return false;
+  }
+}
+function loadDB(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const data=JSON.parse(raw);
+      if(data && Array.isArray(data.students) && data.attendance){
+        db=data;
+      }
+    }
+  }catch(e){
+    alert("သိမ်းဆည်းထားသောအချက်အလက်ကို ဖတ်မရပါ။ Backup ရှိပါက Restore လုပ်ပါ။");
+  }
+}
+function showMessage(msg){
+  $("message").textContent=msg;
+  $("message").style.display="block";
+  window.scrollTo({top:0,behavior:"smooth"});
+  setTimeout(()=>$("message").style.display="none",3500
