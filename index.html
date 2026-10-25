@@ -411,22 +411,61 @@ function deleteStudent(id){
  renderStudents();
 }
 
+
 function renderStudents(){
  const cls=$("studentClass").value;
- const q=$("studentSearch").value.trim().toLowerCase();
- const arr=sortStudents(db.students.filter(s=>
-  s.className===cls&&
-  (!q||String(s.name||"").toLowerCase().includes(q)||
-  String(s.sid||"").toLowerCase().includes(q))
- ));
+ const q=norm($("studentSearch").value);
+
+ const arr=sortStudents(
+  db.students.filter(s=>
+   s.className===cls &&
+   (!q || norm(s.name).includes(q) || norm(s.sid).includes(q))
+  )
+ );
+
+ $("studentListSummary").textContent =
+  cls+" အတန်း · ကျောင်းသား "+arr.length+" ဦး";
+
  const tbody=$("studentTableBody");
 
  if(!arr.length){
-  tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:15px">
-  ဒီအတန်းတွင် ကျောင်းသားစာရင်း မရှိသေးပါ။ အပေါ်က
-  “ကျောင်းသားအသစ် ထည့်ရန်” ကိုနှိပ်ပါ။</td></tr>`;
+  tbody.innerHTML=`
+   <tr>
+    <td colspan="7" style="text-align:center;padding:18px">
+     ကျောင်းသားစာရင်း မရှိသေးပါ။
+     ကျောင်းသားအသစ် ထည့်ရန် ကိုနှိပ်ပါ။
+    </td>
+   </tr>`;
   return;
  }
+
+ tbody.innerHTML=arr.map((s,i)=>`
+  <tr>
+   <td>${i+1}</td>
+   <td>${esc(s.sid||"-")}</td>
+   <td>${esc(s.name||"-")}</td>
+   <td>${esc(s.gender||"-")}</td>
+   <td>${esc(s.dob||"-")}</td>
+   <td>${esc(s.phone||"-")}</td>
+   <td>
+    <div style="display:flex;gap:4px">
+     <button
+      style="padding:6px 8px"
+      onclick="editStudent('${esc(s.id)}')">
+      ပြင်
+     </button>
+     <button
+      class="danger"
+      style="padding:6px 8px"
+      onclick="deleteStudent('${esc(s.id)}')">
+      ဖျက်
+     </button>
+    </div>
+   </td>
+  </tr>
+ `).join("");
+}
+
 
  tbody.innerHTML=arr.map((s,i)=>`
  <tr data-id="${esc(s.id)}">
