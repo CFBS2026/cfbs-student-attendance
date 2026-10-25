@@ -11,14 +11,14 @@ body{margin:0;background:#f1f5f9;color:#172033;font-family:Arial,sans-serif}
 header{background:#193b63;color:white;padding:20px 16px}
 header h2{margin:0 0 6px;font-size:20px}
 header p{margin:0;font-size:13px;color:#dbeafe}
-main{max-width:1100px;margin:auto;padding:14px}
-.panel{background:white;padding:15px;border-radius:14px;margin-bottom:14px;box-shadow:0 2px 8px #0000000a}
+main{max-width:1100px;margin:auto;padding:10px}
+.panel{background:white;padding:12px;border-radius:14px;margin-bottom:14px;box-shadow:0 2px 8px #0000000a}
 h3{font-size:17px;margin:0 0 14px}
 label{display:block;font-size:13px;margin:10px 0 5px}
 input,select,textarea,button{font:inherit}
-input,select,textarea{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:8px;background:white}
+input,select,textarea{width:100%;padding:7px 5px;border:1px solid #cbd5e1;border-radius:6px;background:white;font-size:12px}
 textarea{min-height:200px;resize:vertical}
-button{border:0;border-radius:8px;padding:11px 13px;background:#193b63;color:white;cursor:pointer}
+button{border:0;border-radius:8px;padding:10px 12px;background:#193b63;color:white;cursor:pointer;font-size:13px}
 button.secondary{background:#e2e8f0;color:#172033}
 button.danger{background:#b91c1c}
 button.green{background:#047857}
@@ -37,10 +37,10 @@ button.green{background:#047857}
 .muted{color:#64748b;font-size:13px;line-height:1.6}
 .notice{padding:11px;background:#eff6ff;border-radius:8px;font-size:13px;line-height:1.6;margin:10px 0}
 .warning{padding:11px;background:#fff7ed;color:#9a3412;border-radius:8px;font-size:13px;margin:10px 0}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:9px 6px;text-align:left;border-bottom:1px solid #e2e8f0;vertical-align:middle}
-th{background:#f8fafc}
-.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:750px}
+th,td{padding:8px 4px;text-align:left;border-bottom:1px solid #e2e8f0;vertical-align:middle}
+th{background:#f8fafc;font-size:12px}
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 footer{text-align:center;color:#64748b;font-size:12px;padding:18px}
 @media(min-width:600px){.cards{grid-template-columns:repeat(4,minmax(0,1fr))}.menu{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -125,20 +125,20 @@ footer{text-align:center;color:#64748b;font-size:12px;padding:18px}
 <input id="restoreFile" class="hidden" type="file" accept=".json,application/json">
 </div>
 
-<div class="notice">အောက်ပါဇယားကွက်များထဲတွင် လိုအပ်သည်များကို တိုက်ရိုက်ပြင်ဆင်နိုင်ပြီး <b>"ပြောင်းလဲမှုများ သိမ်းဆည်းရန်"</b> ကို နှိပ်၍ သိမ်းဆည်းနိုင်ပါသည်။</div>
+<div class="notice">ဇယားကွက်များကို ဘေးသို့ ရွှေ့၍ကြည့်နိုင်ပါသည်။ လိုအပ်သည်များကို ပြင်ဆင်ပြီး <b>"ပြောင်းလဲမှုများ သိမ်းဆည်းရန်"</b> ကို နှိပ်ပါ။</div>
 
 <div class="tablewrap">
 <table>
 <thead>
 <tr>
-<th>စဉ်</th>
-<th>ကျောင်းဝင်အမှတ်</th>
-<th>အမည်</th>
-<th>မွေးသက္ကရာဇ်</th>
-<th>မိဘအမည်</th>
-<th>ဖုန်းနံပါတ်</th>
-<th>နေရပ်လိပ်စာ</th>
-<th>လုပ်ဆောင်ချက်</th>
+<th style="width:35px;">စဉ်</th>
+<th style="width:90px;">ကျောင်းဝင်အမှတ်</th>
+<th style="width:110px;">အမည်</th>
+<th style="width:115px;">မွေးသက္ကရာဇ်</th>
+<th style="width:90px;">မိဘအမည်</th>
+<th style="width:90px;">ဖုန်းနံပါတ်</th>
+<th style="width:90px;">နေရပ်လိပ်စာ</th>
+<th style="width:55px;">လုပ်ဆောင်ချက်</th>
 </tr>
 </thead>
 <tbody id="studentTableBody">
@@ -251,13 +251,13 @@ function renderStudents(){
  tbody.innerHTML=arr.map((s,i)=>`
  <tr data-id="${s.id}">
    <td>${i+1}</td>
-   <td><input type="text" class="row-sid" value="${esc(s.sid)}" placeholder="ကျောင်းဝင်အမှတ်"></td>
+   <td><input type="text" class="row-sid" value="${esc(s.sid)}" placeholder="အမှတ်"></td>
    <td><input type="text" class="row-name" value="${esc(s.name)}" placeholder="အမည်"></td>
    <td><input type="date" class="row-dob" value="${esc(s.dob)}"></td>
-   <td><input type="text" class="row-parent" value="${esc(s.parent)}" placeholder="မိဘအမည်"></td>
-   <td><input type="text" class="row-phone" value="${esc(s.phone)}" placeholder="ဖုန်းနံပါတ်"></td>
-   <td><input type="text" class="row-address" value="${esc(s.address)}" placeholder="နေရပ်လိပ်စာ"></td>
-   <td><button class="danger" style="padding:6px 10px;font-size:12px;" onclick="deleteStudent('${s.id}')">ဖျက်</button></td>
+   <td><input type="text" class="row-parent" value="${esc(s.parent)}" placeholder="မိဘ"></td>
+   <td><input type="text" class="row-phone" value="${esc(s.phone)}" placeholder="ဖုန်း"></td>
+   <td><input type="text" class="row-address" value="${esc(s.address)}" placeholder="လိပ်စာ"></td>
+   <td><button class="danger" style="padding:5px 8px;font-size:11px;" onclick="deleteStudent('${s.id}')">ဖျက်</button></td>
  </tr>`).join("");
 }
 
