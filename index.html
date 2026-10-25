@@ -11,7 +11,7 @@ body{margin:0;background:#f1f5f9;color:#172033;font-family:Arial,sans-serif}
 header{background:#193b63;color:white;padding:20px 16px}
 header h2{margin:0 0 6px;font-size:20px}
 header p{margin:0;font-size:13px;color:#dbeafe}
-main{max-width:1000px;margin:auto;padding:14px}
+main{max-width:1100px;margin:auto;padding:14px}
 .panel{background:white;padding:15px;border-radius:14px;margin-bottom:14px;box-shadow:0 2px 8px #0000000a}
 h3{font-size:17px;margin:0 0 14px}
 label{display:block;font-size:13px;margin:10px 0 5px}
@@ -105,7 +105,7 @@ footer{text-align:center;color:#64748b;font-size:12px;padding:18px}
 </section>
 
 <section id="students" class="panel hidden">
-<h3>👨‍🎓 ကျောင်းသားစာရင်း (အတန်းလိုက် ဇယားဖြင့် ပြင်ဆင်ရန်)</h3>
+<h3>👨‍🎓 ကျောင်းသားစာရင်း ဇယား</h3>
 <div class="row">
 <div>
 <label>အတန်းရွေးရန်</label>
@@ -125,7 +125,7 @@ footer{text-align:center;color:#64748b;font-size:12px;padding:18px}
 <input id="restoreFile" class="hidden" type="file" accept=".json,application/json">
 </div>
 
-<div class="notice">ဇယားကွက်များထဲတွင် လိုအပ်သည်များကို တိုက်ရိုက်ပြင်ဆင်နိုင်ပြီး <b>"ပြောင်းလဲမှုများ သိမ်းဆည်းရန်"</b> ကို နှိပ်၍ သိမ်းဆည်းနိုင်ပါသည်။</div>
+<div class="notice">အောက်ပါဇယားကွက်များထဲတွင် လိုအပ်သည်များကို တိုက်ရိုက်ပြင်ဆင်နိုင်ပြီး <b>"ပြောင်းလဲမှုများ သိမ်းဆည်းရန်"</b> ကို နှိပ်၍ သိမ်းဆည်းနိုင်ပါသည်။</div>
 
 <div class="tablewrap">
 <table>
@@ -134,15 +134,15 @@ footer{text-align:center;color:#64748b;font-size:12px;padding:18px}
 <th>စဉ်</th>
 <th>ကျောင်းဝင်အမှတ်</th>
 <th>အမည်</th>
-<th>ကျား/မ</th>
 <th>မွေးသက္ကရာဇ်</th>
 <th>မိဘအမည်</th>
-<th>ဖုန်း</th>
+<th>ဖုန်းနံပါတ်</th>
+<th>နေရပ်လိပ်စာ</th>
 <th>လုပ်ဆောင်ချက်</th>
 </tr>
 </thead>
 <tbody id="studentTableBody">
-<!-- ဇယားအချက်အလက်များ JavaScript ဖြင့် ဝင်ရောက်မည် -->
+<!-- ဇယားအချက်အလက်များ ဒီနေရာမှာ ဝင်လာပါမယ် -->
 </tbody>
 </table>
 </div>
@@ -178,7 +178,7 @@ footer{text-align:center;color:#64748b;font-size:12px;padding:18px}
 <footer>CFBS Principal Attendance · Offline</footer>
 </main>
 
-<script[span_0](start_span)[span_0](end_span)>
+<script[span_1](start_span)[span_1](end_span)>
 "use strict";
 const KEY="CFBS_PRINCIPAL_ATTENDANCE_V1";
 const classes=["KG",...Array.from({length:12},(_,i)=>"Grade "+(i+1))];
@@ -217,9 +217,9 @@ function fillClasses(){
  $("studentClass").innerHTML=classes.map(c=>`<option>${esc(c)}</option>`).join("");
 }
 function sortStudents(arr){
- return arr.sort((a,b)=>(a.gender==="ကျား"?0:1)-(b.gender==="ကျား"?0:1)||
+ return arr.sort((a,b)=>(
  (Number(String(a.sid).replace(/\D/g,""))||999999999)-
- (Number(String(b.sid).replace(/\D/g,""))||999999999));
+ (Number(String(b.sid).replace(/\D/g,""))||999999999)));
 }
 
 function addNewRow(){
@@ -252,43 +252,36 @@ function renderStudents(){
  tbody.innerHTML=arr.map((s,i)=>`
  <tr data-id="${s.id}">
    <td>${i+1}</td>
-   <td><input type="text" class="row-sid" value="${esc(s.sid)}" placeholder="အမှတ်"></td>
+   <td><input type="text" class="row-sid" value="${esc(s.sid)}" placeholder="ကျောင်းဝင်အမှတ်"></td>
    <td><input type="text" class="row-name" value="${esc(s.name)}" placeholder="အမည်"></td>
-   <td>
-     <select class="row-gender">
-       <option value="ကျား" ${s.gender==="ကျား"?"selected":""}>ကျား</option>
-       <option value="မ" ${s.gender==="မ"?"selected":""}>မ</option>
-     </select>
-   </td>
    <td><input type="date" class="row-dob" value="${esc(s.dob)}"></td>
-   <td><input type="text" class="row-parent" value="${esc(s.parent)}" placeholder="မိဘ"></td>
-   <td><input type="text" class="row-phone" value="${esc(s.phone)}" placeholder="ဖုန်း"></td>
+   <td><input type="text" class="row-parent" value="${esc(s.parent)}" placeholder="မိဘအမည်"></td>
+   <td><input type="text" class="row-phone" value="${esc(s.phone)}" placeholder="ဖုန်းနံပါတ်"></td>
+   <td><input type="text" class="row-address" value="${esc(s.address)}" placeholder="နေရပ်လိပ်စာ"></td>
    <td><button class="danger" style="padding:6px 10px;font-size:12px;" onclick="deleteStudent('${s.id}')">ဖျက်</button></td>
  </tr>`).join("");
 }
 
 function saveAllStudents(){
- const cls=$("studentClass").value;
  const rows=document.querySelectorAll("#studentTableBody tr[data-id]");
- let hasError=false;
 
  rows.forEach(row=>{
   const id=row.getAttribute("data-id");
   const sid=row.querySelector(".row-sid").value.trim();
   const name=row.querySelector(".row-name").value.trim();
-  const gender=row.querySelector(".row-gender").value;
   const dob=row.querySelector(".row-dob").value;
   const parent=row.querySelector(".row-parent").value.trim();
   const phone=row.querySelector(".row-phone").value.trim();
+  const address=row.querySelector(".row-address").value.trim();
 
   const student=db.students.find(s=>s.id===id);
   if(student){
     student.sid=sid;
     student.name=name;
-    student.gender=gender;
     student.dob=dob;
     student.parent=parent;
     student.phone=phone;
+    student.address=address;
   }
  });
 
