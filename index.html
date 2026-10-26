@@ -1,826 +1,254 @@
-<!doctype html>
-<html lang="my">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>CFBS Student Attendance Dashboard</title>
+<!DOCTYPE html>
+<html lang="my"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#193b63"><title>CHINDWIN FUTURE BRIGHT SCHOOL — Student Attendance Dashboard</title>
 <style>
-:root {
-  --navy: #193b63;
-  --navy-dark: #0f2744;
-  --blue-light: #e8f1fd;
-  --green-light: #e3f7ed;
-  --red-light: #ffeaea;
-  --yellow-light: #fff8e1;
-  --purple-light: #f3e8ff;
-  --ink: #1f2937;
-  --muted: #64748b;
-  --line: #e2e8f0;
-  --bg: #f8fafc;
-}
+*{box-sizing:border-box}body{margin:0;background:#f1f5f9;color:#172033;font-family:Arial,"Noto Sans Myanmar",sans-serif}header{background:linear-gradient(135deg,#193b63,#285889);color:#fff;padding:20px 14px}header .brand{display:flex;align-items:center;gap:12px;max-width:1150px;margin:auto}.logo{width:52px;height:52px;flex-shrink:0;border-radius:50%;background:#fff;color:#193b63;display:grid;place-items:center;font-size:26px}h1{font-size:18px;margin:0 0 5px}header p{font-size:12px;color:#dbeafe;margin:3px 0}main{max-width:1150px;margin:auto;padding:12px}.topnote{font-size:12px;line-height:1.7;background:#fff7df;color:#805b00;padding:10px 12px;border-radius:10px;margin-bottom:12px}.nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}.nav button{background:#fff;color:#193b63;border:1px solid #dbe4f0;text-align:left;min-height:54px;font-weight:bold}.nav button.active{background:#193b63;color:#fff}.nav span{display:block;font-size:11px;font-weight:normal;opacity:.8;margin-top:4px}button{border:0;border-radius:8px;padding:10px 12px;background:#193b63;color:#fff;font:inherit;cursor:pointer}button.secondary{background:#e2e8f0;color:#172033}button.green{background:#047857}button.danger{background:#b91c1c}.panel{background:#fff;border-radius:13px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px #00000008}.hidden{display:none!important}h2{font-size:17px;margin:0 0 12px}h3{font-size:14px;margin:16px 0 9px}.row{display:flex;gap:10px;flex-wrap:wrap}.field{flex:1;min-width:145px;margin-bottom:8px}label{display:block;font-size:12px;font-weight:bold;margin:8px 0 5px}input,select,textarea{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;font:inherit;color:#172033}textarea{min-height:76px;resize:vertical}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}.stat{border-radius:11px;padding:12px;background:#eaf1fb}.stat small{display:block;color:#475569;font-size:12px}.stat strong{display:block;font-size:25px;margin-top:5px;color:#193b63}.stat.green{background:#dcfce7}.stat.green strong{color:#166534}.stat.red{background:#fee2e2}.stat.red strong{color:#991b1b}.stat.yellow{background:#fef3c7}.stat.yellow strong{color:#92400e}.tablewrap{overflow-x:auto;max-width:100%;border:1px solid #e2e8f0;border-radius:9px;-webkit-overflow-scrolling:touch}.tablewrap table{width:max-content;min-width:100%}tfoot th{background:#e2eaf5}.nav button{border-radius:10px}.panel{border:1px solid #e7edf5}table{border-collapse:collapse;width:100%;min-width:650px;font-size:12px}th,td{padding:9px 8px;border-bottom:1px solid #e2e8f0;text-align:left;white-space:nowrap}th{background:#eff4fa;color:#193b63}td select{min-width:105px;padding:8px;font-size:12px}.gradegrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.grade{background:#f1f5f9;color:#193b63;border:1px solid #dbe4f0;padding:10px 4px;text-align:center}.grade small{display:block;font-size:11px;margin-top:4px;color:#64748b}.actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.muted{font-size:12px;color:#64748b;line-height:1.6}.footer{text-align:center;color:#64748b;font-size:11px;padding:12px}.tag{display:inline-block;border-radius:20px;padding:4px 8px;background:#e0f2fe;color:#075985;font-size:11px}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.formgrid .field{min-width:0;margin:0}.summaryhead{position:relative}.success{color:#166534}.warning{color:#92400e}.dangertext{color:#b91c1c}@media(min-width:700px){.nav{grid-template-columns:repeat(5,minmax(0,1fr))}.stats{grid-template-columns:repeat(4,minmax(0,1fr))}.gradegrid{grid-template-columns:repeat(5,minmax(0,1fr))}.formgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media print{header,.nav,.topnote,.actions,button,.noprint{display:none!important}body{background:#fff}main{padding:0}.panel{box-shadow:none;break-inside:avoid}}
 
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Myanmar', sans-serif;
-  background: var(--bg);
-  color: var(--ink);
-}
-
-header {
-  background: white;
-  padding: 24px 16px 16px;
-  text-align: center;
-}
-
-.logo-circle {
-  width: 72px;
-  height: 72px;
-  border: 2px dashed #94a3b8;
-  border-radius: 50%;
-  margin: 0 auto 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #64748b;
-  font-size: 11px;
-  font-weight: 700;
-  background: #f8fafc;
-  line-height: 1.2;
-}
-
-.school-title {
-  font-size: clamp(18px, 4vw, 24px);
-  font-weight: 900;
-  color: var(--navy);
-  letter-spacing: 0.5px;
-}
-
-.subtitle {
-  font-size: 13px;
-  font-weight: 800;
-  color: #475569;
-  letter-spacing: 1px;
-  margin-top: 4px;
-}
-
-.location {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 3px;
-}
-
-.wrap {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 16px;
-}
-
-/* Tabs Toggle UI */
-.tab-toggle {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.tab-btn {
-  padding: 14px;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 800;
-  text-align: center;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: all 0.2s;
-}
-
-.tab-btn.active-blue {
-  background: #eef5ff;
-  color: var(--navy);
-  border-color: #2563eb;
-}
-
-.tab-btn.light-green {
-  background: #e8f8f0;
-  color: #166534;
-}
-
-.section-label {
-  text-align: center;
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 16px;
-}
-
-/* 5 Stats Cards Row */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-  margin-bottom: 24px;
-}
-
-.stat-card {
-  border-radius: 14px;
-  padding: 14px 4px;
-  text-align: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.stat-card .lbl {
-  font-size: clamp(10px, 2.3vw, 12px);
-  font-weight: 700;
-  line-height: 1.3;
-}
-
-.stat-card .val {
-  font-size: clamp(20px, 4vw, 26px);
-  font-weight: 900;
-  margin-top: 6px;
-}
-
-.c-blue { background: var(--blue-light); color: #1d4ed8; }
-.c-green { background: var(--green-light); color: #15803d; }
-.c-red { background: var(--red-light); color: #b91c1c; }
-.c-yellow { background: var(--yellow-light); color: #b45309; }
-.c-purple { background: var(--purple-light); color: #7e22ce; }
-
-.section-heading {
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--navy);
-  margin: 16px 0 12px;
-}
-
-/* Main 4 Menu Buttons Grid */
-.menu-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.menu-btn {
-  background: var(--navy);
-  color: white;
-  border: 0;
-  border-radius: 12px;
-  padding: 18px 12px;
-  font-size: 15px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(25, 59, 99, 0.15);
-  transition: transform 0.1s;
-}
-
-.menu-btn:active { transform: scale(0.98); }
-
-.footer-credits {
-  text-align: center;
-  font-size: 11px;
-  color: #94a3b8;
-  margin-top: 30px;
-}
-
-/* Internal Page Panels */
-.panel {
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-}
-
-.panel h2 {
-  font-size: 17px;
-  color: var(--navy);
-  margin: 0 0 14px;
-}
-
-.page { display: none; }
-.page.active { display: block; }
-
-.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
-.field { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 130px; margin-bottom: 8px; }
-.field label { font-size: 12px; font-weight: 750; color: #475569; }
-
-input, select, textarea {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  background: white;
-  color: #1e293b;
-  font: inherit;
-  font-size: 13px;
-}
-textarea { min-height: 120px; resize: vertical; }
-
-.btn {
-  border: 0;
-  border-radius: 8px;
-  padding: 10px 14px;
-  font: inherit;
-  font-weight: 750;
-  font-size: 13px;
-  cursor: pointer;
-  background: var(--navy);
-  color: white;
-}
-.btn.light { background: #e2e8f0; color: var(--navy); }
-.btn-green { background: #16a34a; color: white; border: 0; padding: 10px 14px; border-radius: 8px; font-weight: 750; cursor: pointer; }
-.btn-red { background: #dc2626; color: white; border: 0; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; }
-
-.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
-table { border-collapse: collapse; width: 100%; min-width: 680px; background: white; }
-th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #f1f5f9; font-size: 12px; vertical-align: middle; }
-th { background: #f1f5f9; color: var(--navy); font-weight: 800; white-space: nowrap; }
-
-.notice {
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: #eff6ff;
-  color: #1e40af;
-  font-size: 12px;
-  margin: 10px 0;
-  line-height: 1.5;
-}
-
-.summary-card {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  color: #166534;
-  padding: 12px;
-  border-radius: 10px;
-  font-size: 13px;
-  line-height: 1.6;
-  margin-top: 12px;
-}
-
-.toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #0f172a;
-  color: white;
-  padding: 10px 18px;
-  border-radius: 20px;
-  display: none;
-  z-index: 100;
-  font-size: 13px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.hidden { display: none !important; }
-</style>
-</head>
-<body>
-
-<header>
-  <div class="logo-circle">LOGO<br>HERE</div>
-  <div class="school-title">CHINDWIN FUTURE BRIGHT SCHOOL</div>
-  <div class="subtitle">STUDENT ATTENDANCE DASHBOARD</div>
-  <div class="location">Budalin Township</div>
-</header>
-
-<main class="wrap">
-
-  <!-- HOME PAGE -->
-  <div id="home" class="page active">
-    <div class="tab-toggle">
-      <div class="tab-btn active-blue" onclick="openPage('attendance')">နေ့စဉ်</div>
-      <div class="tab-btn light-green" onclick="openPage('reports')">လစဉ်</div>
-    </div>
-
-    <div class="section-label" id="homeDateLabel">နေ့စွဲအလိုက် တက်ရောက်မှုစာရင်း</div>
-
-    <div class="stats-grid">
-      <div class="stat-card c-blue">
-        <div class="lbl">ကျောင်းသား<br>စုစုပေါင်း</div>
-        <div class="val" id="totalN">0</div>
-      </div>
-      <div class="stat-card c-green">
-        <div class="lbl">တက်ရောက်သူ</div>
-        <div class="val" id="presentN">0</div>
-      </div>
-      <div class="stat-card c-red">
-        <div class="lbl">ပျက်ကွက်သူ</div>
-        <div class="val" id="absentN">0</div>
-      </div>
-      <div class="stat-card c-yellow">
-        <div class="lbl">ခွင့်</div>
-        <div class="val" id="leaveN">0</div>
-      </div>
-      <div class="stat-card c-purple">
-        <div class="lbl">ခွင့်မဲ့/နောက်ကျ</div>
-        <div class="val" id="unexcusedN">0</div>
-      </div>
-    </div>
-
-    <div class="section-heading">အဓိက မီနူးများ</div>
-
-    <div class="menu-grid">
-      <button class="menu-btn" onclick="openPage('students')"><span>👨‍🎓</span> ကျောင်းသားစာရင်း</button>
-      <button class="menu-btn" onclick="openPage('attendance')"><span>📋</span> တက်ရောက်မှု</button>
-      <button class="menu-btn" onclick="openPage('sms')"><span>💬</span> အတန်းပိုင် SMS</button>
-      <button class="menu-btn" onclick="openPage('reports')"><span>📊</span> လစဉ်အစီရင်ခံစာ</button>
-    </div>
-
-    <div class="panel">
-      <h2>ယနေ့ အတန်းလိုက် အခြေအနေ</h2>
-      <div id="classSummary"></div>
-    </div>
-
-    <div class="panel">
-      <h2>ဒေတာ Backup / Restore</h2>
-      <div class="row">
-        <button class="btn" onclick="backupData()">Backup ဖိုင်ထုတ်ရန်</button>
-        <label class="btn light" style="display:inline-flex;align-items:center;cursor:pointer">
-          Backup ပြန်ထည့်ရန်
-          <input type="file" accept="application/json,.json" class="hidden" onchange="restoreData(event)">
-        </label>
-        <button class="btn light" onclick="exportCSV()">ကျောင်းသားစာရင်း CSV</button>
-      </div>
-    </div>
-
-    <div class="footer-credits">CHINDWIN FUTURE BRIGHT SCHOOL · Attendance Dashboard</div>
-  </div>
-
-  <!-- STUDENTS PAGE -->
-  <section id="students" class="page">
-    <button class="btn light" style="margin-bottom:12px;" onclick="goBack()">← နောက်သို့</button>
-
-    <div class="panel">
-      <h2>ကျောင်းသားစာရင်း စီမံရန်</h2>
-      <form id="studentForm">
-        <input id="editId" type="hidden">
-        <div class="row">
-          <div class="field"><label>အတန်း</label><select id="stClass" required></select></div>
-          <div class="field"><label>ကျောင်းဝင်အမှတ်</label><input id="stCode" required placeholder="ဥပမာ 501"></div>
-          <div class="field"><label>ကျောင်းသားအမည်</label><input id="stName" required placeholder="အမည်"></div>
-        </div>
-        <div class="row">
-          <div class="field"><label>မွေးသက္ကရာဇ် (ရက်.လ.ခုနှစ်)</label><input id="stDOB" placeholder="ဥပမာ 15.01.2012"></div>
-          <div class="field"><label>မိဘအမည်</label><input id="stParent" placeholder="မိဘအမည်"></div>
-          <div class="field"><label>ဖုန်းနံပါတ်</label><input id="stPhone" inputmode="tel" placeholder="ဖုန်းနံပါတ်"></div>
-        </div>
-        <div class="row">
-          <div class="field"><label>ကျား / မ</label><select id="stGender"><option value="ကျား">ကျား</option><option value="မ">မ</option></select></div>
-          <div class="field" style="flex:2;"><label>နေရပ်လိပ်စာ</label><input id="stAddress" placeholder="နေရပ်လိပ်စာ အပြည့်အစုံ"></div>
-        </div>
-        <div class="row" style="margin-top:8px;">
-          <button class="btn" type="submit">သိမ်းရန်</button>
-          <button class="btn light" type="button" onclick="clearStudentForm()">အသစ်ဖြည့်ရန်</button>
-        </div>
-      </form>
-    </div>
-
-    <div class="panel">
-      <h2>ကျောင်းသားစာရင်းဇယား</h2>
-      <div class="row" style="margin-bottom:12px;">
-        <div class="field">
-          <label>အတန်းရွေးရန်</label>
-          <select id="sfClass" onchange="renderStudents()"></select>
-        </div>
-        <div class="field" style="flex:2;">
-          <label>ရှာဖွေရန် (အမည် / ကျောင်းဝင်အမှတ်)</label>
-          <input id="sSearch" placeholder="ရှာဖွေရန်..." oninput="renderStudents()">
-        </div>
-      </div>
-      <div class="notice">မှတ်ချက် - ကျား စာရင်းကို ကျောင်းဝင်အမှတ် ငယ်စဉ်ကြီးလိုက် အရင်ပြပြီး၊ မ စာရင်းကို အောက်တွင် ကျောင်းဝင်အမှတ် ငယ်စဉ်ကြီးလိုက် အစဉ်လိုက် ပြပေးထားပါသည်။</div>
-      <div id="studentTable"></div>
-    </div>
-  </section>
-
-  <!-- ATTENDANCE PAGE -->
-  <section id="attendance" class="page">
-    <button class="btn light" style="margin-bottom:12px;" onclick="goBack()">← နောက်သို့</button>
-    <div class="panel">
-      <h2>နေ့စဉ် တက်ရောက်မှုမှတ်တမ်း</h2>
-      <div class="row">
-        <div class="field"><label>ရက်စွဲ</label><input type="date" id="attDate"></div>
-        <div class="field"><label>အတန်း</label><select id="attClass"></select></div>
-        <button class="btn" onclick="renderAttendance()">စာရင်းပြရန်</button>
-      </div>
-
-      <div id="attendanceTable" style="margin-top:12px;"></div>
-
-      <div id="attendanceSummaryBox" class="summary-card"></div>
-
-      <!-- ပျက်ကွက်သူများစာရင်း သီးသန့်ဇယား -->
-      <div class="panel" style="margin-top:16px; border:1px solid #fecaca; background:#fff5f5;">
-        <h3 style="color:#b91c1c; font-size:15px; margin-top:0;">🚫 ယနေ့ ပျက်ကွက်သူများစာရင်း</h3>
-        <div id="absentStudentsTable"></div>
-      </div>
-
-      <div class="row" style="margin-top:14px;">
-        <button class="btn-green" onclick="saveAttendance()">တက်ရောက်မှု သိမ်းရန်</button>
-        <button class="btn light" onclick="setAllStatus('present')">အားလုံးတက်</button>
-        <button class="btn light" onclick="setAllStatus('absent')">အားလုံးပျက်</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- SMS PAGE -->
-  <section id="sms" class="page">
-    <button class="btn light" style="margin-bottom:12px;" onclick="goBack()">← နောက်သို့</button>
-    <div class="panel">
-      <h2>အတန်းပိုင် SMS ကူးထည့်ရန်</h2>
-      <div class="notice">အတန်းပိုင်ဆရာ/မထံမှ မက်ဆေ့ကို Paste လုပ်လိုက်သည်နှင့် တက်ရောက်မှုများကို အလိုအလျောက် (Auto) စစ်ဆေးပြီး သိမ်းဆည်းရန် အသင့်ဖြစ်ပါမည်။</div>
-      <div class="row">
-        <div class="field"><label>အတန်း</label><select id="smsClass"></select></div>
-        <div class="field"><label>ရက်စွဲ</label><input type="date" id="smsDate"></div>
-      </div>
-      <div class="field">
-        <label>SMS စာသား</label>
-        <textarea id="smsText" placeholder="ဥပမာ -&#10;Grade 5&#10;501 - တက်&#10;502 - ပျက်&#10;503 - ခွင့်&#10;504 - နောက်ကျ" oninput="parseSMSAuto()"></textarea>
-      </div>
-      <div id="smsPreview"></div>
-      <div class="row" style="margin-top:12px;">
-        <button class="btn-green" onclick="saveSMS()">စစ်ဆေးပြီးသားစာရင်း အတည်ပြုသိမ်းရန်</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- REPORTS PAGE -->
-  <section id="reports" class="page">
-    <button class="btn light" style="margin-bottom:12px;" onclick="goBack()">← နောက်သို့</button>
-    <div class="panel">
-      <h2>လစဉ်အစီရင်ခံစာ (ကျောင်းခေါ်ကြိမ်နှင့် % တွက်ချက်မှု)</h2>
-      <div class="row">
-        <div class="field"><label>လ</label><input type="month" id="reportMonth"></div>
-        <div class="field"><label>အတန်း</label><select id="reportClass" onchange="renderReports()"></select></div>
-        <button class="btn" onclick="renderReports()">အစီရင်ခံစာကြည့်ရန်</button>
-        <button class="btn light" onclick="window.print()">Print</button>
-      </div>
-      <div class="notice">မှတ်ချက် - တစ်လလျှင် ပုံမှန်ကျောင်းဖွင့်ရက် (၂၀) ရက်၊ တစ်ရက်လျှင် နံနက်/နေ့လယ် (၂) ကြိမ်နှုန်းဖြင့် စုစုပေါင်း ပုံမှန်ကျောင်းခေါ်ကြိမ် (၄၀) အပေါ် အခြေခံတွက်ချက်ပါသည်။</div>
-      <div id="reportOutput" style="margin-top:12px;"></div>
-    </div>
-  </section>
-
-</main>
-
-<div class="toast" id="toast"></div>
-
+/* CFBS visual refresh — CSS only; preserve existing HTML IDs, handlers and JavaScript */
+body{background:#f3f6fc;color:#243247}
+header{background:#f3f6fc;color:#193b63;padding:26px 14px 18px}
+header .brand{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;max-width:1150px;margin:auto}
+.logo{width:88px;height:88px;flex-shrink:0;border:2px dashed #c4d0dd;border-radius:50%;background:#fff;color:#193b63;display:grid;place-items:center;font-size:36px;box-shadow:0 3px 12px #193b630c}
+header h1{font-size:clamp(20px,3.5vw,34px);font-weight:800;letter-spacing:.2px;margin:8px 0 5px;color:#193b63}
+header p{font-size:14px;color:#66778c;margin:5px 0}
+header p:first-of-type{font-weight:800;letter-spacing:.8px;font-size:clamp(12px,2vw,17px)}
+main{max-width:1200px;margin:auto;padding:14px}
+.topnote{background:#eaf2fc;color:#37536f;border:1px solid #d9e7f7;border-radius:14px;padding:12px 14px}
+.nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+.nav button{background:#193b63;color:#fff;border:1px solid #193b63;text-align:center;min-height:66px;font-weight:750;border-radius:15px;box-shadow:0 5px 14px #193b6314;padding:12px 10px}
+.nav button.active{background:#285889;color:#fff;border-color:#285889;box-shadow:0 0 0 2px #c7dced inset}
+.nav span{font-size:11px;margin-top:5px;color:#e1ebf7}
+.panel{background:#fff;border:1px solid #e6edf6;border-radius:16px;padding:15px;margin-bottom:14px;box-shadow:0 5px 18px #17365b0a}
+h2{font-size:17px;color:#243b59;margin:0 0 13px}h3{color:#344b67}
+button{border-radius:11px;background:#193b63;transition:filter .15s ease}
+button.secondary{background:#e6edf6;color:#243247}
+button.green{background:#188052}button.danger{background:#b8424b}
+.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.stat{border-radius:15px;padding:14px;background:#e2efff}
+.stat small{font-weight:650;color:#425773;line-height:1.5}
+.stat strong{font-size:28px;color:#285889}
+.stat.green{background:#e1f5e9}.stat.green strong{color:#26754e}
+.stat.red{background:#ffebec}.stat.red strong{color:#b94b52}
+.stat.yellow{background:#fff5d8}.stat.yellow strong{color:#8a6a16}
+.stat:nth-child(5){background:#f0e8ff}.stat:nth-child(5) strong{color:#7250a4}
+input,select,textarea{border-color:#d4deea;border-radius:10px;padding:11px}
+input:focus,select:focus,textarea:focus{outline:2px solid #c4dcf6;border-color:#6e9bc8}
+th{background:#eaf1fa;color:#193b63}th,td{padding:10px 9px}
+.tablewrap{border-color:#e1e8f1;border-radius:12px}
+.grade{border-radius:12px;background:#edf4fd;border-color:#d8e6f6;padding:12px 5px}
+.tag{background:#e5f2ff;color:#285889}
+.footer{padding:18px}
+@media(min-width:700px){.nav{grid-template-columns:repeat(5,minmax(0,1fr))}.stats{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(max-width:380px){header h1{font-size:19px}.logo{width:76px;height:76px}.nav button{font-size:13px;padding:10px 7px}.stat{padding:11px}.stat small{font-size:11px}}
+</style></head><body>
+<header><div class="brand"><div class="logo">🎓</div><div><h1>CHINDWIN FUTURE BRIGHT SCHOOL</h1><p>STUDENT ATTENDANCE DASHBOARD</p><p>Budalin Township</p></div></div></header>
+<main><div class="topnote">ကျောင်းသားစာရင်း၊ နေ့စဉ်တက်ရောက်မှု၊ အတန်းပိုင် SMS လက်ခံခြင်းနှင့် လစဉ်အစီရင်ခံစာကို တစ်နေရာတည်းတွင် စီမံရန်။ နမူနာအမည်များသည် စမ်းသပ်ရန်သာဖြစ်ပြီး KG မှ Grade 12 အထိ အတန်းတိုင်းတွင် နမူနာကျောင်းသား ၃ ဦးစီ ပါဝင်သည်။ ကျောင်း၏ အမှန်တကယ်စာရင်းဖြင့် အစားထိုးပါ။ Backup ကို ပုံမှန်ထုတ်ထားပါ။</div>
+<nav class="nav"><button data-page="home" class="active">📊 Dashboard<span>နေ့ / လ စာရင်းချုပ်</span></button><button data-page="students">👨‍🎓 ကျောင်းသားစာရင်း<span>အချက်အလက်အပြည့်အစုံ</span></button><button data-page="attendance">📅 တက်ရောက်မှု<span>အတန်းလိုက် ဇယား</span></button><button data-page="sms">📩 အတန်းပိုင် SMS<span>SMS ကူးထည့်ပြီး တိုက်စစ်ရန်</span></button><button data-page="monthly">📈 လစဉ်အစီရင်ခံစာ<span>လအလိုက်ကြည့်ရန်</span></button></nav>
+<section id="home" class="page">
+<div class="panel summaryhead"><h2>📌 ယနေ့ / ရက်အလိုက် စာရင်းချုပ်</h2><div class="row"><div class="field"><label>ရက်စွဲရွေးရန်</label><input id="homeDate" type="date"></div><div class="field"><label>လအလိုက် အမြန်ကြည့်ရန်</label><input id="homeMonth" type="month"></div></div><div class="stats"><div class="stat"><small>ကျောင်းသားစုစုပေါင်း</small><strong id="total">0</strong></div><div class="stat green"><small>တက်ရောက်သူ</small><strong id="present">0</strong></div><div class="stat red"><small>ပျက် / ခွင့်မဲ့</small><strong id="absent">0</strong></div><div class="stat yellow"><small>ခွင့် / နောက်ကျ</small><strong id="leaveLate">0</strong></div></div><div class="tablewrap"><table><thead><tr><th>အခြေအနေ</th><th>ကျောင်းသားအရေအတွက်</th></tr></thead><tbody id="todaySummary"></tbody></table></div><p class="muted">“မမှတ်ရသေး” သည် ပျက်ကွက်ဟု မဆိုလိုပါ။ အတန်းပိုင်စာရင်း မထည့်ရသေးသောကျောင်းသားများကို သီးခြားပြထားသည်။</p></div>
+<div class="panel" id="homeSmsPanel"><h2>📩 အတန်းပိုင်ဆီက SMS ကို ဒီမှာကူးထည့်ပါ</h2><p class="muted">အတန်းပိုင်ဆရာ/မ ပို့လာသော နေ့စဉ်အစီရင်ခံစာကို SMS မှ Copy လုပ်ပြီး ဒီအကွက်ထဲ Paste လုပ်ပါ။ ပြီးလျှင် စစ်ဆေးရန် နှိပ်ပါ။</p><textarea id="homeSmsText" rows="6" placeholder="အတန်းပိုင်ပို့လာသော SMS ကို ဒီနေရာမှာ ကူးထည့်ပါ..."></textarea><div class="actions"><button onclick="parseHomeTeacherSMS()">🔎 SMS ကို စစ်ဆေးရန်</button><button class="secondary" onclick="document.getElementById('homeSmsText').value=''">ရှင်းရန်</button></div></div>
+<div class="panel"><h2>🏫 ရွေးထားသောနေ့ — အတန်းအလိုက် တက်ရောက်မှု</h2><div id="dailyClassTable"></div><div class="actions"><button onclick="setPage('attendance')">တက်ရောက်မှု ဖြည့်ရန်</button><button class="secondary" onclick="window.print()">🖨️ ပုံနှိပ်ရန်</button></div></div>
+<div class="panel"><h2>📚 အတန်းအလိုက် အမြန်ရွေးရန်</h2><div id="gradeGrid" class="gradegrid"></div></div>
+<div class="panel"><h2>📅 ရွေးထားသောလ — စာရင်းချုပ်</h2><div id="homeMonthTable"></div></div>
+</section>
+<section id="students" class="page hidden"><div class="panel"><div class="actions"><button onclick="toggleStudentForm()" id="studentFormToggle">＋ ကျောင်းသားစာရင်းဖြည့်သွင်းရန်</button></div><div id="studentFormWrap" class="hidden"><h2>👨‍🎓 ကျောင်းသားအချက်အလက် ဖြည့်သွင်းရန်</h2><input id="editId" type="hidden"><div class="formgrid">
+<div class="field"><label>ကျောင်းဝင်အမှတ် *</label><input id="sid" placeholder="ဥပမာ 0001"></div><div class="field"><label>ကျောင်းသားအမည် *</label><input id="sname" placeholder="အမည်အပြည့်အစုံ"></div><div class="field"><label>ကျား / မ</label><select id="gender"><option value="ကျား">ကျား</option><option value="မ">မ</option></select></div>
+<div class="field"><label>မွေးသက္ကရာဇ်</label><input id="dob" type="date"></div><div class="field"><label>အတန်း *</label><select id="studentClass"></select></div><div class="field"><label>ကျောင်းအပ်သည့်ရက်</label><input id="admissionDate" type="date"></div>
+<div class="field"><label>မိဘ / အုပ်ထိန်းသူအမည်</label><input id="parentName" placeholder="မိဘအမည်"></div><div class="field"><label>မိဘဖုန်းနံပါတ်</label><input id="phone" type="tel" placeholder="09xxxxxxxxx"></div><div class="field"><label>ကျောင်းသားအခြေအနေ</label><select id="active"><option value="true">တက်ရောက်ဆဲ</option><option value="paused">ယာယီရပ်နား</option><option value="false">ကျောင်းထွက်</option></select></div><div class="field" style="grid-column:1/-1"><label>နေရပ်လိပ်စာ / မှတ်ချက်</label><textarea id="address" placeholder="နေရပ်လိပ်စာနှင့် လိုအပ်သောမှတ်ချက်"></textarea></div>
+</div><div class="actions"><button class="green" onclick="saveStudentForm()">💾 သိမ်းရန်</button><button class="secondary" onclick="clearStudentForm()">အသစ်ဖြည့်ရန်</button><button class="secondary" onclick="downloadBackup()">Backup ထုတ်ရန်</button><label class="secondary" style="display:inline-block;padding:9px 12px;border-radius:8px;cursor:pointer">Backup ပြန်ထည့်ရန်<input type="file" id="restoreFile" accept="application/json" style="display:none"></label></div><p class="muted">* လу тэмдэглэсэн талбаруудыг бөглөнө үү။ ကျောင်းသားစာရင်းနှင့် တက်ရောက်မှုမှတ်တမ်းများကို ဤ Browser ထဲတွင် သိမ်းထားမည်။</p></div></div>
+<div class="panel"><h2>📋 ကျောင်းသားစာရင်း</h2><div class="row"><div class="field"><label>အတန်းရွေးရန်</label><select id="listClass"></select></div><div class="field"><label>အမည် / ကျောင်းဝင်အမှတ် ရှာရန်</label><input id="search" placeholder="ရှာရန်..."></div><div class="field"><label>ကျောင်းသားအခြေအနေ</label><select id="listStatus"><option value="current">လက်ရှိတက်ရောက်ဆဲ</option><option value="all">အားလုံး</option></select></div></div><div class="stats"><div class="stat"><small>အတန်းရှိစာရင်း</small><strong id="classTotal">0</strong></div><div class="stat"><small>ကျား</small><strong id="boys">0</strong></div><div class="stat"><small>မ</small><strong id="girls">0</strong></div><div class="stat"><small>အတန်း</small><strong id="className">KG</strong></div></div><div id="studentTable"></div></div></section>
+<section id="attendance" class="page hidden"><div class="panel"><h2>📅 တက်ရောက်မှု — အတန်းလိုက် ဇယား</h2><div class="row"><div class="field"><label>ရက်စွဲ</label><input id="attDate" type="date"></div><div class="field"><label>အတန်းရွေးမယ်</label><select id="attClass"></select></div></div><div class="stats"><div class="stat"><small>အတန်းကျောင်းသား</small><strong id="attTotal">0</strong></div><div class="stat green"><small>တက်</small><strong id="attPresent">0</strong></div><div class="stat red"><small>ပျက် / ခွင့်မဲ့</small><strong id="attAbsent">0</strong></div><div class="stat yellow"><small>မမှတ်ရသေး</small><strong id="attPending">0</strong></div></div><p class="muted">အတန်းရွေးပြီး အတန်းပိုင်ပို့သော SMS ကို စစ်ဆေးပြီး သိမ်းထားသော အခြေအနေများကို ဒီဇယားတွင် ကြည့်နိုင်သည်။ ကျောင်းသားတစ်ဦးချင်းကို ကိုယ်တိုင်ရွေးစရာမလိုပါ။</p><div id="attendanceTable"></div><div class="actions"><button class="secondary" onclick="window.print()">🖨️ ဇယားပုံနှိပ်ရန်</button><button onclick="setPage('home')">စာရင်းချုပ်သို့</button></div></div></section>
+<section id="sms" class="page hidden">
+<div class="panel"><h2>📩 အတန်းပိုင်ဆီက ပို့လာတဲ့ SMS ကို ထည့်ရန်</h2>
+<p class="muted">အတန်းပိုင်ဆရာ/မ ပို့လာသော SMS ကို ကူးထည့်ပါ။ ပျက်ကွက်သူအမည်များကို အတန်းစာရင်းနှင့် တိုက်စစ်ပြီး ကျန်ကျောင်းသားများကို တက်ရောက်သူအဖြစ် အလိုအလျောက်သတ်မှတ်ပါမည်။ အမည်မကိုက်ညီခြင်း သို့မဟုတ် အရေအတွက်မကိုက်ညီခြင်းရှိပါက သိမ်းဆည်းမီ သတိပေးပါမည်။</p>
+<label for="smsText">အတန်းပိုင်ပို့လာသော SMS စာသား</label><textarea id="smsText" rows="10" placeholder="CHINDWIN FUTURE BRIGHT SCHOOL
+နေ့စဉ်တက်ရောက်မှုအစီရင်ခံစာ
+ရက်စွဲ = 26/10/2026
+အတန်း = KG
+စာရင်းရှိ = 30
+ပျက်ကွက်ကျောင်းသား = မောင်မောင်"></textarea>
+<div class="actions"><button onclick="parseTeacherSMS()">🔎 စာတိုဖတ်ယူပြီး စစ်ရန်</button><button class="secondary" onclick="clearTeacherSMS()">ရှင်းရန်</button></div><div id="smsReview"></div></div>
+</section>
+<section id="monthly" class="page hidden"><div class="panel"><h2>📈 လအလိုက် အစီရင်ခံစာ</h2><div class="row"><div class="field"><label>လရွေးရန်</label><input id="reportMonth" type="month"></div><div class="field"><label>အတန်းရွေးရန်</label><select id="reportClass"></select></div></div><div id="monthlyTable"></div><h3>ကျောင်းသားတစ်ဦးချင်း လစဉ်မှတ်တမ်း</h3><div class="row"><div class="field"><label>ကျောင်းသားရွေးရန်</label><select id="detailStudent"></select></div></div><div id="studentDetail"></div><div class="actions"><button onclick="window.print()">🖨️ ပုံနှိပ်ရန်</button><button class="secondary" onclick="downloadBackup()">Backup ထုတ်ရန်</button></div><p class="muted">လစဉ်အရေအတွက်သည် တက် % = (တက် + နောက်ကျ) ÷ မှတ်တမ်းရှိသည့်နေ့ × 100။ ပျက် % = (ပျက် + ခွင့်မဲ့) ÷ မှတ်တမ်းရှိသည့်နေ့ × 100။ ခွင့်ကို သီးခြားဖော်ပြပြီး မမှတ်ရသေးသည့်နေ့ကို ပျက်ကွက်ဟု မတွက်ပါ။</p></div></section>
+<div class="footer">CFBS Attendance Dashboard · Offline local storage</div></main>
 <script>
-const classes=['KG','Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6','Grade 7','Grade 8','Grade 9','Grade 10','Grade 11','Grade 12'];
-const statuses={present:'တက်',absent:'ပျက်',leave:'ခွင့်',unexcused:'ခွင့်မဲ့',late:'နောက်ကျ'};
-let students=[], attendance={}, smsPending=[], historyPages=['home'];
-
+const classes=["KG",...Array.from({length:12},(_,i)=>"Grade "+(i+1))];
+const statuses=[["present","တက်"],["absent","ပျက်"],["leave","ခွင့်"],["unexcused","ခွင့်မဲ့"],["late","နောက်ကျ"]];
+const statusLabel={present:"တက်",absent:"ပျက်",leave:"ခွင့်",unexcused:"ခွင့်မဲ့",late:"နောက်ကျ",pending:"မမှတ်ရသေး"};
+const names=[["မောင်မင်းခန့်","ကျား"],["မသဇင်","မ"],["မောင်ကောင်းမြတ်","ကျား"]];
+let db;try{db=JSON.parse(localStorage.getItem("CFBS_ATTENDANCE_DASHBOARD_V3")||localStorage.getItem("CFBS_DASHBOARD_DEMO_V1")||"null")}catch(e){}
+if(!db||!Array.isArray(db.students)){db={students:classes.flatMap((c,i)=>names.map((n,j)=>({id:c.replace(" ","")+"-"+(j+1),sid:""+(i+1).toString().padStart(2,"0")+(j+1).toString().padStart(2,"0"),name:["မောင်မင်းခန့်","မသဇင်","မောင်ကောင်းမြတ်"][((i+j)%3)],gender:j===1?"မ":"ကျား",className:c,active:true,parentName:"",phone:"",dob:"",admissionDate:"",address:""}))),records:{}}}
+if(!db.records)db.records={};db.students.forEach(s=>{if(s.active===undefined)s.active=true;if(!s.parentName)s.parentName="";if(!s.phone)s.phone="";if(!s.dob)s.dob="";if(!s.admissionDate)s.admissionDate="";if(!s.address)s.address=""});
 const $=id=>document.getElementById(id);
-const today=()=>{let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
-
-function load(){
-  try{
-    students=JSON.parse(localStorage.getItem('cfbs_att_students')||'[]');
-    attendance=JSON.parse(localStorage.getItem('cfbs_att_records')||'{}');
-  }catch(e){students=[];attendance={}}
-
-  if(!students.length){
-    let n=1;
-    classes.forEach((c,ci)=>{
-      for(let j=1;j<=3;j++){
-        students.push({
-          id:'s'+n++,cls:c,code:String((ci+1)*100+j),
-          name:['မောင်အောင်','မသီတာ','မောင်မင်း'][j-1]+' ('+c+')',
-          dob:'15.01.2012',parent:'ဦးဘ',phone:'0912345678',
-          gender:j===2?'မ':'ကျား',address:'မုံရွာမြို့'
-        })
-      }
-    });
-    persistStudents();
-  }
-  fillSelects();
-  $('attDate').value=today();$('smsDate').value=today();$('reportMonth').value=today().slice(0,7);
-  $('homeDateLabel').textContent='နေ့စွဲအလိုက် တက်ရောက်မှုစာရင်း ('+today()+')';
-  renderHome();renderStudents();renderAttendance();renderReports();
-}
-
-function persistStudents(){localStorage.setItem('cfbs_att_students',JSON.stringify(students))}
-function persistAttendance(){localStorage.setItem('cfbs_att_records',JSON.stringify(attendance))}
-
-function fillSelects(){
-  ['sfClass','stClass','attClass','smsClass','reportClass'].forEach(id=>{
-    let el=$(id),old=el.value;
-    el.innerHTML=(id==='sfClass'||id==='reportClass'?'<option value="ALL">အတန်းအားလုံး</option>':'')+classes.map(c=>`<option value="${c}">${c}</option>`).join('');
-    if([...el.options].some(o=>o.value===old))el.value=old
-  });
-  $('sfClass').value='ALL';$('reportClass').value='ALL';
-}
-
-function openPage(id){
-  if(!$(id))return;
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  $(id).classList.add('active');historyPages.push(id);window.scrollTo(0,0);
-  if(id==='students')renderStudents();
-  if(id==='attendance')renderAttendance();
-  if(id==='reports')renderReports();
-  renderHome();
-}
-
-function goBack(){
-  historyPages.pop();let id=historyPages.pop()||'home';
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  $(id).classList.add('active');historyPages.push(id);window.scrollTo(0,0);renderHome();
-}
-
-function toast(t){let el=$('toast');el.textContent=t;el.style.display='block';setTimeout(()=>el.style.display='none',2600)}
-function recKey(date,code){return date+'|'+code}
-function getStatus(date,code){return attendance[recKey(date,code)]||''}
-
-function calculateAge(dobStr){
-  if(!dobStr) return '-';
-  let parts = dobStr.split(/[\.\-\/]/);
-  if(parts.length!==3) return dobStr;
-  let d=parseInt(parts[0]), m=parseInt(parts[1]), y=parseInt(parts[2]);
-  if(y<100) y += (y>50?1900:2000);
-  let birthDate = new Date(y, m-1, d);
-  let todayDate = new Date();
-  let years = todayDate.getFullYear() - birthDate.getFullYear();
-  let months = todayDate.getMonth() - birthDate.getMonth();
-  if (months < 0 || (months === 0 && todayDate.getDate() < birthDate.getDate())) {
-    years--;
-    months += 12;
-  }
-  return `${years} နှစ် ${months} လ`;
-}
-
-function renderHome(){
-  let date=$('attDate').value||today(),todayList=students;
-  let counts={present:0,absent:0,leave:0,unexcused:0,late:0};
-  todayList.forEach(s=>{let st=getStatus(date,s.code);if(counts[st]!==undefined)counts[st]++});
-  $('totalN').textContent=students.length;
-  $('presentN').textContent=counts.present;
-  $('absentN').textContent=counts.absent;
-  $('leaveN').textContent=counts.leave;
-  $('unexcusedN').textContent=counts.unexcused+counts.late;
-
-  let tableHTML='<div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>စုစုပေါင်း</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက်%</th><th>ပျက်%</th></tr></thead><tbody>';
-  let tTotal=0, tPres=0, tAbs=0, tLeave=0, tUnex=0, tLate=0;
-
-  classes.forEach(c=>{
-    let list=students.filter(s=>s.cls===c);
-    if(list.length===0) return;
-    let x={present:0,absent:0,leave:0,unexcused:0,late:0};
-    list.forEach(s=>{let st=getStatus(date,s.code);if(x[st]!==undefined)x[st]++});
-    
-    let sumNotPresent = x.absent + x.leave + x.unexcused + x.late;
-    let pPct = list.length > 0 ? ((x.present/list.length)*100).toFixed(1) : '0.0';
-    let aPct = list.length > 0 ? ((sumNotPresent/list.length)*100).toFixed(1) : '0.0';
-
-    tTotal += list.length; tPres += x.present; tAbs += x.absent; tLeave += x.leave; tUnex += x.unexcused; tLate += x.late;
-
-    tableHTML += `<tr><td>${c}</td><td>${list.length}</td><td>${x.present}</td><td>${x.absent}</td><td>${x.leave}</td><td>${x.unexcused}</td><td>${x.late}</td><td>${pPct}%</td><td>${aPct}%</td></tr>`;
-  });
-
-  let totNotPres = tAbs + tLeave + tUnex + tLate;
-  let totPPct = tTotal > 0 ? ((tPres/tTotal)*100).toFixed(1) : '0.0';
-  let totAPct = tTotal > 0 ? ((totNotPres/tTotal)*100).toFixed(1) : '0.0';
-
-  tableHTML += `<tr style="background:#f1f5f9; font-weight:bold;"><td>စုစုပေါင်း</td><td>${tTotal}</td><td>${tPres}</td><td>${tAbs}</td><td>${tLeave}</td><td>${tUnex}</td><td>${tLate}</td><td>${totPPct}%</td><td>${totAPct}%</td></tr>`;
-  tableHTML += '</tbody></table></div>';
-  $('classSummary').innerHTML = tableHTML;
-}
-
-function renderStudents(){
-  let cls=$('sfClass').value||'ALL',q=($('sSearch').value||'').toLowerCase().trim();
-  let list=students.filter(s=>(cls==='ALL'||s.cls===cls)&&[s.name,s.code,s.parent,s.phone,s.address,s.dob].some(v=>(v||'').toLowerCase().includes(q)));
-  
-  list.sort((a,b)=>{
-    if(a.gender===b.gender){ return parseInt(a.code||0) - parseInt(b.code||0); }
-    return a.gender==='ကျား' ? -1 : 1;
-  });
-
-  $('studentTable').innerHTML=list.length?'<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>အတန်း</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>မွေးသက္ကရာဇ်</th><th>မိဘအမည်</th><th>ဖုန်းနံပါတ်</th><th>နေရပ်လိပ်စာ</th><th>ကျား/မ</th><th>လုပ်ဆောင်ရန်</th></tr></thead><tbody>'+list.map((s,i)=>`<tr><td>${i+1}</td><td>${s.cls}</td><td>${esc(s.code)}</td><td>${esc(s.name)}</td><td>${esc(s.dob||'')}</td><td>${esc(s.parent||'')}</td><td>${esc(s.phone||'')}</td><td>${esc(s.address||'')}</td><td>${s.gender||''}</td><td><div style="display:flex;gap:4px;white-space:nowrap;"><button class="btn light" style="padding:4px 8px;font-size:11px;" onclick="editStudent('${s.id}')">ပြင်</button><button class="btn-red" style="padding:4px 8px;font-size:11px;" onclick="deleteStudent('${s.id}')">ဖျက်</button></div></td></tr>`).join('')+'</tbody></table></div>':'<div style="text-align:center;padding:20px;color:var(--muted)">စာရင်းမတွေ့ပါ။</div>';
-}
-
-function clearStudentForm(){$('studentForm').reset();$('editId').value=''}
-
-$('studentForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  let id=$('editId').value,code=$('stCode').value.trim();
-  if(students.some(s=>s.code===code&&s.cls===$('stClass').value&&s.id!==id)){toast('ဒီအတန်းမှာ ကျောင်းဝင်အမှတ် ထပ်နေပါတယ်။');return}
-  let data={
-    id:id||('s'+Date.now()),
-    cls:$('stClass').value,
-    code,
-    name:$('stName').value.trim(),
-    dob:$('stDOB').value.trim(),
-    parent:$('stParent').value.trim(),
-    phone:$('stPhone').value.trim(),
-    address:$('stAddress').value.trim(),
-    gender:$('stGender').value
-  };
-  if(id)students=students.map(s=>s.id===id?data:s);else students.push(data);
-  persistStudents();clearStudentForm();renderStudents();renderHome();toast('ကျောင်းသားစာရင်း သိမ်းပြီးပါပြီ။');
-});
-
-function editStudent(id){
-  let s=students.find(x=>x.id===id);if(!s)return;
-  $('editId').value=s.id;$('stClass').value=s.cls;$('stCode').value=s.code;$('stName').value=s.name;
-  $('stDOB').value=s.dob||'';$('stParent').value=s.parent||'';$('stPhone').value=s.phone||'';
-  $('stAddress').value=s.address||'';$('stGender').value=s.gender||'ကျား';window.scrollTo(0,0);
-}
-
-function deleteStudent(id){
-  let s=students.find(x=>x.id===id);if(!s||!confirm(s.name+' ကို ဖျက်မှာ သေချာပါသလား။'))return;
-  students=students.filter(x=>x.id!==id);persistStudents();renderStudents();renderHome();toast('ဖျက်ပြီးပါပြီ။');
-}
-
+function today(){let d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function save(){try{localStorage.setItem("CFBS_ATTENDANCE_DASHBOARD_V3",JSON.stringify(db))}catch(e){alert("ဖုန်း Browser storage ပြည့်နေနိုင်သည်။ Backup ထုတ်ပြီး စစ်ဆေးပါ။")}}
+function list(c,includeInactive=false){return db.students.filter(s=>s.className===c&&(includeInactive||s.active===true||s.active===undefined))}
+function key(d,id){return d+"|"+id}function status(s,d){return db.records[key(d,s.id)]||"pending"}
+function tally(arr,d){let o={present:0,absent:0,leave:0,unexcused:0,late:0,pending:0};arr.forEach(s=>o[status(s,d)]++);return o}
+function fillSelect(id,all=false){$(id).innerHTML=(all?'<option value="ALL">အတန်းအားလုံး</option>':"")+classes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("")}
+function setPage(p){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hidden",x.id!==p));document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===p));if(p==="home")renderHome();if(p==="students")renderStudents();if(p==="attendance")renderAttendance();if(p==="monthly")renderMonthly();if(p==="sms"){}window.scrollTo({top:0,behavior:"smooth"})}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>setPage(b.dataset.page));
+function renderHome(){let d=$("homeDate").value||today(),m=$("homeMonth").value||d.slice(0,7),a=db.students.filter(s=>s.active===true||s.active===undefined),t=tally(a,d);$("total").textContent=a.length;$("present").textContent=t.present;$("absent").textContent=t.absent+t.unexcused;$("leaveLate").textContent=t.leave+t.late;$("todaySummary").innerHTML=statuses.map(([k,l])=>`<tr><td>${l}</td><td>${t[k]}</td></tr>`).join("")+`<tr><td>မမှတ်ရသေး</td><td>${t.pending}</td></tr>`;$("gradeGrid").innerHTML=classes.map(c=>`<button class="grade" onclick="openClass('${c}')">${c}<small>${list(c).length} ဦး</small></button>`).join("");let rows=classes.map(c=>{let ar=list(c),x=tally(ar,d);return `<tr><td>${c}</td><td>${ar.length}</td><td>${x.present}</td><td>${x.absent}</td><td>${x.leave}</td><td>${x.unexcused}</td><td>${x.late}</td><td>${x.pending}</td></tr>`}).join("");$("dailyClassTable").innerHTML=`<div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>စုစုပေါင်း</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>မမှတ်ရသေး</th></tr></thead><tbody>${rows}</tbody></table></div>`;let mr=classes.map(c=>{let ar=list(c),x=monthTally(ar,m);return `<tr><td>${c}</td><td>${ar.length}</td><td>${x.present}</td><td>${x.absent}</td><td>${x.leave}</td><td>${x.unexcused}</td><td>${x.late}</td></tr>`}).join("");$("homeMonthTable").innerHTML=`<div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>ကျောင်းသား</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th></tr></thead><tbody>${mr}</tbody></table></div>`}
+function openClass(c){$("studentClass").value=c;$("listClass").value=c;$("attClass").value=c;setPage("attendance")}
+function toggleStudentForm(force){let wrap=$("studentFormWrap"),show=typeof force==="boolean"?force:wrap.classList.contains("hidden");if(show&&!( $("editId").value)){}wrap.classList.toggle("hidden",!show);$("studentFormToggle").textContent=show?"− ဖြည့်သွင်းဖောင် ပိတ်ရန်":"＋ ကျောင်းသားစာရင်းဖြည့်သွင်းရန်";if(show)window.scrollTo({top:0,behavior:"smooth"})}
+function saveStudentForm(){let id=$("editId").value,sid=$("sid").value.trim(),name=$("sname").value.trim(),c=$("studentClass").value;if(!sid||!name){alert("ကျောင်းဝင်အမှတ်နှင့် ကျောင်းသားအမည် ဖြည့်ပါ။");return}if(db.students.some(s=>s.sid.toLowerCase()===sid.toLowerCase()&&s.id!==id)){alert("ဤကျောင်းဝင်အမှတ်ကို အသုံးပြုပြီးသားဖြစ်သည်။");return}let raw=$("active").value,active=raw==="true"?true:raw==="false"?false:"paused";let data={sid,name,gender:$("gender").value,className:c,dob:$("dob").value,admissionDate:$("admissionDate").value,parentName:$("parentName").value.trim(),phone:$("phone").value.trim(),address:$("address").value.trim(),active};if(id){let i=db.students.findIndex(s=>s.id===id);if(i>=0)db.students[i]={...db.students[i],...data}}else db.students.push({id:"stu"+Date.now()+Math.random().toString(16).slice(2,6),...data});save();clearStudentForm();renderStudents();renderHome();toggleStudentForm(false);alert("ကျောင်းသားအချက်အလက် သိမ်းပြီးပါပြီ။")}
+function clearStudentForm(){["editId","sid","sname","dob","admissionDate","parentName","phone","address"].forEach(id=>$(id).value="");$("gender").value="ကျား";$("active").value="true"}
+function editStudent(id){let s=db.students.find(x=>x.id===id);if(!s)return;toggleStudentForm(true);$("editId").value=s.id;$("sid").value=s.sid||"";$("sname").value=s.name||"";$("gender").value=s.gender||"ကျား";$("studentClass").value=s.className;$("dob").value=s.dob||"";$("admissionDate").value=s.admissionDate||"";$("parentName").value=s.parentName||"";$("phone").value=s.phone||"";$("address").value=s.address||"";$("active").value=s.active===false?"false":s.active==="paused"?"paused":"true";window.scrollTo({top:0,behavior:"smooth"})}
+function deleteStudent(id){let s=db.students.find(x=>x.id===id);if(!s)return;if(!confirm(`${s.name} ကို ကျောင်းသားစာရင်းမှ ဖယ်ရှားမလား။ တက်ရောက်မှုမှတ်တမ်းကိုတော့ မဖျက်ပါ။`))return;s.active=false;save();renderStudents();renderHome()}
+function renderStudents(){let c=$("listClass").value||"KG",q=$("search").value.trim().toLowerCase(),all=$("listStatus").value==="all",arr=db.students.filter(s=>s.className===c&&(all||s.active===true||s.active===undefined)).filter(s=>(s.name||"").toLowerCase().includes(q)||(s.sid||"").toLowerCase().includes(q));let active=list(c);$("classTotal").textContent=active.length;$("boys").textContent=active.filter(s=>s.gender==="ကျား").length;$("girls").textContent=active.filter(s=>s.gender==="မ").length;$("className").textContent=c;$("studentTable").innerHTML=arr.length?`<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>မွေးသက္ကရာဇ်</th><th>အတန်း</th><th>မိဘအမည်</th><th>ဖုန်း</th><th>အခြေအနေ</th><th>ပြင် / ဖယ်</th></tr></thead><tbody>${arr.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.sid)}</td><td>${esc(s.name)}</td><td>${esc(s.gender)}</td><td>${esc(s.dob||"-")}</td><td>${esc(s.className)}</td><td>${esc(s.parentName||"-")}</td><td>${esc(s.phone||"-")}</td><td>${s.active===false?"ကျောင်းထွက်":s.active==="paused"?"ယာယီရပ်နား":"တက်ရောက်ဆဲ"}</td><td><button class="secondary" onclick="editStudent('${s.id}')">ပြင်</button> <button class="danger" onclick="deleteStudent('${s.id}')">ဖယ်</button></td></tr>`).join("")}</tbody></table></div>`:'<p>စာရင်းမရှိပါ။ အပေါ်ကနေ ကျောင်းသားအသစ်ထည့်နိုင်သည်။</p>'}
 function renderAttendance(){
-  let cls=$('attClass').value||classes[0],date=$('attDate').value||today();
-  let list=students.filter(s=>s.cls===cls);
-  
-  list.sort((a,b)=>{
-    if(a.gender===b.gender) return parseInt(a.code||0) - parseInt(b.code||0);
-    return a.gender==='ကျား' ? -1 : 1;
-  });
+ const d=$("attDate").value||today();
+ const c=$("attClass").value||"KG";
+ const a=list(c);
+ const t=tally(a,d);
 
-  $('attendanceTable').innerHTML=list.length?'<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>အခြေအနေ</th></tr></thead><tbody>'+list.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.code)}</td><td>${esc(s.name)}</td><td>${s.gender||''}</td><td><select class="attStatus" data-code="${esc(s.code)}" onchange="updateAttendanceSummary()"><option value="">မရွေးရသေး</option>${Object.entries(statuses).map(([k,v])=>`<option value="${k}" ${getStatus(date,s.code)===k?'selected':''}>${v}</option>`).join('')}</select></td></tr>`).join('')+'</tbody></table></div>':'<div style="text-align:center;padding:20px;color:var(--muted)">ဒီအတန်းမှာ ကျောင်းသားမရှိပါ။</div>';
-  updateAttendanceSummary();
+ $("attTotal").textContent=a.length;
+ $("attPresent").textContent=t.present;
+ $("attAbsent").textContent=t.absent+t.unexcused;
+ $("attPending").textContent=t.pending;
+
+ const m=d.slice(0,7);
+
+ function studentMonth(s){
+   const counts={present:0,absent:0,leave:0,unexcused:0,late:0};
+   const keys=monthKeys(s.id,m);
+   keys.forEach(k=>{
+     const v=db.records[k];
+     if(counts[v]!==undefined)counts[v]++;
+   });
+   const n=keys.length;
+   return {
+     counts,
+     attendance:pct(counts.present+counts.late,n),
+     absence:pct(counts.absent+counts.unexcused,n),
+     days:n
+   };
+ }
+
+ $("attendanceTable").innerHTML=`
+ <div class="tablewrap">
+ <table style="min-width:1100px">
+ <thead>
+ <tr>
+ <th>စဉ်</th>
+ <th>ကျောင်းသားအမည်</th>
+ <th>အတန်း</th>
+ <th>ကျောင်းသားအမှတ်</th>
+ <th>ကျား/မ</th>
+ <th>တက်</th>
+ <th>ပျက်</th>
+ <th>ခွင့်</th>
+ <th>ခွင့်မဲ့</th>
+ <th>နောက်ကျ</th>
+ <th>တက် %</th>
+ <th>ပျက် %</th>
+ </tr>
+ </thead>
+ <tbody>
+ ${a.map((s,i)=>{
+   const current=status(s,d);
+   const mt=studentMonth(s);
+   return `<tr>
+   <td>${i+1}</td>
+   <td>${esc(s.name)}</td>
+   <td>${esc(s.className)}</td>
+   <td>${esc(s.sid)}</td>
+   <td>${esc(s.gender||"-")}</td>
+   <td>${mt.counts.present}</td>
+   <td>${mt.counts.absent}</td>
+   <td>${mt.counts.leave}</td>
+   <td>${mt.counts.unexcused}</td>
+   <td>${mt.counts.late}</td>
+   <td>${mt.days?mt.attendance+"%":"—"}</td>
+   <td>${mt.days?mt.absence+"%":"—"}</td>
+   </tr>
+   <tr>
+   <td colspan="12" style="background:#f8fafc;white-space:normal">
+   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+   <strong>${esc(s.name)} — ${esc(d)}</strong>
+   <label style="display:flex;align-items:center;gap:8px;margin:0">
+   ယနေ့အခြေအနေ
+   <select aria-label="${esc(s.name)} တက်ရောက်မှု"
+   style="width:auto;min-width:125px"
+   onchange="mark('${String(s.id).replace(/['\\\\]/g,'')}',this.value)">
+   <option value="pending" ${current==="pending"?"selected":""}>မမှတ်ရသေး</option>
+   ${statuses.map(([k,l])=>`<option value="${k}" ${current===k?"selected":""}>${l}</option>`).join("")}
+   </select>
+   </label>
+   </div>
+   </td>
+   </tr>`;
+ }).join("")||'<tr><td colspan="12">ဤအတန်းတွင် ကျောင်းသားစာရင်းမရှိပါ။</td></tr>'}
+ </tbody>
+ </table>
+ </div>
+ <p class="muted">အထက်ပါအရေအတွက်နှင့် ရာခိုင်နှုန်းများသည် ရွေးထားသောလအတွက် ဖြစ်သည်။ ယနေ့အခြေအနေကို ရွေးလိုက်လျှင် မှတ်တမ်းကို အလိုအလျောက်သိမ်းဆည်းပါမည်။ ဖုန်းတွင် ဇယားကို ဘေးတိုက်ရွှေ့ကြည့်နိုင်သည်။</p>`;
 }
 
-function updateAttendanceSummary(){
-  let cls=$('attClass').value||classes[0],date=$('attDate').value||today();
-  let list=students.filter(s=>s.cls===cls);
-  let totalB=list.filter(s=>s.gender==='ကျား').length, totalG=list.filter(s=>s.gender==='မ').length;
-  let presentB=0, presentG=0, absentB=0, absentG=0;
-  let absentStudentsList = [];
-
-  document.querySelectorAll('.attStatus').forEach(el=>{
-    let code=el.dataset.code, st=el.value;
-    let s=list.find(x=>x.code===code);
-    if(!s)return;
-    if(st==='present'){
-      if(s.gender==='ကျား') presentB++; else presentG++;
-    } else if(st==='absent'||st==='unexcused'||st==='late'||st==='leave'){
-      if(s.gender==='ကျား') absentB++; else absentG++;
-      if(st==='absent'||st==='unexcused'){
-        absentStudentsList.push(s);
-      }
-    }
-  });
-
-  let totalAll=totalB+totalG, presentAll=presentB+presentG, absentAll=absentB+absentG;
-  let presentPct = totalAll > 0 ? ((presentAll/totalAll)*100).toFixed(1) : 0;
-  let absentPct = totalAll > 0 ? ((absentAll/totalAll)*100).toFixed(1) : 0;
-
-  $('attendanceSummaryBox').innerHTML=`<strong>အတန်းလိုက် စာရင်းချုပ် (${cls})</strong><br>
-  • စာရင်းရှိ = ကျား - ${totalB} + မ - ${totalG} = စုစုပေါင်း - ${totalAll}<br>
-  • တက်ရောက် = ကျား - ${presentB} + မ - ${presentG} = စုစုပေါင်း - ${presentAll} (တက် ${presentPct}%)<br>
-  • ပျက်/ခွင့်/နောက်ကျ = ကျား - ${absentB} + မ - ${absentG} = စုစုပေါင်း - ${absentAll} (ပျက် ${absentPct}%)`;
-
-  // Render Absent Students Table
-  if(absentStudentsList.length > 0){
-    $('absentStudentsTable').innerHTML = '<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>အတန်း</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th></tr></thead><tbody>' + absentStudentsList.map((s,i)=>`<tr><td>${i+1}</td><td>${s.cls}</td><td>${esc(s.code)}</td><td>${esc(s.name)}</td></tr>`).join('') + '</tbody></table></div>';
-  } else {
-    $('absentStudentsTable').innerHTML = '<div style="color:#166534; font-size:12px; padding:6px;">ယနေ့ ပျက်ကွက်သူ မရှိပါ။</div>';
-  }
+function mark(id,k){let d=$("attDate").value||today(),kk=key(d,id);if(k==="pending")delete db.records[kk];else db.records[kk]=k;save();renderAttendance();renderHome()}
+function monthTally(arr,m){let t={present:0,absent:0,leave:0,unexcused:0,late:0};Object.keys(db.records).forEach(k=>{if(!k.startsWith(m+"-"))return;let id=k.split("|")[1];if(!arr.some(s=>s.id===id))return;let v=db.records[k];if(t[v]!==undefined)t[v]++});return t}
+function monthKeys(id,m){return Object.keys(db.records).filter(k=>k.startsWith(m+"-")&&k.endsWith("|"+id)&&["present","absent","leave","unexcused","late"].includes(db.records[k])).sort()}
+function pct(n,d){return d?Math.round(n/d*1000)/10:0}
+function renderMonthly(){
+ let m=$("reportMonth").value||today().slice(0,7),c=$("reportClass").value||"ALL";
+ let active=db.students.filter(s=>s.active===true||s.active===undefined),arr=(c==="ALL"?active:active.filter(s=>s.className===c)).slice().sort((a,b)=>classes.indexOf(a.className)-classes.indexOf(b.className)||(a.sid||"").localeCompare(b.sid||""));
+ let clsList=c==="ALL"?classes:[c];
+ let classRows=clsList.map(cl=>{let a=list(cl),t=monthTally(a,m),n=Object.values(t).reduce((x,y)=>x+y,0),att=pct(t.present+t.late,n),abs=pct(t.absent+t.unexcused,n);return `<tr><td>${esc(cl)}</td><td>${a.length}</td><td>${t.present}</td><td>${t.absent}</td><td>${t.leave}</td><td>${t.unexcused}</td><td>${t.late}</td><td>${n?att+"%":"—"}</td><td>${n?abs+"%":"—"}</td></tr>`}).join("");
+ let studentRows=arr.map(s=>{let t={present:0,absent:0,leave:0,unexcused:0,late:0},keys=monthKeys(s.id,m);keys.forEach(k=>{t[db.records[k]]++});let n=keys.length,att=pct(t.present+t.late,n),abs=pct(t.absent+t.unexcused,n);return `<tr><td>${esc(s.name)}</td><td>${esc(s.className)}</td><td>${esc(s.sid)}</td><td>${esc(s.gender||"-")}</td><td>${t.present}</td><td>${t.absent}</td><td>${t.leave}</td><td>${t.unexcused}</td><td>${t.late}</td><td>${n?att.toFixed(1)+"%":"—"}</td><td>${n?abs.toFixed(1)+"%":"—"}</td></tr>`}).join("");
+ let grand=arr.reduce((o,s)=>{let t=monthTally([s],m);Object.keys(t).forEach(k=>o[k]+=t[k]);return o},{present:0,absent:0,leave:0,unexcused:0,late:0});let gn=Object.values(grand).reduce((a,b)=>a+b,0);
+ $("monthlyTable").innerHTML=`<p class="muted">ရွေးထားသောလ: <b>${esc(m)}</b> · ${c==="ALL"?"အတန်းအားလုံး":esc(c)} · မှတ်တမ်းမရှိသေးသောရက်များကို ပျက်ကွက်ဟု မတွက်ပါ။</p><h3>📚 အတန်းအလိုက် လစဉ်စာရင်းချုပ်</h3><div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>ကျောင်းသား</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက် %</th><th>ပျက် %</th></tr></thead><tbody>${classRows}</tbody><tfoot><tr><th>ရွေးထားသောစာရင်း စုစုပေါင်း</th><th>${arr.length}</th><th>${grand.present}</th><th>${grand.absent}</th><th>${grand.leave}</th><th>${grand.unexcused}</th><th>${grand.late}</th><th>${gn?pct(grand.present+grand.late,gn)+"%":"—"}</th><th>${gn?pct(grand.absent+grand.unexcused,gn)+"%":"—"}</th></tr></tfoot></table></div><h3>👨‍🎓 ကျောင်းသားတစ်ဦးချင်း လစဉ်စာရင်း — အလျားလိုက်ဇယား</h3><p class="muted">ဖုန်းတွင် ဇယားကို ဘေးတိုက်ရွှေ့ကြည့်နိုင်သည်။ တက် % တွင် တက် + နောက်ကျ၊ ပျက် % တွင် ပျက် + ခွင့်မဲ့ကို တွက်ထားသည်။</p><div class="tablewrap"><table style="min-width:1050px"><thead><tr><th>ကျောင်းသားအမည်</th><th>အတန်း</th><th>ကျောင်းသားအမှတ်</th><th>ကျား/မ</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက် %</th><th>ပျက် %</th></tr></thead><tbody>${studentRows||'<tr><td colspan="11">ကျောင်းသားစာရင်းမရှိပါ။</td></tr>'}</tbody></table></div>`;
+ let opts=arr.map(s=>`<option value="${esc(s.id)}">${esc(s.className)} · ${esc(s.name)} (${esc(s.sid)})</option>`).join("");let old=$("detailStudent").value;$("detailStudent").innerHTML='<option value="">ကျောင်းသားရွေးရန်</option>'+opts;if(arr.some(s=>s.id===old))$("detailStudent").value=old;showDetail($("detailStudent").value,m)
 }
-
-function setAllStatus(st){
-  document.querySelectorAll('.attStatus').forEach(el=>el.value=st);
-  updateAttendanceSummary();
+function showDetail(id,m){
+ if(!id){$("studentDetail").innerHTML="";return}let s=db.students.find(x=>x.id===id);if(!s){$("studentDetail").innerHTML="";return}
+ let keys=monthKeys(id,m),t={present:0,absent:0,leave:0,unexcused:0,late:0};keys.forEach(k=>t[db.records[k]]++);let n=keys.length,att=pct(t.present+t.late,n),abs=pct(t.absent+t.unexcused,n);
+ $("studentDetail").innerHTML=`<div style="margin-top:10px"><h3>${esc(s.name)} · ${esc(s.className)} · ကျောင်းသားအမှတ် ${esc(s.sid)} · ${esc(s.gender||"-")}</h3><div class="tablewrap"><table style="min-width:1000px"><thead><tr><th>ကျောင်းသားအမည်</th><th>အတန်း</th><th>ကျောင်းသားအမှတ်</th><th>ကျား/မ</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက် %</th><th>ပျက် %</th></tr></thead><tbody><tr><td>${esc(s.name)}</td><td>${esc(s.className)}</td><td>${esc(s.sid)}</td><td>${esc(s.gender||"-")}</td><td>${t.present}</td><td>${t.absent}</td><td>${t.leave}</td><td>${t.unexcused}</td><td>${t.late}</td><td>${n?att.toFixed(1)+"%":"—"}</td><td>${n?abs.toFixed(1)+"%":"—"}</td></tr></tbody></table></div><h3>📅 နေ့စဉ်မှတ်တမ်း</h3><div class="tablewrap"><table><thead><tr><th>ရက်စွဲ</th><th>အခြေအနေ</th></tr></thead><tbody>${keys.map(k=>`<tr><td>${esc(k.split("|")[0])}</td><td>${esc(statusLabel[db.records[k]]||"-")}</td></tr>`).join("")||'<tr><td colspan="2">ဤလအတွက် မှတ်တမ်းမရှိသေးပါ။</td></tr>'}</tbody></table></div></div>`
 }
-
-function saveAttendance(){
-  let date=$('attDate').value;if(!date){toast('ရက်စွဲရွေးပါ။');return}
-  let n=0;
-  document.querySelectorAll('.attStatus').forEach(el=>{
-    let k=recKey(date,el.dataset.code);
-    if(el.value){attendance[k]=el.value;n++}else delete attendance[k];
-  });
-  persistAttendance();renderHome();renderReports();toast(n+' ဦး၏ တက်ရောက်မှု သိမ်းပြီးပါပြီ။');
+let smsDraft=null;
+function parseHomeTeacherSMS(){let v=$("homeSmsText").value.trim();if(!v){alert("SMS ကို အရင်ကူးထည့်ပါ။");return}$("smsText").value=v;setPage("sms");parseTeacherSMS()}
+function clearTeacherSMS(){$("smsText").value="";$("smsReview").innerHTML="";smsDraft=null}
+function smsField(text,labels){for(const label of labels){const re=new RegExp("^\\s*"+label+"\\s*[:：=]\\s*(.*?)\\s*$","mi");const m=text.match(re);if(m)return m[1].trim()}return ""}
+function smsCount(text,labels){let v=smsField(text,labels);let m=v.match(/\d+/);return m?Number(m[0]):null}
+function smsDate(text){let v=smsField(text,["ရက်စွဲ","နေ့စွဲ","Date"]);let m=v.match(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);if(m)return validDate(m[1],m[2],m[3]);m=v.match(/(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);if(m)return validDate(m[3],m[1],m[2]);return ""}
+function validDate(y,mo,d){let yy=Number(y),mm=Number(mo),dd=Number(d),dt=new Date(yy,mm-1,dd);return dt.getFullYear()===yy&&dt.getMonth()===mm-1&&dt.getDate()===dd?yy+"-"+String(mm).padStart(2,"0")+"-"+String(dd).padStart(2,"0"):""}
+function normalizeClass(v){let x=(v||"").trim().toLowerCase().replace(/grade\s*/i,"").replace(/အတန်း/g,"").trim();if(/^kg\b/i.test(x)||x.includes("သူငယ်တန်း"))return "KG";let m=x.match(/\d{1,2}/);return m&&Number(m[0])>=1&&Number(m[0])<=12?"Grade "+Number(m[0]):""}
+function normalizeName(v){return (v||"").replace(/^[\s\-•*]+|[\s,၊;；]+$/g,"").trim()}
+function parseNameList(text,labels){let out=[];const lines=text.split(/\r?\n/);let collecting="";for(let i=0;i<lines.length;i++){let line=lines[i].trim();if(!line)continue;let m=line.match(/^(.+?)\s*[:：=]\s*(.*)$/);if(m){let label=m[1].trim();let val=m[2].trim();if(labels.includes(label)){if(val&&!/(မရှိပါ|မရှိ|none|nil|0)$/i.test(val)){val=val.replace(/^(ကျောင်းသား\s*)/,'');out.push(...val.split(/[၊,;\n]+/).map(normalizeName).filter(Boolean))}collecting=labels.includes(label)?label:"";continue}collecting="";continue}if(collecting&&/^[-•*]/.test(line)&&!/(မရှိပါ|မရှိ|none|nil)/i.test(line)){out.push(normalizeName(line));}}
+return [...new Set(out.map(x=>x.replace(/^[-•*]\s*/,"").trim()).filter(Boolean))]}
+function matchSmsStudent(name,arr){let raw=normalizeName(name),m=raw.match(/^(.+?)\s*[-–—]\s*(.+)$/);if(m){let maybeId=m[1].replace(/\s/g,"");let byId=arr.find(s=>(s.sid||"").replace(/\s/g,"")===maybeId);if(byId)return byId;raw=m[2]}let keyName=raw.replace(/\s/g,"").toLowerCase();return arr.find(s=>(s.name||"").replace(/\s/g,"").toLowerCase()===keyName)||null}
+function parseTeacherSMS(){
+ let text=$("smsText").value.trim();if(!text){alert("အတန်းပိုင်ပို့လာတဲ့ SMS ကို အရင်ကူးထည့်ပါ။");return}
+ let cls=normalizeClass(smsField(text,["အတန်း","အတန်းအမည်","Class"]));let date=smsDate(text)||$("homeDate").value||today();
+ if(!cls){$("smsReview").innerHTML='<div class="notice dangertext">အတန်းအမည် မတွေ့ပါ။ ဥပမာ “အတန်း = KG” ဟု ထည့်ပါ။</div>';return}
+ let roster=list(cls);if(!roster.length){$("smsReview").innerHTML=`<div class="notice dangertext">${esc(cls)} အတန်းတွင် လက်ရှိကျောင်းသားစာရင်းမရှိပါ။ ကျောင်းသားစာရင်းကို အရင်ဖြည့်ပါ။</div>`;return}
+ let total=smsCount(text,["စာရင်းရှိ","ကျောင်းသားစုစုပေါင်း","စုစုပေါင်းကျောင်းသား","စုစုပေါင်း","Total students"]);
+ let absentNames=parseNameList(text,["ပျက်ကွက်ကျောင်းသား","ပျက်ကွက်သူ","ပျက်သူ","Absent students","Absent"]);
+ let leaveNames=parseNameList(text,["ခွင့်ယူသူ","ခွင့်သူ","ခွင့်ကျောင်းသား"]);
+ let unexcusedNames=parseNameList(text,["ခွင့်မဲ့ပျက်ကွက်သူ","ခွင့်မဲ့သူ"]);
+ let lateNames=parseNameList(text,["နောက်ကျသူ","နောက်ကျကျောင်းသား"]);
+ let assignments={},unmatched=[],duplicates=[];
+ [{status:"absent",names:absentNames},{status:"leave",names:leaveNames},{status:"unexcused",names:unexcusedNames},{status:"late",names:lateNames}].forEach(cat=>cat.names.forEach(name=>{let st=matchSmsStudent(name,roster);if(!st){unmatched.push(name);return}if(assignments[st.id]){duplicates.push(st.name);return}assignments[st.id]=cat.status}));
+ let inferredPresent=roster.filter(st=>!assignments[st.id]);
+ let stated={present:smsCount(text,["တက်ရောက်သူ","တက်သူ","တက်","Present"]),absent:smsCount(text,["ပျက်ကွက်","ပျက်","Absent count"]),leave:smsCount(text,["ခွင့်","ခွင့်ယူသူအရေအတွက်"]),unexcused:smsCount(text,["ခွင့်မဲ့","ခွင့်မဲ့အရေအတွက်"]),late:smsCount(text,["နောက်ကျ","နောက်ကျအရေအတွက်"])};
+ // Count fields are only used for validation when explicitly present. Named lists determine individual statuses.
+ let issues=[];if(total!==null&&total!==roster.length)issues.push(`SMS စာရင်းရှိ ${total} ဦး၊ ${esc(cls)} စာရင်း ${roster.length} ဦး ဖြစ်နေသည်။`);
+ if(unmatched.length)issues.push("စာရင်းထဲ မတွေ့သောအမည်: "+unmatched.join("၊ "));
+ if(duplicates.length)issues.push("အခြေအနေတစ်မျိုးထက်ပို၍ တွေ့ရသောအမည်: "+[...new Set(duplicates)].join("၊ "));
+ const explicitCounts=[stated.present,stated.absent,stated.leave,stated.unexcused,stated.late];
+ if(explicitCounts.some(v=>v!==null)){let calculated={present:inferredPresent.length,absent:absentNames.length,leave:leaveNames.length,unexcused:unexcusedNames.length,late:lateNames.length};let mismatch=[];Object.keys(calculated).forEach(k=>{if(stated[k]!==null&&stated[k]!==calculated[k])mismatch.push(`${k} အရေအတွက် SMS ${stated[k]} / အမည်စာရင်း ${calculated[k]}`)});if(mismatch.length)issues.push("အရေအတွက် မကိုက်ညီပါ: "+mismatch.join("၊ "))}
+ smsDraft={cls,date,arr:roster.map(st=>({id:st.id,sid:st.sid,name:st.name,status:assignments[st.id]||"present"})),unmatched,issues,total,rosterCount:roster.length,counts:{present:inferredPresent.length,absent:absentNames.length,leave:leaveNames.length,unexcused:unexcusedNames.length,late:lateNames.length}};
+ let canSave=unmatched.length===0&&duplicates.length===0&&issues.length===0;
+ let html=`<div class="panel" style="background:#f8fafc;margin-top:12px"><h3>🔍 SMS စစ်ဆေးချက် — ${esc(cls)} · ${esc(date)}</h3><p>စာရင်းရှိ: <b>${roster.length}</b> ဦး · SMS ထဲက ပျက်ကွက်သူ: <b>${absentNames.length}</b> ဦး · ကျန်သူများကို တက်ရောက်အဖြစ် သတ်မှတ်မည်: <b>${inferredPresent.length}</b> ဦး</p>`;
+ if(issues.length)html+=`<div class="notice warning" style="padding:10px;background:#fff7df;border-radius:8px"><b>စစ်ဆေးရန် လိုအပ်သည်</b><ul>${issues.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`;
+ html+=`<div class="tablewrap"><table><thead><tr><th>ကျောင်းသားအမှတ်</th><th>ကျောင်းသားအမည်</th><th>အခြေအနေ</th></tr></thead><tbody>${smsDraft.arr.map(st=>`<tr><td>${esc(st.sid)}</td><td>${esc(st.name)}</td><td>${esc(statusLabel[st.status])}</td></tr>`).join("")}</tbody></table></div>`;
+ if(canSave)html+=`<p class="muted">အမည်တွေကို စာရင်းနဲ့ တိုက်စစ်ပြီးပါပြီ။ သိမ်းဆည်းလိုက်ပါက ဒီအတန်းနဲ့ ရက်စွဲအတွက် ယခင်မှတ်တမ်းကို အစားထိုးမည်။</p><div class="actions"><button class="green" onclick="applyTeacherSMS()">💾 စစ်ဆေးထားသော SMS မှတ်တမ်းသိမ်းရန်</button><button class="secondary" onclick="clearTeacherSMS()">SMS ရှင်းရန်</button></div>`;
+ else html+=`<p class="dangertext">အမည်မကိုက်ညီမှု သို့မဟုတ် အမည်ထပ်နေမှုကို ပြင်ပြီးမှ သိမ်းဆည်းနိုင်ပါမည်။</p><div class="actions"><button class="secondary" onclick="clearTeacherSMS()">SMS ရှင်းရန်</button></div>`;
+ html+=`</div>`;$("smsReview").innerHTML=html;
 }
-
-function normalizeStatus(s){
-  s=(s||'').toLowerCase();
-  if(/နောက်ကျ|late/.test(s))return'late';
-  if(/ခွင့်မဲ့|ခွင့်မပါ|unexcused|မလာဘဲ|ခွင့်မရှိ/.test(s))return'unexcused';
-  if(/ခွင့်|leave|ခွင့်/.test(s))return'leave';
-  if(/ပျက်|မတက်|absent|မလာ/.test(s))return'absent';
-  if(/တက်|ရှိ|present|လာ/.test(s))return'present';
-  return'';
-}
-
-function parseSMSAuto(){
-  let text=$('smsText').value.trim(), cls=$('smsClass').value, date=$('smsDate').value;
-  if(!text){ $('smsPreview').innerHTML=''; return; }
-  let lines=text.split(/\n|\r/).map(x=>x.trim()).filter(Boolean), list=students.filter(s=>s.cls===cls), rows=[], used=new Set();
-  
-  lines.forEach(line=>{
-    let codeMatch=line.match(/(?:ကျောင်းဝင်အမှတ်|ကျောင်းဝင်နံပါတ်|အမှတ်|ID|Roll\s*No\.?|Student\s*ID|Code)\s*[:：#-]?\s*([\w-]+)/i);
-    if(!codeMatch)codeMatch=line.match(/^\s*(\d{2,})\s*[-:：.)]/);
-    let status=normalizeStatus(line);if(!status)return;
-    let code=codeMatch?codeMatch[1]:'';
-    let s=code?list.find(x=>x.code.toLowerCase()===code.toLowerCase()):null;
-    if(!s){let name=list.find(x=>line.includes(x.name));if(name)s=name}
-    if(s&&!used.has(s.code)){
-      rows.push({code:s.code,name:s.name,status,matched:true,studentId:s.id});used.add(s.code);
-    }else{
-      let label=code||line.slice(0,35);
-      rows.push({code:label,name:'မကိုက်ညီပါ - ကိုယ်တိုင်စစ်ပါ',status,matched:false,studentId:''});
-    }
-  });
-  smsPending=rows.map(r=>({...r,date,cls}));
-  if(!rows.length){$('smsPreview').innerHTML='<div class="notice">စာသားထဲမှ တက်/ပျက်/ခွင့်/နောက်ကျ အချက်အလက်ကို မဖတ်နိုင်ပါ။</div>';return}
-  
-  $('smsPreview').innerHTML='<h3 style="margin-top:12px;">Auto စစ်ဆေးပြီးစာရင်း ('+rows.length+' ကြောင်း)</h3><div class="tablewrap"><table><thead><tr><th>ကိုက်ညီမှု</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>အခြေအနေ</th><th>ပြင်ရန်</th></tr></thead><tbody>'+smsPending.map((r,i)=>`<tr><td>${r.matched?'✓ ကိုက်ညီ':'⚠ စစ်ရန်'}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td><select id="smsst${i}">${Object.entries(statuses).map(([k,v])=>`<option value="${k}" ${r.status===k?'selected':''}>${v}</option>`).join('')}</select></td><td><select id="smsmatch${i}" onchange="rematchSMS(${i},this.value)"><option value="">မသိမ်းရန်</option>${list.map(s=>`<option value="${s.id}" ${s.id===r.studentId?'selected':''}>${esc(s.code)} - ${esc(s.name)}</option>`).join('')}</select></td></tr>`).join('')+'</tbody></table></div>';
-}
-
-function rematchSMS(i,id){
-  let s=students.find(x=>x.id===id);
-  if(s){smsPending[i].studentId=id;smsPending[i].code=s.code;smsPending[i].name=s.name;smsPending[i].matched=true}
-  else{smsPending[i].studentId='';smsPending[i].matched=false}
-}
-
-function saveSMS(){
-  let date=$('smsDate').value;if(!date){toast('ရက်စွဲရွေးပါ။');return}
-  let saved=0;
-  smsPending.forEach((r,i)=>{
-    let id=$('smsmatch'+i);if(!id||!id.value)return;
-    let s=students.find(x=>x.id===id.value),st=$('smsst'+i).value;
-    if(s&&s.cls===$('smsClass').value){attendance[recKey(date,s.code)]=st;saved++}
-  });
-  if(!saved){toast('သိမ်းရန် ကိုက်ညီသောစာရင်း မရှိပါ။');return}
-  persistAttendance();renderHome();renderReports();toast(saved+' ဦး၏ SMS တက်ရောက်မှု သိမ်းပြီးပါပြီ။');
-}
-
-function renderReports(){
-  let month=$('reportMonth').value||today().slice(0,7), cls=$('reportClass').value||'ALL';
-  let list = cls==='ALL' ? students : students.filter(s=>s.cls===cls);
-  
-  // Assuming 20 school days per month * 2 sessions = 40 total attendance calls
-  let totalScheduledClasses = 40;
-
-  let html = `<div class="notice">ရွေးချယ်ထားသောလ: <strong>${month}</strong> (ပုံမှန်ကျောင်းဖွင့်ရက် ၂၀ ရက် × တစ်ရက် ၂ ကြိမ် = ကျောင်းခေါ်ကြိမ် စုစုပေါင်း ${totalScheduledClasses} ကြိမ်)</div>`;
-  
-  html += '<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>အတန်း</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>အသက်</th><th>ကျောင်းခေါ်ကြိမ်</th><th>ယခုလတက်ရောက်ကြိမ်</th><th>ရာခိုင်နှုန်း (%)</th></tr></thead><tbody>';
-
-  list.forEach((s, i) => {
-    // Count how many times this student was present ('present') in this month
-    let studentPresentCount = 0;
-    Object.entries(attendance).forEach(([k, v]) => {
-      let [d, code] = k.split('|');
-      if(d.startsWith(month+'-') && code === s.code && v === 'present'){
-        studentPresentCount++;
-      }
-    });
-
-    let pct = totalScheduledClasses > 0 ? ((studentPresentCount / totalScheduledClasses) * 100).toFixed(1) : '0.0';
-    let ageText = calculateAge(s.dob);
-
-    html += `<tr><td>${i+1}</td><td>${s.cls}</td><td>${esc(s.code)}</td><td>${esc(s.name)}</td><td>${ageText}</td><td>${totalScheduledClasses}</td><td>${studentPresentCount}</td><td><strong>${pct}%</strong></td></tr>`;
-  });
-
-  html += '</tbody></table></div>';
-  $('reportOutput').innerHTML = html;
-}
-
-function backupData(){
-  let data={app:'CFBS Attendance Dashboard',version:4,exportedAt:new Date().toISOString(),students,attendance};
-  let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);a.download='CFBS-Attendance-Backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href);toast('Backup ဖိုင်ထုတ်ပြီးပါပြီ။');
-}
-
-function restoreData(e){
-  let f=e.target.files[0];if(!f)return;
-  let r=new FileReader();
-  r.onload=()=>{
-    try{
-      let d=JSON.parse(r.result);
-      if(!Array.isArray(d.students)||!d.attendance)throw Error('invalid');
-      if(!confirm('လက်ရှိစာရင်းကို Backup ဖိုင်ထဲကစာရင်းနဲ့ အစားထိုးမလား။'))return;
-      students=d.students;attendance=d.attendance;persistStudents();persistAttendance();
-      fillSelects();renderStudents();renderAttendance();renderReports();renderHome();toast('Backup ပြန်ထည့်ပြီးပါပြီ။');
-    }catch(err){toast('Backup ဖိုင်ဖတ်မရပါ။ မှန်ကန်သော JSON ဖိုင်ရွေးပါ။')}
-    e.target.value=''
-  };
-  r.readAsText(f);
-}
-
-function exportCSV(){
-  let csv='အတန်း,ကျောင်းဝင်အမှတ်,အမည်,မွေးသက္ကရာဇ်,မိဘအမည်,ဖုန်းနံပါတ်,နေရပ်လိပ်စာ,ကျား/မ\n'+students.map(s=>[s.cls,s.code,s.name,s.dob,s.parent,s.phone,s.address,s.gender].map(v=>'"'+String(v||'').replaceAll('"','""')+'"').join(',')).join('\n');
-  let blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);a.download='CFBS-Students.csv';a.click();URL.revokeObjectURL(a.href);
-}
-
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'} [c]))}
-
-$('attDate').addEventListener('change',()=>{renderAttendance();renderHome()});
-$('attClass').addEventListener('change',renderAttendance);
-$('reportMonth').addEventListener('change',renderReports);
-$('reportClass').addEventListener('change',renderReports);
-window.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('home').classList.contains('active')===false)goBack()});
-load();
-</script>
-</body>
-</html>
+function applyTeacherSMS(){if(!smsDraft){alert("SMS ကို အရင်စစ်ဆေးပါ။");return}if(smsDraft.unmatched.length||smsDraft.issues.some(x=>x.includes("အခြေအနေတစ်မျိုးထက်ပို"))){alert("SMS ထဲက အမည်များကို ကျောင်းသားစာရင်းနဲ့ ပြန်စစ်ပါ။");return}if(!confirm(`${smsDraft.cls} အတန်း၊ ${smsDraft.date} ရက်နေ့အတွက် ${smsDraft.rosterCount} ဦး၏ တက်ရောက်မှုကို သိမ်းမလား။ ယခင်နေ့စဉ်မှတ်တမ်းရှိပါက အစားထိုးပါမည်။`))return;smsDraft.arr.forEach(st=>{db.records[key(smsDraft.date,st.id)]=st.status});$("homeDate").value=smsDraft.date;$("attDate").value=smsDraft.date;$("attClass").value=smsDraft.cls;save();renderAll();alert(`${smsDraft.cls} အတန်း၏ ${smsDraft.date} တက်ရောက်မှုမှတ်တမ်း သိမ်းပြီးပါပြီ။`);setPage("home")}
+function downloadBackup(){let blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="CFBS-attendance-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+$("restoreFile").addEventListener("change",async e=>{let f=e.target.files[0];if(!f)return;try{let x=JSON.parse(await f.text());if(!Array.isArray(x.students)||!x.records)throw Error("invalid");if(confirm("လက်ရှိစာရင်းကို Backup ဖိုင်ဖြင့် အစားထိုးမလား။ အရင်စာရင်းကို Backup ထုတ်ထားပါ။")){db=x;save();renderAll();alert("Backup ပြန်ထည့်ပြီးပါပြီ။")}}catch(err){alert("Backup ဖိုင်ဖတ်မရပါ။ မှန်ကန်သော CFBS JSON Backup ကိုရွေးပါ။")}e.target.value=""});
+function renderAll(){renderHome();renderStudents();renderAttendance();renderMonthly()}
+$("homeDate").value=today();$("attDate").value=today();$("homeMonth").value=today().slice(0,7);$("reportMonth").value=today().slice(0,7);["studentClass","listClass","attClass","reportClass"].forEach(id=>fillSelect(id,id==="reportClass"));$("studentClass").value="KG";$("listClass").value="KG";$("attClass").value="KG";$("reportClass").value="ALL";$("homeDate").onchange=renderHome;$("homeMonth").onchange=renderHome;$("studentClass").onchange=()=>{};$("listClass").onchange=renderStudents;$("search").oninput=renderStudents;$("listStatus").onchange=renderStudents;$("attClass").onchange=renderAttendance;$("attDate").onchange=renderAttendance;$("reportMonth").onchange=renderMonthly;$("reportClass").onchange=renderMonthly;$("detailStudent").onchange=()=>showDetail($("detailStudent").value,$("reportMonth").value||today());
+renderAll();
+</script></body></html>
