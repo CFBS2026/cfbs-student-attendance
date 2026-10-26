@@ -1,7 +1,6 @@
-
 name: Build CFBS Attendance APK
 
-"on":
+on:
   workflow_dispatch:
   push:
     branches:
@@ -176,7 +175,6 @@ jobs:
                   }
               }
 
-              @Override
               public void onBackPressed() {
                   if (webView != null && webView.canGoBack()) {
                       webView.goBack();
