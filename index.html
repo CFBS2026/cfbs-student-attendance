@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="my"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#193b63"><title>CHINDWIN FUTURE BRIGHT SCHOOL — Student Attendance Dashboard</title>
 <style>
@@ -245,10 +246,7 @@ function parseTeacherSMS(){
  else html+=`<p class="dangertext">အမည်မကိုက်ညီမှု သို့မဟုတ် အမည်ထပ်နေမှုကို ပြင်ပြီးမှ သိမ်းဆည်းနိုင်ပါမည်။</p><div class="actions"><button class="secondary" onclick="clearTeacherSMS()">SMS ရှင်းရန်</button></div>`;
  html+=`</div>`;$("smsReview").innerHTML=html;
 }
-function applyTeacherSMS(){if(smsDraft.unmatched.length || smsDraft.issues.length){
-  alert("SMS စစ်ဆေးမှု မအောင်မြင်ပါ။ အမည်၊ ရက်စွဲ၊ အရေအတွက်နဲ့ အတန်းစာရင်းကို ပြန်စစ်ပါ။");
-  return;
-}
+function applyTeacherSMS(){if(smsDraft.unmatched.length || smsDraft.issues.length)  alert("SMS စစ်ဆေးမှု မအောင်မြင်ပါ။ အမည်၊ ရက်စွဲ၊ အရေအတွက်နဲ့ အတန်းစာရင်းကို ပြန်စစ်ပါ။");  return;}
 function downloadBackup(){let blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="CFBS-attendance-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 $("restoreFile").addEventListener("change",async e=>{let f=e.target.files[0];if(!f)return;try{let x=JSON.parse(await f.text());if(!Array.isArray(x.students)||!x.records)throw Error("invalid");if(confirm("လက်ရှိစာရင်းကို Backup ဖိုင်ဖြင့် အစားထိုးမလား။ အရင်စာရင်းကို Backup ထုတ်ထားပါ။")){db=x;save();renderAll();alert("Backup ပြန်ထည့်ပြီးပါပြီ။")}}catch(err){alert("Backup ဖိုင်ဖတ်မရပါ။ မှန်ကန်သော CFBS JSON Backup ကိုရွေးပါ။")}e.target.value=""});
 function renderAll(){renderHome();renderStudents();renderAttendance();renderMonthly()}
