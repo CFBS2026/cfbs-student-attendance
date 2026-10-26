@@ -24,39 +24,26 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      
       - name: Configure Android SDK
         shell: bash
         run: |
           set -e
-
-          echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> "$GITHUB_ENV"
-          echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> "$GITHUB_ENV"
-          echo "/usr/local/lib/android/sdk/platform-tools" >> "$GITHUB_PATH"
-
           SDK="/usr/local/lib/android/sdk"
           SDKMANAGER="$SDK/cmdline-tools/latest/bin/sdkmanager"
 
-          if [ ! -x "$SDKMANAGER" ]; then
-            echo "ERROR: Existing Android SDK manager not found"
-            find "$SDK/cmdline-tools" -name sdkmanager -type f 2>/dev/null || true
-            exit 1
-          fi
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          echo "$SDK/platform-tools" >> "$GITHUB_PATH"
 
+          test -x "$SDKMANAGER"
           "$SDKMANAGER" --version
-
-          set +e
-          yes | "$SDKMANAGER" --licenses
-          LICENSE_STATUS=${PIPESTATUS[1]}
-          set -e
-
-          if [ "$LICENSE_STATUS" -ne 0 ]; then
-            echo "License command returned $LICENSE_STATUS; continuing to package installation"
-          fi
 
           "$SDKMANAGER" --install \
             "platform-tools" \
             "platforms;android-35" \
             "build-tools;35.0.0"
+
 
       - name: Verify source HTML
         shell: bash
