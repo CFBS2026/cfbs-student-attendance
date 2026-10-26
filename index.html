@@ -1,17 +1,69 @@
 <!doctype html>
 <html lang="my"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#193b63"><title>CHINDWIN FUTURE BRIGHT - Class Teacher Attendance System</title>
 <style>
-:root{--navy:#193b63;--blue:#2463a6;--pale:#edf4fb;--ink:#172033;--line:#dbe4ef}*{box-sizing:border-box}body{margin:0;background:#f3f6fb;color:var(--ink);font:15px Arial,"Noto Sans Myanmar",sans-serif}header{background:linear-gradient(135deg,#193b63,#2878b9);color:white;padding:22px 12px;text-align:center}header h1{font-size:22px;margin:0}header p{margin:7px 0 0}main{max-width:1100px;margin:auto;padding:12px}nav{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px}button{border:0;border-radius:8px;padding:10px 12px;font:inherit;font-weight:600;background:#e4edf8;color:var(--navy);cursor:pointer}nav button{min-height:48px}.active,.primary{background:var(--navy);color:white}.hidden{display:none!important}.card,.stat{background:white;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:13px}.card h2{color:var(--navy);font-size:19px;margin:0 0 14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.stat{text-align:center;margin:0;padding:12px 5px;font-size:13px}.stat b{display:block;color:var(--blue);font-size:22px;margin-top:5px}.row{display:flex;gap:9px;flex-wrap:wrap}.field{flex:1;min-width:135px;margin-bottom:10px}.field label{display:block;font-weight:bold;font-size:13px;margin-bottom:5px}.field input,.field select,input[type=date],input[type=month],select,textarea{width:100%;padding:10px;border:1px solid #cbd6e4;border-radius:8px;background:white;font:inherit;color:var(--ink)}.actions{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:8px}table{border-collapse:collapse;width:100%;min-width:700px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;font-size:13px;white-space:nowrap}th{background:var(--pale);color:var(--navy)}.small{padding:6px;font-size:12px}.notice{background:#fff7df;border:1px solid #f0dfa4;padding:10px;border-radius:8px;font-size:13px;line-height:1.6;margin:10px 0}.muted{color:#65758b;font-size:13px}textarea{min-height:260px;line-height:1.6}.message{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);background:#16385e;color:white;padding:12px;border-radius:9px;z-index:10}@media(max-width:620px){nav{grid-template-columns:repeat(2,1fr)}header h1{font-size:20px}main{padding:8px}.card{padding:10px}}@media print{header,nav,.no-print,button,.notice{display:none!important}body,main{background:white;padding:0}.tab.hidden{display:none!important}.card{border:0}}
+:root{--navy:#193b63;--blue:#2463a6;--pale:#edf4fb;--ink:#172033;--line:#dbe4ef}*{box-sizing:border-box}body{margin:0;background:#f3f6fb;color:var(--ink);font:15px Arial,"Noto Sans Myanmar",sans-serif}header{background:linear-gradient(135deg,#193b63,#2878b9);color:white;padding:22px 12px;text-align:center}header h1{font-size:22px;margin:0}header p{margin:7px 0 0}main{max-width:1100px;margin:auto;padding:12px}nav{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px}button{border:0;border-radius:8px;padding:10px 12px;font:inherit;font-weight:600;background:#e4edf8;color:var(--navy);cursor:pointer}nav button{min-height:48px}.active,.primary{background:var(--navy);color:white}.hidden{display:none!important}.card,.stat{background:white;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:13px}.card h2{color:var(--navy);font-size:19px;margin:0 0 14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.stat{text-align:center;margin:0;padding:12px 5px;font-size:13px}.stat b{display:block;color:var(--blue);font-size:22px;margin-top:5px}.row{display:flex;gap:9px;flex-wrap:wrap}.field{flex:1;min-width:135px;margin-bottom:10px}.field label{display:block;font-weight:bold;font-size:13px;margin-bottom:5px}.field input,.field select,input[type=date],input[type=month],select,textarea{width:100%;padding:10px;border:1px solid #cbd6e4;border-radius:8px;background:white;font:inherit;color:var(--ink)}.actions{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:8px;margin-bottom:15px}table{border-collapse:collapse;width:100%;min-width:700px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;font-size:13px;white-space:nowrap}th{background:var(--pale);color:var(--navy)}.small{padding:6px;font-size:12px}.notice{background:#fff7df;border:1px solid #f0dfa4;padding:10px;border-radius:8px;font-size:13px;line-height:1.6;margin:10px 0}.muted{color:#65758b;font-size:13px}textarea{min-height:260px;line-height:1.6}.message{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);background:#16385e;color:white;padding:12px;border-radius:9px;z-index:10}@media(max-width:620px){nav{grid-template-columns:repeat(2,1fr)}header h1{font-size:20px}main{padding:8px}.card{padding:10px}}@media print{header,nav,.no-print,button,.notice{display:none!important}body,main{background:white;padding:0}.tab.hidden{display:none!important}.card{border:0}}
 </style></head><body>
 <header><h1>CHINDWIN FUTURE BRIGHT</h1><p>CLASS TEACHER ATTENDANCE SYSTEM</p><p>Budalin Township</p></header><main>
 <nav class="no-print"><button class="active" data-tab="students">ကျောင်းသားစာရင်း</button><button data-tab="attendance">နေ့စဉ်တက်ရောက်မှု</button><button data-tab="monthly">လစဉ်အစီရင်ခံစာ</button><button data-tab="principal">ကျောင်းအုပ်ဆီပို့ရန်</button></nav>
+
 <section id="students" class="tab"><div class="stats"><div class="stat">လက်ရှိကျောင်းသား<b id="totalStudents">0</b></div><div class="stat">ကျား<b id="totalBoys">0</b></div><div class="stat">မ<b id="totalGirls">0</b></div></div><div class="card"><h2>ကျောင်းသားစာရင်း</h2><div class="row"><div class="field"><label>အတန်း</label><select id="studentClass"></select></div><div class="field"><label>အမည် / ကျောင်းဝင်အမှတ် ရှာရန်</label><input id="studentSearch" placeholder="ရှာရန်..."></div></div><div class="actions no-print"><button class="primary" id="showStudentForm">＋ ကျောင်းသားအသစ်ထည့်ရန်</button><button id="backupButton">Backup သိမ်းရန်</button><button id="chooseRestore">Backup ပြန်ထည့်ရန်</button><input class="hidden" type="file" id="restoreFile" accept=".json,application/json"></div>
 <div id="studentFormBox" class="card hidden"><h2 id="studentFormTitle">ကျောင်းသားအသစ်</h2><form id="studentForm"><input type="hidden" id="editStudentId"><div class="row"><div class="field"><label>ကျောင်းဝင်အမှတ် *</label><input id="sid" required></div><div class="field"><label>ကျောင်းသားအမည် *</label><input id="sname" required></div><div class="field"><label>မွေးသက္ကရာဇ် *</label><input id="sdob" type="date" required></div><div class="field"><label>မိဘအမည် *</label><input id="sparent" required></div><div class="field"><label>ကျား / မ *</label><select id="sgender"><option value="ကျား">ကျား</option><option value="မ">မ</option></select></div><div class="field"><label>ဖုန်း</label><input id="sphone" inputmode="tel"></div><div class="field"><label>လိပ်စာ</label><input id="saddress"></div><div class="field"><label>အခြေအနေ</label><select id="sactive"><option value="yes">လက်ရှိတက်ရောက်</option><option value="no">ကျောင်းမှထွက် / ယာယီမရှိ</option></select></div></div><p class="muted">ကျောင်းဝင်အမှတ်သည် အတန်းပြောင်းသော်လည်း မပြောင်းရပါ။</p><div class="actions"><button class="primary" type="submit">သိမ်းမည်</button><button type="button" id="cancelStudentForm">မလုပ်တော့ပါ</button></div></form></div>
 <div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>မွေးသက္ကရာဇ်</th><th>မိဘအမည်</th><th>ဖုန်း</th><th>အခြေအနေ</th><th class="no-print">လုပ်ဆောင်ချက်</th></tr></thead><tbody id="studentRows"></tbody></table></div></div></section>
 
-<section id="attendance" class="tab hidden"><div class="card"><h2>နေ့စဉ်တက်ရောက်မှု</h2><div class="row"><div class="field"><label>အတန်း</label><select id="attClass"></select></div><div class="field"><label>ရက်စွဲ</label><input id="attDate" type="date"></div><div class="field"><label>ကျောင်းသားရှာရန်</label><input id="attSearch" placeholder="အမည် / ကျောင်းဝင်အမှတ်"></div></div><div class="stats"><div class="stat">စုစုပေါင်း<b id="attTotal">0</b></div><div class="stat">တက်<b id="attPresent">0</b></div><div class="stat">ပျက်<b id="attAbsent">0</b></div></div><p id="attStatusMessage" class="notice">တက်ရောက်မှုကို သတ်မှတ်ပါ။</p><div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက်%</th><th>ပျက်%</th></tr></thead><tbody id="attendanceRows"></tbody><tfoot id="attendanceFoot" style="font-weight:bold;background:var(--pale)"></tfoot></table></div><div class="actions no-print"><button class="primary" id="saveAttendance">တက်ရောက်မှု သိမ်းရန်</button><button id="markAllPresent" style="background:#28a745;color:white">အားလုံးတက်</button><button id="markAllAbsent" style="background:#dc3545;color:white">အားလုံးပျက်</button><button id="printAttendance">ပုံနှိပ် / PDF</button></div><p class="muted">တက်ရောက်မှု အခြေအနေများကို ရွေးချယ်ပြီး သိမ်းဆည်းပါ။</p></div></section>
+<!-- နေ့စဉ်တက်ရောက်မှု Section -->
+<section id="attendance" class="tab hidden"><div class="card"><h2>နေ့စဉ်တက်ရောက်မှု</h2><div class="row"><div class="field"><label>အတန်း</label><select id="attClass"></select></div><div class="field"><label>ရက်စွဲ</label><input id="attDate" type="date"></div><div class="field"><label>ကျောင်းသားရှာရန်</label><input id="attSearch" placeholder="အမည် / ကျောင်းဝင်အမှတ်"></div></div>
 
-<section id="monthly" class="tab hidden"><div class="card"><h2>လစဉ်တက်ရောက်မှုအစီရင်ခံစာ</h2><div class="row"><div class="field"><label>အတန်း</label><select id="monthClass"></select></div><div class="field"><label>လ</label><input id="monthValue" type="month"></div></div><div class="stats" style="grid-template-columns:repeat(4,1fr)"><div class="stat" style="background:#e8f5e9;border:1px solid #a5d6a7">ကျောင်းသားစုစုပေါင်း<b id="mStudents" style="color:#2e7d32">0</b></div><div class="stat" style="background:#e3f2fd;border:1px solid #90caf9">တက်<b id="mPresent" style="color:#1565c0">0</b></div><div class="stat" style="background:#ffebee;border:1px solid #ef9a9a">ပျက်<b id="mAbsent" style="color:#c62828">0</b></div><div class="stat" style="background:#fff8e1;border:1px solid #ffe082">ခွင့်<b id="mLeave" style="color:#f57f17">0</b></div></div><div class="stats" style="grid-template-columns:repeat(4,1fr)"><div class="stat" style="background:#fce4ec;border:1px solid #f48fb1">ခွင့်မဲ့<b id="mUnauthorized" style="color:#ad1457">0</b></div><div class="stat" style="background:#f3e5f5;border:1px solid #ce93d8">နောက်ကျ<b id="mLate" style="color:#6a1b9a">0</b></div><div class="stat" style="background:#e0f7fa;border:1px solid #80deea">တက်%<b id="mPresentPct" style="color:#00695c">0%</b></div><div class="stat" style="background:#fbe9e7;border:1px solid #ffab91">ပျက်%<b id="mAbsentPct" style="color:#d84315">0%</b></div></div><div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက်%</th><th>ပျက်%</th></tr></thead><tbody id="monthlyRows"></tbody><tfoot id="monthlyFoot" style="font-weight:bold;background:var(--pale)"></tfoot></table></div><div class="actions no-print"><button class="primary" id="printMonthly">ပုံနှိပ် / PDF သိမ်းရန်</button></div></div></section>
+<!-- Box ၅ ခု (Color ဖြင့်) -->
+<div class="stats" style="grid-template-columns:repeat(5,1fr)">
+  <div class="stat" style="background:#e8f5e9;border:1px solid #a5d6a7">ကျောင်းသားစုစုပေါင်း<b id="attTotal" style="color:#2e7d32">0</b></div>
+  <div class="stat" style="background:#e3f2fd;border:1px solid #90caf9">တက်<b id="attPresent" style="color:#1565c0">0</b></div>
+  <div class="stat" style="background:#ffebee;border:1px solid #ef9a9a">ပျက်<b id="attAbsent" style="color:#c62828">0</b></div>
+  <div class="stat" style="background:#e0f7fa;border:1px solid #80deea">တက်%<b id="attPresentPct" style="color:#00695c">0%</b></div>
+  <div class="stat" style="background:#fbe9e7;border:1px solid #ffab91">ပျက်%<b id="attAbsentPct" style="color:#d84315">0%</b></div>
+</div>
+
+<p id="attStatusMessage" class="notice">တက်ရောက်မှုကို သတ်မှတ်ပါ။</p>
+
+<div class="tablewrap">
+  <table>
+    <thead>
+      <tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>တက်ရောက်မှု (တက်/ပျက်/ခွင့်/ခွင့်မဲ့/နောက်ကျ)</th></tr>
+    </thead>
+    <tbody id="attendanceInputRows"></tbody>
+  </table>
+</div>
+
+<div class="actions no-print">
+  <button class="primary" id="saveAttendance">တက်ရောက်မှု သိမ်းရန်</button>
+  <button id="markAllPresent" style="background:#28a745;color:white">အားလုံးတက်</button>
+  <button id="markAllAbsent" style="background:#dc3545;color:white">အားလုံးပျက်</button>
+  <button id="printAttendance">ပုံနှိပ် / PDF</button>
+</div>
+
+<h3 style="margin-top:20px;color:var(--navy);">နေ့စဉ်တက်ရောက်မှု စာရင်းရလဒ်</h3>
+<div class="tablewrap">
+  <table>
+    <thead>
+      <tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက်%</th><th>ပျက်%</th></tr>
+    </thead>
+    <tbody id="attendanceResultRows"></tbody>
+    <tfoot id="attendanceFoot" style="font-weight:bold;background:var(--pale)"></tfoot>
+  </table>
+</div>
+</div></section>
+
+<!-- လစဉ်အစီရင်ခံစာ Section -->
+<section id="monthly" class="tab hidden"><div class="card"><h2>လစဉ်အစီရင်ခံစာအစီရင်ခံစာ</h2><div class="row"><div class="field"><label>အတန်း</label><select id="monthClass"></select></div><div class="field"><label>လ</label><input id="monthValue" type="month"></div></div>
+
+<div class="stats" style="grid-template-columns:repeat(5,1fr)">
+  <div class="stat" style="background:#e8f5e9;border:1px solid #a5d6a7">ကျောင်းသားစုစုပေါင်း<b id="mStudents" style="color:#2e7d32">0</b></div>
+  <div class="stat" style="background:#e3f2fd;border:1px solid #90caf9">တက်<b id="mPresent" style="color:#1565c0">0</b></div>
+  <div class="stat" style="background:#ffebee;border:1px solid #ef9a9a">ပျက်<b id="mAbsent" style="color:#c62828">0</b></div>
+  <div class="stat" style="background:#e0f7fa;border:1px solid #80deea">တက်%<b id="mPresentPct" style="color:#00695c">0%</b></div>
+  <div class="stat" style="background:#fbe9e7;border:1px solid #ffab91">ပျက်%<b id="mAbsentPct" style="color:#d84315">0%</b></div>
+</div>
+
+<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက်%</th><th>ပျက်%</th></tr></thead><tbody id="monthlyRows"></tbody><tfoot id="monthlyFoot" style="font-weight:bold;background:var(--pale)"></tfoot></table></div><div class="actions no-print"><button class="primary" id="printMonthly">ပုံနှိပ် / PDF သိမ်းရန်</button></div></div></section>
 
 <section id="principal" class="tab hidden"><div class="card"><h2>ကျောင်းအုပ်ဆီပို့ရန် အစီရင်ခံစာ</h2><div class="row"><div class="field"><label>အတန်း</label><select id="principalClass"></select></div><div class="field"><label>ရက်စွဲ</label><input id="principalDate" type="date"></div></div><p class="notice">အစီရင်ခံစာတွင် တက်ရောက်သူအရေအတွက်နှင့် ပျက်ကွက်သူစာရင်းကို ဖော်ပြမည်။</p><div class="actions no-print"><button class="primary" id="generatePrincipal">အစီရင်ခံစာ ပြုလုပ်ရန်</button><button id="copyPrincipal">စာသားကူးရန်</button><button id="sharePrincipal">မျှဝေရန်</button></div><textarea id="principalOutput" placeholder="အစီရင်ခံစာကို ဤနေရာတွင် ပြသမည်။" readonly></textarea></div></section>
 
@@ -35,37 +87,43 @@ $('showStudentForm').onclick=()=>{$('studentForm').reset();$('editStudentId').va
 
 function renderAtt(){
   let cls=$('attClass').value,date=$('attDate').value,q=$('attSearch').value.trim().toLowerCase(),ss=people(cls,true),r=record(cls,date),c=counts(r);
-  $('attTotal').textContent=ss.length;$('attPresent').textContent=c['တက်'];$('attAbsent').textContent=c['ပျက်'];
+  
+  // Update 5 Stat Boxes
+  $('attTotal').textContent=ss.length;
+  $('attPresent').textContent=c['တက်'];
+  $('attAbsent').textContent=c['ပျက်'];
+  let totalDays=ss.length;
+  let pPct=totalDays?(c['တက်']/totalDays*100).toFixed(1)+'%':'0%';
+  let abPct=totalDays?(c['ပျက်']/totalDays*100).toFixed(1)+'%':'0%';
+  $('attPresentPct').textContent=pPct;
+  $('attAbsentPct').textContent=abPct;
+
   let missing=ss.filter(s=>!STATUSES.includes(r[s.id])).length;
   $('attStatusMessage').textContent=missing?'သတ်မှတ်ရန်ကျန်ရှိသူ '+missing+' ဦးရှိသည်။':'အားလုံးကို သတ်မှတ်ပြီးပါပြီ။';
   
-  $('attendanceRows').innerHTML=ss.map((s,i)=>{
+  $('attendanceInputRows').innerHTML=ss.map((s,i)=>{
     let st=r[s.id]||'';
-    let p=st==='တက်'?1:0, ab=st==='ပျက်'?1:0;
-    let pPct=(p*100)+'%';
-    let abPct=(ab*100)+'%';
     return '<tr style="'+(!s.name.toLowerCase().includes(q)&&!s.sid.toLowerCase().includes(q)?'display:none':'')+'">' +
       '<td>'+(i+1)+'</td><td>'+esc(s.sid)+'</td><td>'+esc(s.name)+'</td>' +
-      STATUSES.map(stName=>'<td><select data-status="'+esc(s.id)+'"><option value="">ရွေးပါ</option>'+STATUSES.map(opt=>'<option '+(st===opt?'selected':'')+'>'+opt+'</option>').join('')+'</select></td>').join('') +
-      '<td>'+pPct+'</td><td>'+abPct+'</td>' +
+      '<td><select data-status="'+esc(s.id)+'"><option value="">ရွေးပါ</option>'+STATUSES.map(opt=>'<option '+(st===opt?'selected':'')+'>'+opt+'</option>').join('')+'</select></td>' +
+    '</tr>';
+  }).join('')||'<tr><td colspan="4">ကျောင်းသားမရှိသေးပါ။</td></tr>';
+
+  $('attendanceResultRows').innerHTML=ss.map((s,i)=>{
+    let st=r[s.id]||'';
+    let p=st==='တက်'?1:0, ab=st==='ပျက်'?1:0, l=st==='ခွင့်'?1:0, ul=st==='ခွင့်မဲ့'?1:0, late=st==='နောက်ကျ'?1:0;
+    let sPPct=st==='တက်'?'100%':'0%';
+    let sAPct=st==='ပျက်'?'100%':'0%';
+    return '<tr style="'+(!s.name.toLowerCase().includes(q)&&!s.sid.toLowerCase().includes(q)?'display:none':'')+'">' +
+      '<td>'+(i+1)+'</td><td>'+esc(s.sid)+'</td><td>'+esc(s.name)+'</td>' +
+      '<td>'+p+'</td><td>'+ab+'</td><td>'+l+'</td><td>'+ul+'</td><td>'+late+'</td>' +
+      '<td>'+sPPct+'</td><td>'+sAPct+'</td>' +
     '</tr>';
   }).join('')||'<tr><td colspan="10">ကျောင်းသားမရှိသေးပါ။</td></tr>';
 
-  let totP=0, totAb=0, totL=0, totUL=0, totLate=0;
-  ss.forEach(s=>{
-    let st=r[s.id];
-    if(st==='တက်')totP++;
-    if(st==='ပျက်')totAb++;
-    if(st==='ခွင့်')totL++;
-    if(st==='ခွင့်မဲ့')totUL++;
-    if(st==='နောက်ကျ')totLate++;
-  });
-  let totalDays=ss.length;
-  let pPct=totalDays?(totP/totalDays*100).toFixed(1)+'%':'0%';
-  let abPct=totalDays?(totAb/totalDays*100).toFixed(1)+'%':'0%';
-
-  $('attendanceFoot').innerHTML='<tr><td colspan="3" style="text-align:right">စုစုပေါင်း</td><td>'+totP+'</td><td>'+totAb+'</td><td>'+totL+'</td><td>'+totUL+'</td><td>'+totLate+'</td><td>'+pPct+'</td><td>'+abPct+'</td></tr>';
+  $('attendanceFoot').innerHTML='<tr><td colspan="3" style="text-align:right">စုစုပေါင်း</td><td>'+c['တက်']+'</td><td>'+c['ပျက်']+'</td><td>'+c['ခွင့်']+'</td><td>'+c['ခွင့်မဲ့']+'</td><td>'+c['နောက်ကျ']+'</td><td>'+pPct+'</td><td>'+abPct+'</td></tr>';
 }
+
 $('attClass').onchange=renderAtt;$('attDate').onchange=renderAtt;$('attSearch').oninput=renderAtt;
 
 $('markAllPresent').onclick=()=>{
@@ -92,7 +150,7 @@ $('markAllAbsent').onclick=()=>{
   msg('အားလုံးကို ပျက်ကွက်သည်ဟု သတ်မှတ်ပြီးပါပြီ။');
 };
 
-$('attendanceRows').onchange=e=>{
+$('attendanceInputRows').onchange=e=>{
   let sel=e.target.closest('[data-status]');
   if(sel){
     let id=sel.dataset.status,val=sel.value;
@@ -121,9 +179,6 @@ function renderMonth(){
   $('mStudents').textContent=ss.length;
   $('mPresent').textContent=tot['တက်'];
   $('mAbsent').textContent=tot['ပျက်'];
-  $('mLeave').textContent=tot['ခွင့်'];
-  $('mUnauthorized').textContent=tot['ခွင့်မဲ့'];
-  $('mLate').textContent=tot['နောက်ကျ'];
   
   let totalPossible = ss.length * totalAttEntries;
   let mPPct = totalPossible ? (tot['တက်'] / totalPossible * 100).toFixed(1) + '%' : '0%';
