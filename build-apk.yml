@@ -1,3 +1,4 @@
+
 name: Build CFBS Attendance APK
 
 on:
@@ -27,12 +28,12 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Configure Android SDK
+      - name: Configure and Build
         shell: bash
         run: |
           set -euo pipefail
-          
-          # Android SDK command-line tools ကို အလွယ်တကူ တိုက်ရိုက်ဒေါင်းလုပ်လုပ်ခြင်း
+
+          echo "Setting up Android SDK command-line tools..."
           SDK_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
           mkdir -p "$ANDROID_HOME/cmdline-tools"
           wget -q "$SDK_TOOLS_URL" -O cmdline-tools.zip
@@ -48,27 +49,18 @@ jobs:
 
           yes | "$SDKMANAGER" --sdk_root="$ANDROID_HOME" --licenses >/dev/null || true
 
+          echo "Installing SDK packages..."
           "$SDKMANAGER" --sdk_root="$ANDROID_HOME" --install \
             "platform-tools" \
             "platforms;android-34" \
             "build-tools;34.0.0"
 
-      - name: Check source HTML
-        shell: bash
-        run: |
-          set -euo pipefail
           if [ ! -s index.html ]; then
             echo "ERROR: Repository root index.html is missing or empty."
             exit 1
           fi
-          echo "Found index.html:"
-          wc -c index.html
 
-      - name: Create Android project
-        shell: bash
-        run: |
-          set -euo pipefail
-
+          echo "Creating Android project structure..."
           mkdir -p app/src/main/assets
           mkdir -p app/src/main/java/com/cfbs/attendance
           cp index.html app/src/main/assets/index.html
@@ -149,19 +141,15 @@ jobs:
               @Override
               protected void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
-
                   webView = new WebView(this);
-
                   WebSettings settings = webView.getSettings();
                   settings.setJavaScriptEnabled(true);
                   settings.setDomStorageEnabled(true);
                   settings.setDatabaseEnabled(true);
                   settings.setAllowFileAccess(true);
                   settings.setAllowContentAccess(true);
-
                   webView.setWebViewClient(new WebViewClient());
                   setContentView(webView);
-
                   if (savedInstanceState != null) {
                       webView.restoreState(savedInstanceState);
                   } else {
@@ -195,15 +183,6 @@ jobs:
 
       - name: Build debug APK
         run: gradle --no-daemon --stacktrace assembleDebug
-
-      - name: Verify APK exists
-        shell: bash
-        run: |
-          set -euo pipefail
-          APK="app/build/outputs/apk/debug/app-debug.apk"
-          test -s "$APK"
-          echo "APK build succeeded:"
-          ls -lh "$APK"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
