@@ -10,7 +10,7 @@ header p{font-size:14px;color:#66778c;margin:5px 0}
 header p:first-of-type{font-weight:800;letter-spacing:.8px;font-size:clamp(12px,2vw,17px)}
 main{max-width:1200px;margin:auto;padding:14px}
 .topnote{background:#eaf2fc;color:#37536f;border:1px solid #d9e7f7;border-radius:14px;padding:12px 14px;margin-bottom:12px;font-size:12px;line-height:1.7}
-.nav{display:none!important} /* Hide top full nav as we use the image menu layout */
+.nav{display:none!important}
 button{border:0;border-radius:11px;padding:10px 12px;background:#193b63;color:#fff;font:inherit;cursor:pointer;transition:filter .15s ease}
 button.secondary{background:#e6edf6;color:#243247}button.green{background:#188052}button.danger{background:#b8424b}
 .panel{background:#fff;border:1px solid #e6edf6;border-radius:16px;padding:15px;margin-bottom:14px;box-shadow:0 5px 18px #17365b0a}
@@ -43,12 +43,10 @@ td select{min-width:105px;padding:8px;font-size:12px}
 .formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.formgrid .field{min-width:0;margin:0}
 .success{color:#166534}.warning{color:#92400e}.dangertext{color:#b91c1c}
 
-/* Dashboard View Switcher Buttons (Like Image) */
 .dash-view-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}
 .dash-view-tab{background:#e2efff;color:#193b63;border:1px solid #cbd5e1;padding:14px;font-weight:750;border-radius:12px;cursor:pointer;text-align:center;font:inherit;transition:all 0.2s}
 .dash-view-tab.active{background:#285889;color:#fff;border-color:#285889;box-shadow:0 4px 12px rgba(40,88,137,0.2)}
 
-/* Main Menu 4 Buttons Grid Style matching the image */
 .main-menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
 .main-menu-btn{background:#193b63;color:#fff;border:none;border-radius:12px;padding:16px 12px;text-align:center;cursor:pointer;font:inherit;box-shadow:0 4px 12px rgba(25,59,99,0.12);display:flex;align-items:center;justify-content:center;gap:10px;font-weight:bold;font-size:14px;transition:all 0.2s}
 .main-menu-btn:hover{background:#285889}
@@ -65,7 +63,6 @@ td select{min-width:105px;padding:8px;font-size:12px}
 <header>
   <div class="brand">
     <div class="logo">
-      <!-- Provided Logo Image[span_0](start_span)[span_0](end_span) -->
       <img src="1000002170.png" alt="CFBS Logo" onerror="this.parentElement.innerHTML='🎓'">
     </div>
     <div>
@@ -79,17 +76,14 @@ td select{min-width:105px;padding:8px;font-size:12px}
 <main>
   <div class="topnote">ကျောင်းသားစာရင်း၊ နေ့စဉ်တက်ရောက်မှု၊ အတန်းပိုင် SMS လက်ခံခြင်းနှင့် လစဉ်အစီရင်ခံစာကို တစ်နေရာတည်းတွင် စီမံရန်။ အချက်အလက်များအားလုံး ဖုန်းအတွင်း အလိုအလျောက် သိမ်းဆည်းပေးပါသည်။</div>
   
-  <!-- HOME / DASHBOARD PAGE -->
   <section id="home" class="page">
     <div class="panel summaryhead">
       
-      <!-- Top Daily / Monthly Switch Tabs (As shown in image) -->
       <div class="dash-view-tabs">
         <button type="button" id="tabDailyBtn" class="dash-view-tab active" onclick="switchDashView('daily')">နေ့စဉ် စာရင်းချုပ်</button>
         <button type="button" id="tabMonthlyBtn" class="dash-view-tab" onclick="switchDashView('monthly')">လစဉ် စာရင်းချုပ်</button>
       </div>
 
-      <!-- Daily View Panel -->
       <div id="dailyViewPanel">
         <h3 style="text-align:center;color:#475569;margin:8px 0 12px;font-size:13px;">နေ့စဥ်အလိုက် တက်ရောက်မှုစာရင်း</h3>
         <div class="row">
@@ -104,7 +98,6 @@ td select{min-width:105px;padding:8px;font-size:12px}
         </div>
       </div>
 
-      <!-- Monthly View Panel -->
       <div id="monthlyViewPanel" class="hidden">
         <h3 style="text-align:center;color:#475569;margin:8px 0 12px;font-size:13px;">လအလိုက် အမြန်ကြည့်ရန်</h3>
         <div class="row">
@@ -115,7 +108,6 @@ td select{min-width:105px;padding:8px;font-size:12px}
 
     </div>
 
-    <!-- Main Menu 4 Quick Action Buttons (Matching the image layout precisely) -->
     <div class="panel">
       <h2>အဓိက မီနူးများ:</h2>
       <div class="main-menu-grid">
@@ -151,7 +143,6 @@ td select{min-width:105px;padding:8px;font-size:12px}
     </div>
   </section>
 
-  <!-- STUDENTS PAGE -->
   <section id="students" class="page hidden">
     <div class="panel">
       <div class="actions"><button onclick="toggleStudentForm()" id="studentFormToggle">＋ ကျောင်းသားစာရင်းဖြည့်သွင်းရန်</button> <button class="secondary" onclick="setPage('home')">⬅️ ပင်မစာမျက်နှာသို့</button></div>
@@ -195,7 +186,6 @@ td select{min-width:105px;padding:8px;font-size:12px}
     </div>
   </section>
 
-  <!-- ATTENDANCE PAGE -->
   <section id="attendance" class="page hidden">
     <div class="panel">
       <div class="actions"><button class="secondary" onclick="setPage('home')">⬅️ ပင်မစာမျက်နှာသို့</button></div>
@@ -218,7 +208,6 @@ td select{min-width:105px;padding:8px;font-size:12px}
     </div>
   </section>
 
-  <!-- SMS PAGE -->
   <section id="sms" class="page hidden">
     <div class="panel">
       <div class="actions"><button class="secondary" onclick="setPage('home')">⬅️ ပင်မစာမျက်နှာသို့</button></div>
@@ -234,7 +223,6 @@ td select{min-width:105px;padding:8px;font-size:12px}
     </div>
   </section>
 
-  <!-- MONTHLY PAGE -->
   <section id="monthly" class="page hidden">
     <div class="panel">
       <div class="actions"><button class="secondary" onclick="setPage('home')">⬅️ ပင်မစာမျက်နှာသို့</button></div>
@@ -277,7 +265,6 @@ function tally(arr,d){let o={present:0,absent:0,leave:0,unexcused:0,late:0,pendi
 function fillSelect(id,all=false){$(id).innerHTML=(all?'<option value="ALL">အတန်းအားလုံး</option>':"")+classes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("")}
 function setPage(p){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hidden",x.id!==p));if(p==="home")renderHome();if(p==="students")renderStudents();if(p==="attendance")renderAttendance();if(p==="monthly")renderMonthly();window.scrollTo({top:0,behavior:"smooth"})}
 
-// Daily / Monthly Tab Switcher inside Dashboard
 function switchDashView(type){
   if(type==='daily'){
     $("tabDailyBtn").classList.add("active");
@@ -314,7 +301,7 @@ function saveStudentForm(){let id=$("editId").value,sid=$("sid").value.trim(),na
 function clearStudentForm(){["editId","sid","sname","dob","admissionDate","parentName","phone","address"].forEach(id=>$(id).value="");$("gender").value="ကျား";$("active").value="true"}
 function editStudent(id){let s=db.students.find(x=>x.id===id);if(!s)return;toggleStudentForm(true);$("editId").value=s.id;$("sid").value=s.sid||"";$("sname").value=s.name||"";$("gender").value=s.gender||"ကျား";$("studentClass").value=s.className;$("dob").value=s.dob||"";$("admissionDate").value=s.admissionDate||"";$("parentName").value=s.parentName||"";$("phone").value=s.phone||"";$("address").value=s.address||"";$("active").value=s.active===false?"false":s.active==="paused"?"paused":"true";window.scrollTo({top:0,behavior:"smooth"})}
 function deleteStudent(id){let s=db.students.find(x=>x.id===id);if(!s)return;if(!confirm(`${s.name} ကို ကျောင်းသားစာရင်းမှ ဖယ်ရှားမလား။ တက်ရောက်မှုမှတ်တမ်းကိုတော့ မဖျက်ပါ။`))return;s.active=false;save();renderStudents();renderHome()}
-function renderStudents(){let c=$("listClass").value||"KG",q=$("search").value.trim().toLowerCase(),all=$("listStatus").value==="all",arr=db.students.filter(s=>s.className===c&&(all||s.active===true||s.active===undefined)).filter(s=>(s.name||"").toLowerCase().includes(q)||(s.sid||"").toLowerCase().includes(q));let active=list(c);$("classTotal").textContent=active.length;$("boys").textContent=active.filter(s=>s.gender==="ကျား").length;$("girls").textContent=active.filter(s=>s.gender==="မ").length;$("className").textContent=c;$("studentTable").innerHTML=arr.length?`<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>မွေးသက္ကရာဇ်</th><th>အတန်း</th><th>မိဘအမည်</th><th>ဖုန်း</th><th>အခြေအနေ</th><th>ပြင် / ဖယ်</th></tr></thead><tbody>${arr.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.sid)}</td><td>${esc(s.name)}</td><td>${esc(s.gender)}</td><td>${esc(s.dob||"-")}</td><td>${esc(s.className)}</td><td>${esc(s.parentName||"-")}</td><td>${esc(s.phone||"-")}</td><td>${s.active===false?"ကျောင်းထွက်":s.active==="paused"?"ယာယီရပ်နား":"တက်ရောက်ဆဲ"}</td><td><button class="secondary" onclick="editStudent('${s.id}')">ပြင်</button> <button class="danger" onclick="deleteStudent('${s.id}')">ဖယ်</button></td></tr>`).join("")}</tbody></table></div>`:'<p>စာရင်းမရှိပါ။ အပေါ်ကနေ ကျောင်းသားအသစ်ထည့်နိုင်သည်။တက်ရောက်ဆဲစာရင်းမရှိပါ။</p>'}
+function renderStudents(){let c=$("listClass").value||"KG",q=$("search").value.trim().toLowerCase(),all=$("listStatus").value==="all",arr=db.students.filter(s=>s.className===c&&(all||s.active===true||s.active===undefined)).filter(s=>(s.name||"").toLowerCase().includes(q)||(s.sid||"").toLowerCase().includes(q));let active=list(c);$("classTotal").textContent=active.length;$("boys").textContent=active.filter(s=>s.gender==="ကျား").length;$("girls").textContent=active.filter(s=>s.gender==="မ").length;$("className").textContent=c;$("studentTable").innerHTML=arr.length?`<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>မွေးသက္ကရာဇ်</th><th>အတန်း</th><th>မိဘအမည်</th><th>ဖုန်း</th><th>အခြေအနေ</th><th>ပြင် / ဖယ်</th></tr></thead><tbody>${arr.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.sid)}</td><td>${esc(s.name)}</td><td>${esc(s.gender)}</td><td>${esc(s.dob||"-")}</td><td>${esc(s.className)}</td><td>${esc(s.parentName||"-")}</td><td>${esc(s.phone||"-")}</td><td>${s.active===false?"ကျောင်းထွက်":s.active==="paused"?"ယာယီရပ်နား":"တက်ရောက်ဆဲ"}</td><td><button class="secondary" onclick="editStudent('${s.id}')">ပြင်</button> <button class="danger" onclick="deleteStudent('${s.id}')">ဖယ်</button></td></tr>`).join("")}</tbody></table></div>`:'<p>စာရင်းမရှိပါ။</p>'}
 function renderAttendance(){
  let d=$("attDate").value||today(),c=$("attClass").value||"KG",a=list(c),t=tally(a,d);
  $("attTotal").textContent=a.length;$("attPresent").textContent=t.present;$("attAbsent").textContent=t.absent+t.unexcused;$("attPending").textContent=t.pending;
@@ -323,21 +310,44 @@ function renderAttendance(){
 function monthTally(arr,m){let t={present:0,absent:0,leave:0,unexcused:0,late:0};Object.keys(db.records).forEach(k=>{if(!k.startsWith(m+"-"))return;let id=k.split("|")[1];if(!arr.some(s=>s.id===id))return;let v=db.records[k];if(t[v]!==undefined)t[v]++});return t}
 function monthKeys(id,m){return Object.keys(db.records).filter(k=>k.startsWith(m+"-")&&k.endsWith("|"+id)&&["present","absent","leave","unexcused","late"].includes(db.records[k])).sort()}
 function pct(n,d){return d?Math.round(n/d*1000)/10:0}
+
 function renderMonthly(){
  let m=$("reportMonth").value||today().slice(0,7),c=$("reportClass").value||"ALL";
  let active=db.students.filter(s=>s.active===true||s.active===undefined),arr=(c==="ALL"?active:active.filter(s=>s.className===c)).slice().sort((a,b)=>classes.indexOf(a.className)-classes.indexOf(b.className)||(a.sid||"").localeCompare(b.sid||""));
  let clsList=c==="ALL"?classes:[c];
- let classRows=clsList.map(cl=>{let a=list(cl),t=monthTally(a,m),n=Object.values(t).reduce((x,y)=>x+y,0),att=pct(t.present+t.late,n),abs=pct(t.absent+t.unexcused,n);return `<tr><td>${esc(cl)}</td><td>${a.length}</td><td>${t.present}</td><td>${t.absent}</td><td>${t.leave}</td><td>${t.unexcused}</td><td>${t.late}</td><td>${n?att+"%":"—"}</td><td>${n?abs+"%":"—"}</td></tr>`}).join("");
- let studentRows=arr.map(s=>{let t={present:0,absent:0,leave:0,unexcused:0,late:0},keys=monthKeys(s.id,m);keys.forEach(k=>{t[db.records[k]]++});let n=keys.length,att=pct(t.present+t.late,n),abs=pct(t.absent+t.unexcused,n);return `<tr><td>${esc(s.name)}</td><td>${esc(s.className)}</td><td>${esc(s.sid)}</td><td>${esc(s.gender||"-")}</td><td>${t.present}</td><td>${t.absent}</td><td>${t.leave}</td><td>${t.unexcused}</td><td>${t.late}</td><td>${n?att.toFixed(1)+"%":"—"}</td><td>${n?abs.toFixed(1)+"%":"—"}</td></tr>`}).join("");
- let grand=arr.reduce((o,s)=>{let t=monthTally([s],m);Object.keys(t).forEach(k=>o[k]+=t[k]);return o},{present:0,absent:0,leave:0,unexcused:0,late:0});let gn=Object.values(grand).reduce((a,b)=>a+b,0);
- $("monthlyTable").innerHTML=`<p class="muted">ရွေးထားသောလ: <b>${esc(m)}</b> · ${c==="ALL"?"အတန်းအားလုံး":esc(c)}</p><h3>📚 အတန်းအလိုက် လစဉ်စာရင်းချုပ်</h3><div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>ကျောင်းသား</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက် %</th><th>ပျက် %</th></tr></thead><tbody>${classRows}</tbody><tfoot><tr><th>ရွေးထားသောစာရင်း စုစုပေါင်း</th><th>${arr.length}</th><th>${grand.present}</th><th>${grand.absent}</th><th>${grand.leave}</th><th>${grand.unexcused}</th><th>${grand.late}</th><th>${gn?pct(grand.present+grand.late,gn)+"%":"—"}</th><th>${gn?pct(grand.absent+grand.unexcused,gn)+"%":"—"}</th></tr></tfoot></table></div><h3>👨‍🎓 ကျောင်းသားတစ်ဦးချင်း လစဉ်စာရင်း</h3><div class="tablewrap"><table style="min-width:1050px"><thead><tr><th>ကျောင်းသားအမည်</th><th>အတန်း</th><th>ကျောင်းသားအမှတ်</th><th>ကျား/မ</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက် %</th><th>ပျက် %</th></tr></thead><tbody>${studentRows||'<tr><td colspan="11">ကျောင်းသားစာရင်းမရှိပါ။</td></tr>'}</tbody></table></div>`;
- let opts=arr.map(s=>`<option value="${esc(s.id)}">${esc(s.className)} · ${esc(s.name)} (${esc(s.sid)})</option>`).join("");let old=$("detailStudent").value;$("detailStudent").innerHTML='<option value="">ကျောင်းသားရွေးရန်</option>'+opts;if(arr.some(s=>s.id===old))$("detailStudent").value=old;showDetail($("detailStudent").value,m)
+ 
+ let classRows=clsList.map(cl=>{
+   let a=list(cl),t=monthTally(a,m),n=Object.values(t).reduce((x,y)=>x+y,0);
+   let att=pct(t.present+t.late,n),abs=pct(t.absent+t.unexcused,n);
+   return `<tr><td>${esc(cl)}</td><td>${a.length}</td><td>${t.present}</td><td>${t.absent}</td><td>${t.leave}</td><td>${t.unexcused}</td><td>${t.late}</td><td>${n?att+"%":"—"}</td><td>${n?abs+"%":"—"}</td></tr>`
+ }).join("");
+
+ let studentRows=arr.map(s=>{
+   let t={present:0,absent:0,leave:0,unexcused:0,late:0},keys=monthKeys(s.id,m);
+   keys.forEach(k=>{t[db.records[k]]++});
+   let n=keys.length,att=pct(t.present+t.late,n),abs=pct(t.absent+t.unexcused,n);
+   return `<tr><td>${esc(s.name)}</td><td>${esc(s.className)}</td><td>${esc(s.sid)}</td><td>${esc(s.gender||"-")}</td><td>${t.present}</td><td>${t.absent}</td><td>${t.leave}</td><td>${t.unexcused}</td><td>${t.late}</td><td>${n?att.toFixed(1)+"%":"—"}</td><td>${n?abs.toFixed(1)+"%":"—"}</td></tr>`
+ }).join("");
+
+ let grand=arr.reduce((o,s)=>{let t=monthTally([s],m);Object.keys(t).forEach(k=>o[k]+=t[k]);return o},{present:0,absent:0,leave:0,unexcused:0,late:0});
+ let gn=Object.values(grand).reduce((a,b)=>a+b,0);
+ let gAtt=pct(grand.present+grand.late,gn),gAbs=pct(grand.absent+grand.unexcused,gn);
+
+ $("monthlyTable").innerHTML=`<p class="muted">ရွေးထားသောလ: <b>${esc(m)}</b> · ${c==="ALL"?"အတန်းအားလုံး":esc(c)}</p><h3>📚 အတန်းအလိုက် လစဉ်စာရင်းချုပ်</h3><div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>ကျောင်းသား</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက် %</th><th>ပျက် %</th></tr></thead><tbody>${classRows}</tbody><tfoot><tr><th>ရွေးထားသောစာရင်း စုစုပေါင်း</th><th>${arr.length}</th><th>${grand.present}</th><th>${grand.absent}</th><th>${grand.leave}</th><th>${grand.unexcused}</th><th>${grand.late}</th><th>${gn?gAtt+"%":"—"}</th><th>${gn?gAbs+"%":"—"}</th></tr></tfoot></table></div><h3>👨‍🎓 ကျောင်းသားတစ်ဦးချင်း လစဉ်စာရင်း</h3><div class="tablewrap"><table style="min-width:1050px"><thead><tr><th>ကျောင်းသားအမည်</th><th>အတန်း</th><th>ကျောင်းသားအမှတ်</th><th>ကျား/မ</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက် %</th><th>ပျက် %</th></tr></thead><tbody>${studentRows||'<tr><td colspan="11">ကျောင်းသားစာရင်းမရှိပါ။</td></tr>'}</tbody></table></div>`;
+ 
+ let opts=arr.map(s=>`<option value="${esc(s.id)}">${esc(s.className)} · ${esc(s.name)} (${esc(s.sid)})</option>`).join("");
+ let old=$("detailStudent").value;
+ $("detailStudent").innerHTML='<option value="">ကျောင်းသားရွေးရန်</option>'+opts;
+ if(arr.some(s=>s.id===old))$("detailStudent").value=old;
+ showDetail($("detailStudent").value,m)
 }
+
 function showDetail(id,m){
  if(!id){$("studentDetail").innerHTML="";return}let s=db.students.find(x=>x.id===id);if(!s){$("studentDetail").innerHTML="";return}
  let keys=monthKeys(id,m),t={present:0,absent:0,leave:0,unexcused:0,late:0};keys.forEach(k=>t[db.records[k]]++);let n=keys.length,att=pct(t.present+t.late,n),abs=pct(t.absent+t.unexcused,n);
  $("studentDetail").innerHTML=`<div style="margin-top:10px"><h3>${esc(s.name)} · ${esc(s.className)} · ကျောင်းသားအမှတ် ${esc(s.sid)}</h3><div class="tablewrap"><table><thead><tr><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက် %</th><th>ပျက် %</th></tr></thead><tbody><tr><td>${t.present}</td><td>${t.absent}</td><td>${t.leave}</td><td>${t.unexcused}</td><td>${t.late}</td><td>${n?att.toFixed(1)+"%":"—"}</td><td>${n?abs.toFixed(1)+"%":"—"}</td></tr></tbody></table></div></div>`
 }
+
 let smsDraft=null;
 function parseHomeTeacherSMS(){let v=$("homeSmsText").value.trim();if(!v){alert("SMS ကို အရင်ကူးထည့်ပါ။");return}$("smsText").value=v;setPage("sms");parseTeacherSMS()}
 function clearTeacherSMS(){$("smsText").value="";$("smsReview").innerHTML="";smsDraft=null}
@@ -353,8 +363,8 @@ function matchSmsStudent(name,arr){let raw=normalizeName(name),m=raw.match(/^(.+
 function parseTeacherSMS(){
  let text=$("smsText").value.trim();if(!text){alert("အတန်းပိုင်ပို့လာတဲ့ SMS ကို အရင်ကူးထည့်ပါ။");return}
  let cls=normalizeClass(smsField(text,["အတန်း","အတန်းအမည်","Class"]));let date=smsDate(text)||$("homeDate").value||today();
- if(!cls){$("smsReview").innerHTML='<div class="notice dangertext">အတန်းအမည် မတွေ့ပါ။ ဥပမာ “အတန်း = KG” ဟု ထည့်ပါ။</div>';return}
- let roster=list(cls);if(!roster.length){$("smsReview").innerHTML=`<div class="notice dangertext">${esc(cls)} အတန်းတွင် လက်ရှိကျောင်းသားစာရင်းမရှိပါ။</div>`;return}
+ if(!cls){$("smsReview").innerHTML='<div class="notice dangertext">အတန်းအမည် မတွေ့ပါ။</div>';return}
+ let roster=list(cls);if(!roster.length){$("smsReview").innerHTML=`<div class="notice dangertext">${esc(cls)} အတန်းတွင် ကျောင်းသားစာရင်းမရှိပါ။</div>`;return}
  let total=smsCount(text,["စာရင်းရှိ","ကျောင်းသားစုစုပေါင်း","စုစုပေါင်းကျောင်းသား","စုစုပေါင်း"]);
  let absentNames=parseNameList(text,["ပျက်ကွက်ကျောင်းသား","ပျက်ကွက်သူ","ပျက်သူ","Absent"]);
  let leaveNames=parseNameList(text,["ခွင့်ယူသူ","ခွင့်သူ","ခွင့်ကျောင်းသား"]);
@@ -368,7 +378,7 @@ function parseTeacherSMS(){
  let html=`<div class="panel" style="background:#f8fafc;margin-top:12px"><h3>🔍 SMS စစ်ဆေးချက် — ${esc(cls)} · ${esc(date)}</h3><p>စာရင်းရှိ: <b>${roster.length}</b> ဦး · ပျက်ကွက်သူ: <b>${absentNames.length}</b> ဦး · တက်ရောက်မည်: <b>${inferredPresent.length}</b> ဦး</p>`;
  html+=`<div class="tablewrap"><table><thead><tr><th>ကျောင်းသားအမှတ်</th><th>အမည်</th><th>အခြေအနေ</th></tr></thead><tbody>${smsDraft.arr.map(st=>`<tr><td>${esc(st.sid)}</td><td>${esc(st.name)}</td><td>${esc(statusLabel[st.status])}</td></tr>`).join("")}</tbody></table></div>`;
  if(canSave)html+=`<div class="actions"><button class="green" onclick="applyTeacherSMS()">💾 မှတ်တမ်းသိမ်းရန်</button><button class="secondary" onclick="clearTeacherSMS()">ရှင်းရန်</button></div>`;
- else html+=`<p class="dangertext">အမည်မကိုက်ညီမှု ရှိနေပါသည်။ ပြန်လည်စစ်ဆေးပါ။</p>`;
+ else html+=`<p class="dangertext">အမည်မကိုက်ညီမှု ရှိနေပါသည်။</p>`;
  html+=`</div>`;$("smsReview").innerHTML=html;
 }
 function applyTeacherSMS(){if(!smsDraft)return;smsDraft.arr.forEach(st=>{db.records[key(smsDraft.date,st.id)]=st.status});$("homeDate").value=smsDraft.date;$("attDate").value=smsDraft.date;$("attClass").value=smsDraft.cls;save();renderAll();alert("တက်ရောက်မှုမှတ်တမ်း သိမ်းပြီးပါပြီ။");setPage("home")}
