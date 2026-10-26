@@ -245,7 +245,10 @@ function parseTeacherSMS(){
  else html+=`<p class="dangertext">အမည်မကိုက်ညီမှု သို့မဟုတ် အမည်ထပ်နေမှုကို ပြင်ပြီးမှ သိမ်းဆည်းနိုင်ပါမည်။</p><div class="actions"><button class="secondary" onclick="clearTeacherSMS()">SMS ရှင်းရန်</button></div>`;
  html+=`</div>`;$("smsReview").innerHTML=html;
 }
-function applyTeacherSMS(){if(!smsDraft){alert("SMS ကို အရင်စစ်ဆေးပါ။");return}if(smsDraft.unmatched.length||smsDraft.issues.some(x=>x.includes("အခြေအနေတစ်မျိုးထက်ပို"))){alert("SMS ထဲက အမည်များကို ကျောင်းသားစာရင်းနဲ့ ပြန်စစ်ပါ။");return}if(!confirm(`${smsDraft.cls} အတန်း၊ ${smsDraft.date} ရက်နေ့အတွက် ${smsDraft.rosterCount} ဦး၏ တက်ရောက်မှုကို သိမ်းမလား။ ယခင်နေ့စဉ်မှတ်တမ်းရှိပါက အစားထိုးပါမည်။`))return;smsDraft.arr.forEach(st=>{db.records[key(smsDraft.date,st.id)]=st.status});$("homeDate").value=smsDraft.date;$("attDate").value=smsDraft.date;$("attClass").value=smsDraft.cls;save();renderAll();alert(`${smsDraft.cls} အတန်း၏ ${smsDraft.date} တက်ရောက်မှုမှတ်တမ်း သိမ်းပြီးပါပြီ။`);setPage("home")}
+function applyTeacherSMS(){if(smsDraft.unmatched.length || smsDraft.issues.length){
+  alert("SMS စစ်ဆေးမှု မအောင်မြင်ပါ။ အမည်၊ ရက်စွဲ၊ အရေအတွက်နဲ့ အတန်းစာရင်းကို ပြန်စစ်ပါ။");
+  return;
+}
 function downloadBackup(){let blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="CFBS-attendance-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 $("restoreFile").addEventListener("change",async e=>{let f=e.target.files[0];if(!f)return;try{let x=JSON.parse(await f.text());if(!Array.isArray(x.students)||!x.records)throw Error("invalid");if(confirm("လက်ရှိစာရင်းကို Backup ဖိုင်ဖြင့် အစားထိုးမလား။ အရင်စာရင်းကို Backup ထုတ်ထားပါ။")){db=x;save();renderAll();alert("Backup ပြန်ထည့်ပြီးပါပြီ။")}}catch(err){alert("Backup ဖိုင်ဖတ်မရပါ။ မှန်ကန်သော CFBS JSON Backup ကိုရွေးပါ။")}e.target.value=""});
 function renderAll(){renderHome();renderStudents();renderAttendance();renderMonthly()}
