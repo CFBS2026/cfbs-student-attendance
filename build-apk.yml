@@ -1,3 +1,4 @@
+
 name: Build CFBS Attendance APK
 
 "on":
@@ -12,6 +13,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -32,62 +34,99 @@ jobs:
 
       - name: Create Android project
         run: |
-          mkdir -p app/src/main/java/com/cfbs/attendance
+          test -f index.html || { echo "index.html not found"; exit 1; }
+
           mkdir -p app/src/main/assets
+          mkdir -p app/src/main/java/com/cfbs/attendance
           cp index.html app/src/main/assets/index.html
 
-          echo 'pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
-          dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
-          rootProject.name = "CFBSStudentAttendance"
-          include(":app")' > settings.gradle
+          cat > settings.gradle <<'EOF'
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          rootProject.name = 'CFBSStudentAttendance'
+          include ':app'
+          EOF
 
-          echo "plugins { id 'com.android.application' version '8.5.2' apply false }" > build.gradle
+          cat > build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application' version '8.5.2' apply false
+          }
+          EOF
 
-          echo "plugins { id 'com.android.application' }
+          cat > app/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application'
+          }
+
           android {
-            namespace 'com.cfbs.attendance'
-            compileSdk 35
-            defaultConfig {
-              applicationId 'com.cfbs.attendance'
-              minSdk 23
-              targetSdk 28
-              versionCode 1
-              versionName '1.0'
-            }
-          }" > app/build.gradle
+              namespace 'com.cfbs.attendance'
+              compileSdk 35
 
-          echo '<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-            <application android:label="CFBS Student Attendance" android:theme="@android:style/Theme.Material.Light.NoActionBar">
-              <activity android:name=".MainActivity" android:exported="true">
-                <intent-filter>
-                  <action android:name="android.intent.action.MAIN"/>
-                  <category android:name="android.intent.category.LAUNCHER"/>
-                </intent-filter>
-              </activity>
-            </application>
-          </manifest>' > app/src/main/AndroidManifest.xml
+              defaultConfig {
+                  applicationId 'com.cfbs.attendance'
+                  minSdk 23
+                  targetSdk 28
+                  versionCode 1
+                  versionName '1.0'
+              }
+          }
+          EOF
+
+          cat > app/src/main/AndroidManifest.xml <<'EOF'
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <application
+                  android:label="CFBS Student Attendance"
+                  android:theme="@android:style/Theme.Material.Light.NoActionBar">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
 
           cat > app/src/main/java/com/cfbs/attendance/MainActivity.java <<'EOF'
           package com.cfbs.attendance;
+
           import android.app.Activity;
           import android.os.Bundle;
           import android.webkit.WebView;
           import android.webkit.WebSettings;
+
           public class MainActivity extends Activity {
-            public void onCreate(Bundle b) {
-              super.onCreate(b);
-              WebView w = new WebView(this);
-              WebSettings s = w.getSettings();
-              s.setJavaScriptEnabled(true);
-              s.setDomStorageEnabled(true);
-              setContentView(w);
-              w.loadUrl("file:///android_asset/index.html");
-            }
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+
+                  WebView webView = new WebView(this);
+                  WebSettings settings = webView.getSettings();
+                  settings.setJavaScriptEnabled(true);
+                  settings.setDomStorageEnabled(true);
+
+                  setContentView(webView);
+                  webView.loadUrl("file:///android_asset/index.html");
+              }
           }
           EOF
 
-      - name: Install Android SDK
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Install Android SDK packages
+        run: sdkmanager --install "platforms;android-35" "build-tools;35.0.0"
 
       - name: Build APK
         run: gradle --no-daemon assembleDebug
