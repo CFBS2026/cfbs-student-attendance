@@ -72,12 +72,12 @@ header {
 }
 
 .wrap {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 16px;
 }
 
-/* Tabs Toggle UI like Image */
+/* Tabs Toggle UI */
 .tab-toggle {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -136,7 +136,7 @@ header {
 }
 
 .stat-card .val {
-  font-size: clamp(22px, 4.5vw, 28px);
+  font-size: clamp(20px, 4vw, 26px);
   font-weight: 900;
   margin-top: 6px;
 }
@@ -179,9 +179,7 @@ header {
   transition: transform 0.1s;
 }
 
-.menu-btn:active {
-  transform: scale(0.98);
-}
+.menu-btn:active { transform: scale(0.98); }
 
 .footer-credits {
   text-align: center;
@@ -282,12 +280,6 @@ th { background: #f1f5f9; color: var(--navy); font-weight: 800; white-space: now
 }
 
 .hidden { display: none !important; }
-
-@media (max-width: 600px) {
-  .stats-grid { gap: 4px; }
-  .stat-card { padding: 10px 2px; }
-  .menu-btn { padding: 14px 8px; font-size: 13.5px; }
-}
 </style>
 </head>
 <body>
@@ -336,18 +328,10 @@ th { background: #f1f5f9; color: var(--navy); font-weight: 800; white-space: now
     <div class="section-heading">အဓိက မီနူးများ</div>
 
     <div class="menu-grid">
-      <button class="menu-btn" onclick="openPage('students')">
-        <span>👨‍🎓</span> ကျောင်းသားစာရင်း
-      </button>
-      <button class="menu-btn" onclick="openPage('attendance')">
-        <span>📋</span> တက်ရောက်မှု
-      </button>
-      <button class="menu-btn" onclick="openPage('sms')">
-        <span>💬</span> အတန်းပိုင် SMS
-      </button>
-      <button class="menu-btn" onclick="openPage('reports')">
-        <span>📊</span> လစဉ်အစီရင်ခံစာ
-      </button>
+      <button class="menu-btn" onclick="openPage('students')"><span>👨‍🎓</span> ကျောင်းသားစာရင်း</button>
+      <button class="menu-btn" onclick="openPage('attendance')"><span>📋</span> တက်ရောက်မှု</button>
+      <button class="menu-btn" onclick="openPage('sms')"><span>💬</span> အတန်းပိုင် SMS</button>
+      <button class="menu-btn" onclick="openPage('reports')"><span>📊</span> လစဉ်အစီရင်ခံစာ</button>
     </div>
 
     <div class="panel">
@@ -367,9 +351,7 @@ th { background: #f1f5f9; color: var(--navy); font-weight: 800; white-space: now
       </div>
     </div>
 
-    <div class="footer-credits">
-      CHINDWIN FUTURE BRIGHT SCHOOL · Attendance Dashboard
-    </div>
+    <div class="footer-credits">CHINDWIN FUTURE BRIGHT SCHOOL · Attendance Dashboard</div>
   </div>
 
   <!-- STUDENTS PAGE -->
@@ -386,7 +368,7 @@ th { background: #f1f5f9; color: var(--navy); font-weight: 800; white-space: now
           <div class="field"><label>ကျောင်းသားအမည်</label><input id="stName" required placeholder="အမည်"></div>
         </div>
         <div class="row">
-          <div class="field"><label>မွေးသက္ကရာဇ်</label><input id="stDOB" placeholder="ဥပမာ ၁၅.၁.၂၀၁၀"></div>
+          <div class="field"><label>မွေးသက္ကရာဇ် (ရက်.လ.ခုနှစ်)</label><input id="stDOB" placeholder="ဥပမာ 15.01.2012"></div>
           <div class="field"><label>မိဘအမည်</label><input id="stParent" placeholder="မိဘအမည်"></div>
           <div class="field"><label>ဖုန်းနံပါတ်</label><input id="stPhone" inputmode="tel" placeholder="ဖုန်းနံပါတ်"></div>
         </div>
@@ -413,9 +395,7 @@ th { background: #f1f5f9; color: var(--navy); font-weight: 800; white-space: now
           <input id="sSearch" placeholder="ရှာဖွေရန်..." oninput="renderStudents()">
         </div>
       </div>
-      <div class="notice">
-        မှတ်ချက် - ကျား စာရင်းကို ကျောင်းဝင်အမှတ် ငယ်စဉ်ကြီးလိုက် အရင်ပြပြီး၊ မ စာရင်းကို အောက်တွင် ကျောင်းဝင်အမှတ် ငယ်စဉ်ကြီးလိုက် အစဉ်လိုက် ပြပေးထားပါသည်။
-      </div>
+      <div class="notice">မှတ်ချက် - ကျား စာရင်းကို ကျောင်းဝင်အမှတ် ငယ်စဉ်ကြီးလိုက် အရင်ပြပြီး၊ မ စာရင်းကို အောက်တွင် ကျောင်းဝင်အမှတ် ငယ်စဉ်ကြီးလိုက် အစဉ်လိုက် ပြပေးထားပါသည်။</div>
       <div id="studentTable"></div>
     </div>
   </section>
@@ -435,6 +415,12 @@ th { background: #f1f5f9; color: var(--navy); font-weight: 800; white-space: now
 
       <div id="attendanceSummaryBox" class="summary-card"></div>
 
+      <!-- ပျက်ကွက်သူများစာရင်း သီးသန့်ဇယား -->
+      <div class="panel" style="margin-top:16px; border:1px solid #fecaca; background:#fff5f5;">
+        <h3 style="color:#b91c1c; font-size:15px; margin-top:0;">🚫 ယနေ့ ပျက်ကွက်သူများစာရင်း</h3>
+        <div id="absentStudentsTable"></div>
+      </div>
+
       <div class="row" style="margin-top:14px;">
         <button class="btn-green" onclick="saveAttendance()">တက်ရောက်မှု သိမ်းရန်</button>
         <button class="btn light" onclick="setAllStatus('present')">အားလုံးတက်</button>
@@ -448,24 +434,18 @@ th { background: #f1f5f9; color: var(--navy); font-weight: 800; white-space: now
     <button class="btn light" style="margin-bottom:12px;" onclick="goBack()">← နောက်သို့</button>
     <div class="panel">
       <h2>အတန်းပိုင် SMS ကူးထည့်ရန်</h2>
-      <div class="notice">
-        အတန်းပိုင်ဆရာ/မထံမှ မက်ဆေ့ကို Copy လုပ်ပြီး Paste လုပ်ပါ။ တက်/ပျက်/ခွင့်/ခွင့်မဲ့/နောက်ကျ များကို Auto စစ်ဆေးပေးပါမည်။
-      </div>
+      <div class="notice">အတန်းပိုင်ဆရာ/မထံမှ မက်ဆေ့ကို Paste လုပ်လိုက်သည်နှင့် တက်ရောက်မှုများကို အလိုအလျောက် (Auto) စစ်ဆေးပြီး သိမ်းဆည်းရန် အသင့်ဖြစ်ပါမည်။</div>
       <div class="row">
         <div class="field"><label>အတန်း</label><select id="smsClass"></select></div>
         <div class="field"><label>ရက်စွဲ</label><input type="date" id="smsDate"></div>
       </div>
       <div class="field">
         <label>SMS စာသား</label>
-        <textarea id="smsText" placeholder="ဥပမာ -&#10;Grade 5&#10;ရက်စွဲ - 26/10/2026&#10;501 - တက်&#10;502 - ပျက်&#10;503 - ခွင့်&#10;504 - နောက်ကျ"></textarea>
-      </div>
-      <div class="row">
-        <button class="btn" onclick="parseSMS()">SMS စစ်ဆေးရန်</button>
-        <button class="btn light" onclick="document.getElementById('smsText').value='';document.getElementById('smsPreview').innerHTML='';">ရှင်းလင်းရန်</button>
+        <textarea id="smsText" placeholder="ဥပမာ -&#10;Grade 5&#10;501 - တက်&#10;502 - ပျက်&#10;503 - ခွင့်&#10;504 - နောက်ကျ" oninput="parseSMSAuto()"></textarea>
       </div>
       <div id="smsPreview"></div>
       <div class="row" style="margin-top:12px;">
-        <button class="btn-green" onclick="saveSMS()">စစ်ဆေးထားသောစာရင်း သိမ်းရန်</button>
+        <button class="btn-green" onclick="saveSMS()">စစ်ဆေးပြီးသားစာရင်း အတည်ပြုသိမ်းရန်</button>
       </div>
     </div>
   </section>
@@ -474,13 +454,14 @@ th { background: #f1f5f9; color: var(--navy); font-weight: 800; white-space: now
   <section id="reports" class="page">
     <button class="btn light" style="margin-bottom:12px;" onclick="goBack()">← နောက်သို့</button>
     <div class="panel">
-      <h2>လစဉ်အစီရင်ခံစာ</h2>
+      <h2>လစဉ်အစီရင်ခံစာ (ကျောင်းခေါ်ကြိမ်နှင့် % တွက်ချက်မှု)</h2>
       <div class="row">
         <div class="field"><label>လ</label><input type="month" id="reportMonth"></div>
-        <div class="field"><label>အတန်း</label><select id="reportClass"></select></div>
+        <div class="field"><label>အတန်း</label><select id="reportClass" onchange="renderReports()"></select></div>
         <button class="btn" onclick="renderReports()">အစီရင်ခံစာကြည့်ရန်</button>
         <button class="btn light" onclick="window.print()">Print</button>
       </div>
+      <div class="notice">မှတ်ချက် - တစ်လလျှင် ပုံမှန်ကျောင်းဖွင့်ရက် (၂၀) ရက်၊ တစ်ရက်လျှင် နံနက်/နေ့လယ် (၂) ကြိမ်နှုန်းဖြင့် စုစုပေါင်း ပုံမှန်ကျောင်းခေါ်ကြိမ် (၄၀) အပေါ် အခြေခံတွက်ချက်ပါသည်။</div>
       <div id="reportOutput" style="margin-top:12px;"></div>
     </div>
   </section>
@@ -510,7 +491,7 @@ function load(){
         students.push({
           id:'s'+n++,cls:c,code:String((ci+1)*100+j),
           name:['မောင်အောင်','မသီတာ','မောင်မင်း'][j-1]+' ('+c+')',
-          dob:'၁၅.၁.၂၀၁၅',parent:'ဦးဘ',phone:'0912345678',
+          dob:'15.01.2012',parent:'ဦးဘ',phone:'0912345678',
           gender:j===2?'မ':'ကျား',address:'မုံရွာမြို့'
         })
       }
@@ -555,6 +536,23 @@ function toast(t){let el=$('toast');el.textContent=t;el.style.display='block';se
 function recKey(date,code){return date+'|'+code}
 function getStatus(date,code){return attendance[recKey(date,code)]||''}
 
+function calculateAge(dobStr){
+  if(!dobStr) return '-';
+  let parts = dobStr.split(/[\.\-\/]/);
+  if(parts.length!==3) return dobStr;
+  let d=parseInt(parts[0]), m=parseInt(parts[1]), y=parseInt(parts[2]);
+  if(y<100) y += (y>50?1900:2000);
+  let birthDate = new Date(y, m-1, d);
+  let todayDate = new Date();
+  let years = todayDate.getFullYear() - birthDate.getFullYear();
+  let months = todayDate.getMonth() - birthDate.getMonth();
+  if (months < 0 || (months === 0 && todayDate.getDate() < birthDate.getDate())) {
+    years--;
+    months += 12;
+  }
+  return `${years} နှစ် ${months} လ`;
+}
+
 function renderHome(){
   let date=$('attDate').value||today(),todayList=students;
   let counts={present:0,absent:0,leave:0,unexcused:0,late:0};
@@ -565,26 +563,43 @@ function renderHome(){
   $('leaveN').textContent=counts.leave;
   $('unexcusedN').textContent=counts.unexcused+counts.late;
 
-  $('classSummary').innerHTML='<div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>စုစုပေါင်း</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th></tr></thead><tbody>'+classes.map(c=>{
-    let list=students.filter(s=>s.cls===c),x={present:0,absent:0,leave:0,unexcused:0,late:0};
+  let tableHTML='<div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>စုစုပေါင်း</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက်%</th><th>ပျက်%</th></tr></thead><tbody>';
+  let tTotal=0, tPres=0, tAbs=0, tLeave=0, tUnex=0, tLate=0;
+
+  classes.forEach(c=>{
+    let list=students.filter(s=>s.cls===c);
+    if(list.length===0) return;
+    let x={present:0,absent:0,leave:0,unexcused:0,late:0};
     list.forEach(s=>{let st=getStatus(date,s.code);if(x[st]!==undefined)x[st]++});
-    return `<tr><td>${c}</td><td>${list.length}</td><td>${x.present}</td><td>${x.absent}</td><td>${x.leave}</td><td>${x.unexcused}</td><td>${x.late}</td></tr>`
-  }).join('')+'</tbody></table></div>';
+    
+    let sumNotPresent = x.absent + x.leave + x.unexcused + x.late;
+    let pPct = list.length > 0 ? ((x.present/list.length)*100).toFixed(1) : '0.0';
+    let aPct = list.length > 0 ? ((sumNotPresent/list.length)*100).toFixed(1) : '0.0';
+
+    tTotal += list.length; tPres += x.present; tAbs += x.absent; tLeave += x.leave; tUnex += x.unexcused; tLate += x.late;
+
+    tableHTML += `<tr><td>${c}</td><td>${list.length}</td><td>${x.present}</td><td>${x.absent}</td><td>${x.leave}</td><td>${x.unexcused}</td><td>${x.late}</td><td>${pPct}%</td><td>${aPct}%</td></tr>`;
+  });
+
+  let totNotPres = tAbs + tLeave + tUnex + tLate;
+  let totPPct = tTotal > 0 ? ((tPres/tTotal)*100).toFixed(1) : '0.0';
+  let totAPct = tTotal > 0 ? ((totNotPres/tTotal)*100).toFixed(1) : '0.0';
+
+  tableHTML += `<tr style="background:#f1f5f9; font-weight:bold;"><td>စုစုပေါင်း</td><td>${tTotal}</td><td>${tPres}</td><td>${tAbs}</td><td>${tLeave}</td><td>${tUnex}</td><td>${tLate}</td><td>${totPPct}%</td><td>${totAPct}%</td></tr>`;
+  tableHTML += '</tbody></table></div>';
+  $('classSummary').innerHTML = tableHTML;
 }
 
 function renderStudents(){
   let cls=$('sfClass').value||'ALL',q=($('sSearch').value||'').toLowerCase().trim();
   let list=students.filter(s=>(cls==='ALL'||s.cls===cls)&&[s.name,s.code,s.parent,s.phone,s.address,s.dob].some(v=>(v||'').toLowerCase().includes(q)));
   
-  // Sort Logic: Male first (sorted by code), Female second (sorted by code)
   list.sort((a,b)=>{
-    if(a.gender===b.gender){
-      return parseInt(a.code||0) - parseInt(b.code||0);
-    }
+    if(a.gender===b.gender){ return parseInt(a.code||0) - parseInt(b.code||0); }
     return a.gender==='ကျား' ? -1 : 1;
   });
 
-  $('studentTable').innerHTML=list.length?'<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>အတန်း</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>မွေးသက္ကရာဇ်</th><th>မိဘအမည်</th><th>ဖုန်းနံပါတ်</th><th>နေရပ်လိပ်စာ</th><th>ကျား/မ</th><th>လုပ်ဆောင်ရန်</th></tr></thead><tbody>'+list.map((s,i)=>`<tr><td>${i+1}</td><td>${s.cls}</td><td>${esc(s.code)}</td><td>${esc(s.name)}</td><td>${esc(s.dob||'')}</td><td>${esc(s.parent||'')}</td><td>${esc(s.phone||'')}</td><td>${esc(s.address||'')}</td><td>${s.gender||''}</td><td><div class="row" style="gap:4px;"><button class="btn light" onclick="editStudent('${s.id}')">ပြင်</button><button class="btn-red" onclick="deleteStudent('${s.id}')">ဖျက်</button></div></td></tr>`).join('')+'</tbody></table></div>':'<div style="text-align:center;padding:20px;color:var(--muted)">စာရင်းမတွေ့ပါ။</div>';
+  $('studentTable').innerHTML=list.length?'<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>အတန်း</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>မွေးသက္ကရာဇ်</th><th>မိဘအမည်</th><th>ဖုန်းနံပါတ်</th><th>နေရပ်လိပ်စာ</th><th>ကျား/မ</th><th>လုပ်ဆောင်ရန်</th></tr></thead><tbody>'+list.map((s,i)=>`<tr><td>${i+1}</td><td>${s.cls}</td><td>${esc(s.code)}</td><td>${esc(s.name)}</td><td>${esc(s.dob||'')}</td><td>${esc(s.parent||'')}</td><td>${esc(s.phone||'')}</td><td>${esc(s.address||'')}</td><td>${s.gender||''}</td><td><div style="display:flex;gap:4px;white-space:nowrap;"><button class="btn light" style="padding:4px 8px;font-size:11px;" onclick="editStudent('${s.id}')">ပြင်</button><button class="btn-red" style="padding:4px 8px;font-size:11px;" onclick="deleteStudent('${s.id}')">ဖျက်</button></div></td></tr>`).join('')+'</tbody></table></div>':'<div style="text-align:center;padding:20px;color:var(--muted)">စာရင်းမတွေ့ပါ။</div>';
 }
 
 function clearStudentForm(){$('studentForm').reset();$('editId').value=''}
@@ -634,10 +649,11 @@ function renderAttendance(){
 }
 
 function updateAttendanceSummary(){
-  let cls=$('attClass').value||classes[0];
+  let cls=$('attClass').value||classes[0],date=$('attDate').value||today();
   let list=students.filter(s=>s.cls===cls);
   let totalB=list.filter(s=>s.gender==='ကျား').length, totalG=list.filter(s=>s.gender==='မ').length;
   let presentB=0, presentG=0, absentB=0, absentG=0;
+  let absentStudentsList = [];
 
   document.querySelectorAll('.attStatus').forEach(el=>{
     let code=el.dataset.code, st=el.value;
@@ -647,6 +663,9 @@ function updateAttendanceSummary(){
       if(s.gender==='ကျား') presentB++; else presentG++;
     } else if(st==='absent'||st==='unexcused'||st==='late'||st==='leave'){
       if(s.gender==='ကျား') absentB++; else absentG++;
+      if(st==='absent'||st==='unexcused'){
+        absentStudentsList.push(s);
+      }
     }
   });
 
@@ -658,6 +677,13 @@ function updateAttendanceSummary(){
   • စာရင်းရှိ = ကျား - ${totalB} + မ - ${totalG} = စုစုပေါင်း - ${totalAll}<br>
   • တက်ရောက် = ကျား - ${presentB} + မ - ${presentG} = စုစုပေါင်း - ${presentAll} (တက် ${presentPct}%)<br>
   • ပျက်/ခွင့်/နောက်ကျ = ကျား - ${absentB} + မ - ${absentG} = စုစုပေါင်း - ${absentAll} (ပျက် ${absentPct}%)`;
+
+  // Render Absent Students Table
+  if(absentStudentsList.length > 0){
+    $('absentStudentsTable').innerHTML = '<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>အတန်း</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th></tr></thead><tbody>' + absentStudentsList.map((s,i)=>`<tr><td>${i+1}</td><td>${s.cls}</td><td>${esc(s.code)}</td><td>${esc(s.name)}</td></tr>`).join('') + '</tbody></table></div>';
+  } else {
+    $('absentStudentsTable').innerHTML = '<div style="color:#166534; font-size:12px; padding:6px;">ယနေ့ ပျက်ကွက်သူ မရှိပါ။</div>';
+  }
 }
 
 function setAllStatus(st){
@@ -685,10 +711,11 @@ function normalizeStatus(s){
   return'';
 }
 
-function parseSMS(){
-  let text=$('smsText').value.trim(),cls=$('smsClass').value,date=$('smsDate').value;
-  if(!text){toast('SMS စာသားကို Paste လုပ်ပါ။');return}
-  let lines=text.split(/\n|\r/).map(x=>x.trim()).filter(Boolean),list=students.filter(s=>s.cls===cls),rows=[],used=new Set();
+function parseSMSAuto(){
+  let text=$('smsText').value.trim(), cls=$('smsClass').value, date=$('smsDate').value;
+  if(!text){ $('smsPreview').innerHTML=''; return; }
+  let lines=text.split(/\n|\r/).map(x=>x.trim()).filter(Boolean), list=students.filter(s=>s.cls===cls), rows=[], used=new Set();
+  
   lines.forEach(line=>{
     let codeMatch=line.match(/(?:ကျောင်းဝင်အမှတ်|ကျောင်းဝင်နံပါတ်|အမှတ်|ID|Roll\s*No\.?|Student\s*ID|Code)\s*[:：#-]?\s*([\w-]+)/i);
     if(!codeMatch)codeMatch=line.match(/^\s*(\d{2,})\s*[-:：.)]/);
@@ -704,8 +731,9 @@ function parseSMS(){
     }
   });
   smsPending=rows.map(r=>({...r,date,cls}));
-  if(!rows.length){$('smsPreview').innerHTML='<div class="notice">စာသားထဲမှ တက်/ပျက်/ခွင့်/ခွင့်မဲ့/နောက်ကျ အချက်အလက်ကို မဖတ်နိုင်ပါ။</div>';return}
-  $('smsPreview').innerHTML='<h3 style="margin-top:12px;">စစ်ဆေးရန် ('+rows.length+' ကြောင်း)</h3><div class="tablewrap"><table><thead><tr><th>ကိုက်ညီမှု</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>အခြေအနေ</th><th>ပြင်ရန်</th></tr></thead><tbody>'+smsPending.map((r,i)=>`<tr><td>${r.matched?'✓ ကိုက်ညီ':'⚠ စစ်ရန်'}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td><select id="smsst${i}">${Object.entries(statuses).map(([k,v])=>`<option value="${k}" ${r.status===k?'selected':''}>${v}</option>`).join('')}</select></td><td><select id="smsmatch${i}" onchange="rematchSMS(${i},this.value)"><option value="">မသိမ်းရန်</option>${list.map(s=>`<option value="${s.id}" ${s.id===r.studentId?'selected':''}>${esc(s.code)} - ${esc(s.name)}</option>`).join('')}</select></td></tr>`).join('')+'</tbody></table></div>';
+  if(!rows.length){$('smsPreview').innerHTML='<div class="notice">စာသားထဲမှ တက်/ပျက်/ခွင့်/နောက်ကျ အချက်အလက်ကို မဖတ်နိုင်ပါ။</div>';return}
+  
+  $('smsPreview').innerHTML='<h3 style="margin-top:12px;">Auto စစ်ဆေးပြီးစာရင်း ('+rows.length+' ကြောင်း)</h3><div class="tablewrap"><table><thead><tr><th>ကိုက်ညီမှု</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>အခြေအနေ</th><th>ပြင်ရန်</th></tr></thead><tbody>'+smsPending.map((r,i)=>`<tr><td>${r.matched?'✓ ကိုက်ညီ':'⚠ စစ်ရန်'}</td><td>${esc(r.code)}</td><td>${esc(r.name)}</td><td><select id="smsst${i}">${Object.entries(statuses).map(([k,v])=>`<option value="${k}" ${r.status===k?'selected':''}>${v}</option>`).join('')}</select></td><td><select id="smsmatch${i}" onchange="rematchSMS(${i},this.value)"><option value="">မသိမ်းရန်</option>${list.map(s=>`<option value="${s.id}" ${s.id===r.studentId?'selected':''}>${esc(s.code)} - ${esc(s.name)}</option>`).join('')}</select></td></tr>`).join('')+'</tbody></table></div>';
 }
 
 function rematchSMS(i,id){
@@ -727,18 +755,38 @@ function saveSMS(){
 }
 
 function renderReports(){
-  let month=$('reportMonth').value||today().slice(0,7),cls=$('reportClass').value||'ALL';
-  let list=students.filter(s=>cls==='ALL'||s.cls===cls);
-  let records=Object.entries(attendance).filter(([k,v])=>k.startsWith(month+'-')&&list.some(s=>s.code===k.split('|')[1]));
-  let x={present:0,absent:0,leave:0,unexcused:0,late:0};
-  records.forEach(([k,v])=>{if(x[v]!==undefined)x[v]++});
-  let days=[...new Set(records.map(([k])=>k.split('|')[0]))].length;
+  let month=$('reportMonth').value||today().slice(0,7), cls=$('reportClass').value||'ALL';
+  let list = cls==='ALL' ? students : students.filter(s=>s.cls===cls);
   
-  $('reportOutput').innerHTML='<div class="stats-grid"><div class="stat-card c-blue"><div class="lbl">ကျောင်းသား</div><div class="val">'+list.length+'</div></div>'+Object.entries(statuses).map(([k,v])=>`<div class="stat-card"><div class="lbl">${v}</div><div class="val">${x[k]}</div></div>`).join('')+'</div><p style="font-size:12px;color:var(--muted)">ရွေးထားသောလ: '+month+' · စာရင်းသွင်းထားသော ရက်: '+days+' ရက်</p><h3>အတန်းလိုက် အကျဉ်းချုပ်</h3><div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>ကျောင်းသား</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th></tr></thead><tbody>'+classes.filter(c=>cls==='ALL'||c===cls).map(c=>{let ss=students.filter(s=>s.cls===c),z={present:0,absent:0,leave:0,unexcused:0,late:0};Object.entries(attendance).forEach(([k,v])=>{let [d,code]=k.split('|');if(d.startsWith(month+'-')&&ss.some(s=>s.code===code)&&z[v]!==undefined)z[v]++});return `<tr><td>${c}</td><td>${ss.length}</td><td>${z.present}</td><td>${z.absent}</td><td>${z.leave}</td><td>${z.unexcused}</td><td>${z.late}</td></tr>`}).join('')+'</tbody></table></div>';
+  // Assuming 20 school days per month * 2 sessions = 40 total attendance calls
+  let totalScheduledClasses = 40;
+
+  let html = `<div class="notice">ရွေးချယ်ထားသောလ: <strong>${month}</strong> (ပုံမှန်ကျောင်းဖွင့်ရက် ၂၀ ရက် × တစ်ရက် ၂ ကြိမ် = ကျောင်းခေါ်ကြိမ် စုစုပေါင်း ${totalScheduledClasses} ကြိမ်)</div>`;
+  
+  html += '<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>အတန်း</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>အသက်</th><th>ကျောင်းခေါ်ကြိမ်</th><th>ယခုလတက်ရောက်ကြိမ်</th><th>ရာခိုင်နှုန်း (%)</th></tr></thead><tbody>';
+
+  list.forEach((s, i) => {
+    // Count how many times this student was present ('present') in this month
+    let studentPresentCount = 0;
+    Object.entries(attendance).forEach(([k, v]) => {
+      let [d, code] = k.split('|');
+      if(d.startsWith(month+'-') && code === s.code && v === 'present'){
+        studentPresentCount++;
+      }
+    });
+
+    let pct = totalScheduledClasses > 0 ? ((studentPresentCount / totalScheduledClasses) * 100).toFixed(1) : '0.0';
+    let ageText = calculateAge(s.dob);
+
+    html += `<tr><td>${i+1}</td><td>${s.cls}</td><td>${esc(s.code)}</td><td>${esc(s.name)}</td><td>${ageText}</td><td>${totalScheduledClasses}</td><td>${studentPresentCount}</td><td><strong>${pct}%</strong></td></tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  $('reportOutput').innerHTML = html;
 }
 
 function backupData(){
-  let data={app:'CFBS Attendance Dashboard',version:3,exportedAt:new Date().toISOString(),students,attendance};
+  let data={app:'CFBS Attendance Dashboard',version:4,exportedAt:new Date().toISOString(),students,attendance};
   let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');
   a.href=URL.createObjectURL(blob);a.download='CFBS-Attendance-Backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href);toast('Backup ဖိုင်ထုတ်ပြီးပါပြီ။');
 }
@@ -765,7 +813,7 @@ function exportCSV(){
   a.href=URL.createObjectURL(blob);a.download='CFBS-Students.csv';a.click();URL.revokeObjectURL(a.href);
 }
 
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'} [c]))}
 
 $('attDate').addEventListener('change',()=>{renderAttendance();renderHome()});
 $('attClass').addEventListener('change',renderAttendance);
