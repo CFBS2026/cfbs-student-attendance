@@ -6,14 +6,30 @@
 <header><h1>CHINDWIN FUTURE BRIGHT</h1><p>CLASS TEACHER ATTENDANCE SYSTEM</p><p>Budalin Township</p></header><main>
 <nav class="no-print"><button class="active" data-tab="students">ကျောင်းသားစာရင်း</button><button data-tab="attendance">နေ့စဉ်တက်ရောက်မှု</button><button data-tab="monthly">လစဉ်အစီရင်ခံစာ</button><button data-tab="principal">ကျောင်းအုပ်ဆီပို့ရန်</button></nav>
 
-<section id="students" class="tab"><div class="stats"><div class="stat">လက်ရှိကျောင်းသား<b id="totalStudents">0</b></div><div class="stat">ကျား<b id="totalBoys">0</b></div><div class="stat">မ<b id="totalGirls">0</b></div></div><div class="card"><h2>ကျောင်းသားစာရင်း</h2><div class="row"><div class="field"><label>အတန်း</label><select id="studentClass"></select></div><div class="field"><label>အမည် / ကျောင်းဝင်အမှတ် ရှာရန်</label><input id="studentSearch" placeholder="ရှာရန်..."></div></div><div class="actions no-print"><button class="primary" id="showStudentForm">＋ ကျောင်းသားအသစ်ထည့်ရန်</button><button id="backupButton">Backup သိမ်းရန်</button><button id="chooseRestore">Backup ပြန်ထည့်ရန်</button><input class="hidden" type="file" id="restoreFile" accept=".json,application/json"></div>
+<!-- ကျောင်းသားစာရင်း Section -->
+<section id="students" class="tab">
+<div class="stats" style="grid-template-columns:repeat(3,1fr)">
+  <div class="stat" style="background:#e8f5e9;border:1px solid #a5d6a7">လက်ရှိကျောင်းသား<b id="totalStudents" style="color:#2e7d32">0</b></div>
+  <div class="stat" style="background:#e3f2fd;border:1px solid #90caf9">ကျား<b id="totalBoys" style="color:#1565c0">0</b></div>
+  <div class="stat" style="background:#fce4ec;border:1px solid #f48fb1">မ<b id="totalGirls" style="color:#ad1457">0</b></div>
+</div>
+
+<div class="card"><h2>ကျောင်းသားစာရင်း</h2><div class="row"><div class="field"><label>အတန်း</label><select id="studentClass"></select></div><div class="field"><label>အမည် / ကျောင်းဝင်အမှတ် ရှာရန်</label><input id="studentSearch" placeholder="ရှာရန်..."></div></div><div class="actions no-print"><button class="primary" id="showStudentForm">＋ ကျောင်းသားအသစ်ထည့်ရန်</button><button id="backupButton">Backup သိမ်းရန်</button><button id="chooseRestore">Backup ပြန်ထည့်ရန်</button><input class="hidden" type="file" id="restoreFile" accept=".json,application/json"></div>
 <div id="studentFormBox" class="card hidden"><h2 id="studentFormTitle">ကျောင်းသားအသစ်</h2><form id="studentForm"><input type="hidden" id="editStudentId"><div class="row"><div class="field"><label>ကျောင်းဝင်အမှတ် *</label><input id="sid" required></div><div class="field"><label>ကျောင်းသားအမည် *</label><input id="sname" required></div><div class="field"><label>မွေးသက္ကရာဇ် *</label><input id="sdob" type="date" required></div><div class="field"><label>မိဘအမည် *</label><input id="sparent" required></div><div class="field"><label>ကျား / မ *</label><select id="sgender"><option value="ကျား">ကျား</option><option value="မ">မ</option></select></div><div class="field"><label>ဖုန်း</label><input id="sphone" inputmode="tel"></div><div class="field"><label>လိပ်စာ</label><input id="saddress"></div><div class="field"><label>အခြေအနေ</label><select id="sactive"><option value="yes">လက်ရှိတက်ရောက်</option><option value="no">ကျောင်းမှထွက် / ယာယီမရှိ</option></select></div></div><p class="muted">ကျောင်းဝင်အမှတ်သည် အတန်းပြောင်းသော်လည်း မပြောင်းရပါ။</p><div class="actions"><button class="primary" type="submit">သိမ်းမည်</button><button type="button" id="cancelStudentForm">မလုပ်တော့ပါ</button></div></form></div>
-<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>မွေးသက္ကရာဇ်</th><th>မိဘအမည်</th><th>ဖုန်း</th><th>အခြေအနေ</th><th class="no-print">လုပ်ဆောင်ချက်</th></tr></thead><tbody id="studentRows"></tbody></table></div></div></section>
+
+<div class="tablewrap">
+  <table>
+    <thead>
+      <tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>မွေးသက္ကရာဇ်</th><th>မိဘအမည်</th><th>ဖုန်း</th><th>နေရပ်လိပ်စာ</th><th>အခြေအနေ</th><th class="no-print">လုပ်ဆောင်ချက်</th></tr>
+    </thead>
+    <tbody id="studentRows"></tbody>
+  </table>
+</div>
+</div></section>
 
 <!-- နေ့စဉ်တက်ရောက်မှု Section -->
 <section id="attendance" class="tab hidden"><div class="card"><h2>နေ့စဉ်တက်ရောက်မှု</h2><div class="row"><div class="field"><label>အတန်း</label><select id="attClass"></select></div><div class="field"><label>ရက်စွဲ</label><input id="attDate" type="date"></div><div class="field"><label>ကျောင်းသားရှာရန်</label><input id="attSearch" placeholder="အမည် / ကျောင်းဝင်အမှတ်"></div></div>
 
-<!-- Box ၅ ခု (Color ဖြင့်) -->
 <div class="stats" style="grid-template-columns:repeat(5,1fr)">
   <div class="stat" style="background:#e8f5e9;border:1px solid #a5d6a7">ကျောင်းသားစုစုပေါင်း<b id="attTotal" style="color:#2e7d32">0</b></div>
   <div class="stat" style="background:#e3f2fd;border:1px solid #90caf9">တက်<b id="attPresent" style="color:#1565c0">0</b></div>
@@ -53,7 +69,7 @@
 </div></section>
 
 <!-- လစဉ်အစီရင်ခံစာ Section -->
-<section id="monthly" class="tab hidden"><div class="card"><h2>လစဉ်အစီရင်ခံစာအစီရင်ခံစာ</h2><div class="row"><div class="field"><label>အတန်း</label><select id="monthClass"></select></div><div class="field"><label>လ</label><input id="monthValue" type="month"></div></div>
+<section id="monthly" class="tab hidden"><div class="card"><h2>လစဉ်အစီရင်ခံစာ</h2><div class="row"><div class="field"><label>အတန်း</label><select id="monthClass"></select></div><div class="field"><label>လ</label><input id="monthValue" type="month"></div></div>
 
 <div class="stats" style="grid-template-columns:repeat(5,1fr)">
   <div class="stat" style="background:#e8f5e9;border:1px solid #a5d6a7">ကျောင်းသားစုစုပေါင်း<b id="mStudents" style="color:#2e7d32">0</b></div>
@@ -82,13 +98,21 @@ function people(cls,active=false){
 function key(c,d){return c+'|'+d}function record(c,d){return db.attendance[key(c,d)]||{}}function counts(r){let x={'တက်':0,'ပျက်':0,'ခွင့်':0,'ခွင့်မဲ့':0,'နောက်ကျ':0};Object.values(r||{}).forEach(s=>{if(s in x)x[s]++});return x}
 function tab(n){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('hidden',x.id!==n));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===n));if(n==='students')renderStudents();if(n==='attendance')renderAtt();if(n==='monthly')renderMonth()}document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
 
-function renderStudents(){let cls=$('studentClass').value,q=$('studentSearch').value.trim().toLowerCase(),all=people(cls),active=all.filter(s=>s.active),list=all.filter(s=>s.name.toLowerCase().includes(q)||s.sid.toLowerCase().includes(q));$('totalStudents').textContent=active.length;$('totalBoys').textContent=active.filter(s=>s.gender==='ကျား').length;$('totalGirls').textContent=active.filter(s=>s.gender==='မ').length;$('studentRows').innerHTML=list.map((s,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(s.sid)+'</td><td>'+esc(s.name)+'</td><td>'+esc(s.gender)+'</td><td>'+esc(s.dob)+'</td><td>'+esc(s.parent)+'</td><td>'+esc(s.phone||'-')+'</td><td>'+(s.active?'လက်ရှိတက်ရောက်':'ကျောင်းမှထွက် / ယာယီမရှိ')+'</td><td class="no-print"><button class="small primary" data-edit="'+esc(s.id)+'">ပြင်ရန်</button> <button class="small" data-toggle="'+esc(s.id)+'">'+(s.active?'ကျောင်းမှထွက်':'ပြန်တက်')+'</button></td></tr>').join('')||'<tr><td colspan="9">စာရင်းမရှိသေးပါ။</td></tr>'}$('studentClass').onchange=renderStudents;$('studentSearch').oninput=renderStudents;
+function renderStudents(){
+  let cls=$('studentClass').value,q=$('studentSearch').value.trim().toLowerCase(),all=people(cls),active=all.filter(s=>s.active),list=all.filter(s=>s.name.toLowerCase().includes(q)||s.sid.toLowerCase().includes(q));
+  $('totalStudents').textContent=active.length;
+  $('totalBoys').textContent=active.filter(s=>s.gender==='ကျား').length;
+  $('totalGirls').textContent=active.filter(s=>s.gender==='မ').length;
+
+  $('studentRows').innerHTML=list.map((s,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(s.sid)+'</td><td>'+esc(s.name)+'</td><td>'+esc(s.gender)+'</td><td>'+esc(s.dob)+'</td><td>'+esc(s.parent)+'</td><td>'+esc(s.phone||'-')+'</td><td>'+esc(s.address||'-')+'</td><td>'+(s.active?'လက်ရှိတက်ရောက်':'ကျောင်းမှထွက် / ယာယီမရှိ')+'</td><td class="no-print"><button class="small primary" data-edit="'+esc(s.id)+'">ပြင်ရန်</button> <button class="small" data-toggle="'+esc(s.id)+'">'+(s.active?'ကျောင်းမှထွက်':'ပြန်တက်')+'</button></td></tr>').join('')||'<tr><td colspan="10">စာရင်းမရှိသေးပါ။</td></tr>'
+}
+$('studentClass').onchange=renderStudents;$('studentSearch').oninput=renderStudents;
+
 $('showStudentForm').onclick=()=>{$('studentForm').reset();$('editStudentId').value='';$('sactive').value='yes';$('studentFormBox').classList.remove('hidden')};$('cancelStudentForm').onclick=()=>$('studentFormBox').classList.add('hidden');$('studentForm').onsubmit=e=>{e.preventDefault();let id=$('editStudentId').value,sid=$('sid').value.trim(),name=$('sname').value.trim();if(db.students.some(s=>s.sid.toLowerCase()===sid.toLowerCase()&&s.id!==id)){alert('ဤကျောင်းဝင်အမှတ်ကို အသုံးပြုပြီးသားဖြစ်သည်။');return}let old=db.students.find(s=>s.id===id),s={id:id||makeId(),sid,name,dob:$('sdob').value,parent:$('sparent').value.trim(),gender:$('sgender').value,phone:$('sphone').value.trim(),address:$('saddress').value.trim(),className:old?old.className:$('studentClass').value,active:$('sactive').value==='yes',createdAt:old?old.createdAt:new Date().toISOString()};if(old)Object.assign(old,s);else db.students.push(s);if(save()){$('studentFormBox').classList.add('hidden');renderStudents();msg('ကျောင်းသားအချက်အလက် သိမ်းပြီးပါပြီ။')}};$('studentRows').onclick=e=>{let ed=e.target.closest('[data-edit]'),tg=e.target.closest('[data-toggle]');if(ed){let s=db.students.find(x=>x.id===ed.dataset.edit);$('studentClass').value=s.className;$('editStudentId').value=s.id;['sid','sname','sdob','sparent','sgender','sphone','saddress'].forEach((id,i)=>$(id).value=[s.sid,s.name,s.dob,s.parent,s.gender,s.phone||'',s.address||''][i]);$('sactive').value=s.active?'yes':'no';$('studentFormBox').classList.remove('hidden');scrollTo(0,0)}if(tg){let s=db.students.find(x=>x.id===tg.dataset.toggle);s.active=!s.active;if(save())renderStudents()}};
 
 function renderAtt(){
   let cls=$('attClass').value,date=$('attDate').value,q=$('attSearch').value.trim().toLowerCase(),ss=people(cls,true),r=record(cls,date),c=counts(r);
   
-  // Update 5 Stat Boxes
   $('attTotal').textContent=ss.length;
   $('attPresent').textContent=c['တက်'];
   $('attAbsent').textContent=c['ပျက်'];
