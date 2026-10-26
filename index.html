@@ -209,7 +209,7 @@ function parseHomeTeacherSMS(){let v=$("homeSmsText").value.trim();if(!v){alert(
 function clearTeacherSMS(){$("smsText").value="";$("smsReview").innerHTML="";smsDraft=null}
 function smsField(text,labels){for(const label of labels){const re=new RegExp("^\\s*"+label+"\\s*[:：=]\\s*(.*?)\\s*$","mi");const m=text.match(re);if(m)return m[1].trim()}return ""}
 function smsCount(text,labels){let v=smsField(text,labels);let m=v.match(/\d+/);return m?Number(m[0]):null}
-function smsDate(text){let v=smsField(text,["ရက်စွဲ","နေ့စွဲ","Date"]);let m=v.match(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);if(m)return validDate(m[1],m[2],m[3]);m=v.match(/(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);if(m)return validDate(m[3],m[1],m[2]);return ""}
+function smsDate(text){let v=smsField(text,["ရက်စွဲ","နေ့စွဲ","Date"]);let m=v.match(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);if(m)return validDate(m[1],m[2],m[3]);m=v.match(/(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);if(m)return validDate(m[3],m[2],m[1]);return "";}
 function validDate(y,mo,d){let yy=Number(y),mm=Number(mo),dd=Number(d),dt=new Date(yy,mm-1,dd);return dt.getFullYear()===yy&&dt.getMonth()===mm-1&&dt.getDate()===dd?yy+"-"+String(mm).padStart(2,"0")+"-"+String(dd).padStart(2,"0"):""}
 function normalizeClass(v){let x=(v||"").trim().toLowerCase().replace(/grade\s*/i,"").replace(/အတန်း/g,"").trim();if(/^kg\b/i.test(x)||x.includes("သူငယ်တန်း"))return "KG";let m=x.match(/\d{1,2}/);return m&&Number(m[0])>=1&&Number(m[0])<=12?"Grade "+Number(m[0]):""}
 function normalizeName(v){return (v||"").replace(/^[\s\-•*]+|[\s,၊;；]+$/g,"").trim()}
