@@ -8,10 +8,10 @@
 
 <!-- ကျောင်းသားစာရင်း Section -->
 <section id="students" class="tab">
-<div class="stats" style="grid-template-columns:repeat(3,1fr)">
-  <div class="stat" style="background:#e8f5e9;border:1px solid #a5d6a7">လက်ရှိကျောင်းသား<b id="totalStudents" style="color:#2e7d32">0</b></div>
-  <div class="stat" style="background:#e3f2fd;border:1px solid #90caf9">ကျား<b id="totalBoys" style="color:#1565c0">0</b></div>
-  <div class="stat" style="background:#fce4ec;border:1px solid #f48fb1">မ<b id="totalGirls" style="color:#ad1457">0</b></div>
+<div class="stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+  <div class="stat" style="text-align:center;margin:0;padding:12px 5px;font-size:13px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:12px">လက်ရှိကျောင်းသား<b id="totalStudents" style="display:block;color:#2e7d32;font-size:22px;margin-top:5px">0</b></div>
+  <div class="stat" style="text-align:center;margin:0;padding:12px 5px;font-size:13px;background:#e3f2fd;border:1px solid #90caf9;border-radius:12px">ကျား<b id="totalBoys" style="display:block;color:#1565c0;font-size:22px;margin-top:5px">0</b></div>
+  <div class="stat" style="text-align:center;margin:0;padding:12px 5px;font-size:13px;background:#fce4ec;border:1px solid #f48fb1;border-radius:12px">မ<b id="totalGirls" style="display:block;color:#ad1457;font-size:22px;margin-top:5px">0</b></div>
 </div>
 
 <div class="card"><h2>ကျောင်းသားစာရင်း</h2><div class="row"><div class="field"><label>အတန်း</label><select id="studentClass"></select></div><div class="field"><label>အမည် / ကျောင်းဝင်အမှတ် ရှာရန်</label><input id="studentSearch" placeholder="ရှာရန်..."></div></div><div class="actions no-print"><button class="primary" id="showStudentForm">＋ ကျောင်းသားအသစ်ထည့်ရန်</button><button id="backupButton">Backup သိမ်းရန်</button><button id="chooseRestore">Backup ပြန်ထည့်ရန်</button><input class="hidden" type="file" id="restoreFile" accept=".json,application/json"></div>
