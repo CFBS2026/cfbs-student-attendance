@@ -291,8 +291,12 @@ function renderHome(){
   let rows=classes.map(c=>{let ar=list(c),x=tally(ar,d);return `<tr><td>${c}</td><td>${ar.length}</td><td>${x.present}</td><td>${x.absent}</td><td>${x.leave}</td><td>${x.unexcused}</td><td>${x.late}</td><td>${x.pending}</td></tr>`}).join("");
   $("dailyClassTable").innerHTML=`<div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>စုစုပေါင်း</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>မမှတ်ရသေး</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   
-  let mr=classes.map(c=>{let ar=list(c),x=monthTally(ar,m);return `<tr><td>${c}</td><td>${ar.length}</td><td>${x.present}</td><td>${x.absent}</td><td>${x.leave}</td><td>${x.unexcused}</td><td>${x.late}</td></tr>`}).join("");
-  $("homeMonthTable").innerHTML=`<div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>ကျောင်းသား</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th></tr></thead><tbody>${mr}</tbody></table></div>`;
+  let mr=classes.map(c=>{
+    let ar=list(c),x=monthTally(ar,m),n=Object.values(x).reduce((sum,val)=>sum+val,0);
+    let att=pct(x.present+x.late,n),abs=pct(x.absent+x.unexcused,n);
+    return `<tr><td>${c}</td><td>${ar.length}</td><td>${x.present}</td><td>${x.absent}</td><td>${x.leave}</td><td>${x.unexcused}</td><td>${x.late}</td><td>${n?att+"%":"—"}</td><td>${n?abs+"%":"—"}</td></tr>`
+  }).join("");
+  $("homeMonthTable").innerHTML=`<div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>ကျောင်းသား</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက် %</th><th>ပျက် %</th></tr></thead><tbody>${mr}</tbody></table></div>`;
 }
 
 function openClass(c){$("studentClass").value=c;$("listClass").value=c;$("attClass").value=c;setPage("attendance")}
