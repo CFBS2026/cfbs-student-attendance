@@ -1,0 +1,58 @@
+name: Build CFBS Student Attendance APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'index.html'
+      - '.github/workflows/build-attendance-apk.yml'
+      - 'android/**'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Attendance APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Attendance Repository
+        uses: actions/checkout@v4
+
+      - name: Verify Attendance Dashboard
+        run: |
+          test -f index.html || {
+            echo "ERROR: Attendance index.html not found"
+            exit 1
+          }
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Verify Android Project
+        run: |
+          test -f android/gradlew || {
+            echo "ERROR: Android project and Gradle wrapper are required"
+            exit 1
+          }
+
+      - name: Build Attendance APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload Attendance APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CFBS-Student-Attendance-APK
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14
