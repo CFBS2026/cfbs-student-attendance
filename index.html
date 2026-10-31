@@ -70,16 +70,18 @@ textarea{min-height:180px;line-height:1.6;resize:vertical}
     <form id="loginForm">
       <div class="field" style="text-align:left">
         <label>Username (အသုံးပြုသူအမည်)</label>
-        <input type="text" id="loginUser" placeholder="ဥပမာ - g1_teacher" required style="text-transform:lowercase">
+        <input type="text" id="loginUser" required style="text-transform:lowercase">
       </div>
       <div class="field" style="text-align:left">
         <label>Password (လျှို့ဝှက်နံပါတ်)</label>
-        <input type="password" id="loginPassword" placeholder="Password ထည့်ပါ" required>
+        <input type="password" id="loginPassword" required>
       </div>
       <div class="actions" style="margin-top:20px">
         <button class="primary" type="submit" style="width:100%">အကောင့်ဝင်မည်</button>
       </div>
-      <div class="notice" style="text-align:left;font-size:11px;margin-top:15px">
+    </form>
+  </div>
+</div>
 
 <!-- Main App Section (Hidden until logged in) -->
 <div id="mainAppSection" class="hidden">
@@ -234,7 +236,6 @@ textarea{min-height:180px;line-height:1.6;resize:vertical}
       <div class="actions no-print">
         <button class="primary" id="generatePrincipal">အစီရင်ခံစာ ပြုလုပ်ရန်</button>
         <button id="sendPrincipalSms" style="background:#10b981;color:#fff">📱 ကျောင်းအုပ်ထံ SMS ပို့ရန်</button>
-      </div>
       <textarea id="principalOutput" placeholder="အစီရင်ခံစာကို ဤနေရာတွင် ပြသမည်။" readonly></textarea>
 
       <h3 style="color:var(--primary);margin-top:20px;font-size:16px">ပျက်ကွက် / ခွင့်ယူသူများ (မိဘထံ SMS ပို့ရန်)</h3>
@@ -322,7 +323,6 @@ function tab(n){
 
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
 
-// Dynamic Username & Password Validation for KG to Grade 12
 $('loginForm').onsubmit = e => {
   e.preventDefault();
   let uInput = $('loginUser').value.trim().toLowerCase();
@@ -330,11 +330,9 @@ $('loginForm').onsubmit = e => {
   
   let matchedClass = '';
   
-  // KG စစ်ဆေးရန်
   if(uInput === 'kg_teacher' && pInput === 'KG@12345') {
     matchedClass = 'KG';
   } else {
-    // Grade 1 မှ Grade 12 အထိ စစ်ဆေးရန် (ဥပမာ g1_teacher / G1@12345)
     for(let i = 1; i <= 12; i++) {
       let expectedUser = 'g' + i + '_teacher';
       let expectedPass = 'G' + i + '@12345';
@@ -362,7 +360,7 @@ $('loginForm').onsubmit = e => {
     generatePrincipalReport();
     msg(matchedClass + ' အကောင့်ဖြင့် အောင်မြင်စွာ ဝင်ရောက်ပါပြီ။');
   } else {
-    alert('Username သို့မဟုတ် Password မှားယွင်းနေပါသည်။ (ဥပမာ - g1_teacher / G1@12345)');
+    alert('Username သို့မဟုတ် Password မှားယွင်းနေပါသည်။');
   }
 };
 
