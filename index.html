@@ -1,4 +1,4 @@
- <!doctype html>
+<!doctype html>
 <html lang="my">
 <head>
 <meta charset="utf-8">
@@ -193,14 +193,16 @@ textarea{min-height:180px;line-height:1.6;resize:vertical}
   <!-- Principal Report Tab -->
   <section id="principal" class="tab hidden">
     <div class="card">
-      <h2>✉️ ကျောင်းအုပ်အစီရင်ခံစာနှင့် မိဘသို့ SMS ပို့ရန်</h2>
+      <h2>✉️ ကျောင်းအုပ်အစီရင်ခံစာနှင့် SMS ပို့ရန်</h2>
       <div class="row">
         <div class="field"><label>အတန်း</label><select id="principalClass"></select></div>
         <div class="field"><label>ရက်စွဲ</label><input id="principalDate" type="date"></div>
+        <div class="field"><label>ကျောင်းအုပ်ဖုန်းနံပါတ်</label><input id="principalPhone" placeholder="09xxxxxxxxx"></div>
       </div>
-      <p class="notice">တက်ရောက်သူအရေအတွက်နှင့် ပျက်ကွက်သူစာရင်းကို ဖော်ပြမည်။ ပျက်ကွက်/ခွင့်ယူသူများအတွက် မိဘဖုန်းသို့ တိုက်ရိုက် SMS ပို့နိုင်ပါသည်။</p>
+      <p class="notice">တက်ရောက်သူအရေအတွက်နှင့် ပျက်ကွက်သူစာရင်းကို ဖော်ပြမည်။ ကျောင်းအုပ်ထံ သို့မဟုတ် မိဘများထံ SMS ပို့နိုင်ပါသည်။</p>
       <div class="actions no-print">
         <button class="primary" id="generatePrincipal">အစီရင်ခံစာ ပြုလုပ်ရန်</button>
+        <button id="sendPrincipalSms" style="background:#10b981;color:#fff">📱 ကျောင်းအုပ်ထံ SMS ပို့ရန်</button>
         <button id="copyPrincipal" style="background:#64748b;color:#fff">စာသားကူးရန်</button>
         <button id="sharePrincipal" style="background:#0ea5e9;color:#fff">မျှဝေရန်</button>
       </div>
@@ -229,7 +231,7 @@ CLASSES=['KG',...Array.from({length:12},(_,i)=>'Grade '+(i+1))],
 STATUSES=['တက်','ပျက်','ခွင့်','ခွင့်မဲ့','နောက်ကျ'],
 KEY='CFBS_CLASS_TEACHER_ATTENDANCE_V1';
 
-let db={students:[],attendance:{}};
+let db={students:[],attendance:{},principalPhone:''};
 
 function makeId(){return 's'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -238,14 +240,20 @@ function monthNow(){return today().slice(0,7)}
 function msg(t){$('message').textContent=t;$('message').classList.remove('hidden');setTimeout(()=>$('message').classList.add('hidden'),2600)}
 
 function save(){
-  try{localStorage.setItem(KEY,JSON.stringify(db));return true;}
-  catch(e){alert('ဒေတာသိမ်းမရပါ။ Storage နေရာလွတ်ကို စစ်ပါ။');return false;}
+  try{
+    db.principalPhone=$('principalPhone')?.value.trim()||db.principalPhone||'';
+    localStorage.setItem(KEY,JSON.stringify(db));
+    return true;
+  }catch(e){alert('ဒေတာသိမ်းမရပါ။ Storage နေရာလွတ်ကို စစ်ပါ။');return false;}
 }
 
 function load(){
   try{
     let x=localStorage.getItem(KEY);
-    if(x){x=JSON.parse(x);if(Array.isArray(x.students)&&x.attendance)db=x;}
+    if(x){
+      x=JSON.parse(x);
+      if(Array.isArray(x.students)&&x.attendance)db=x;
+    }
   }catch(e){alert('သိမ်းထားသောဒေတာကို ဖတ်မရပါ။ Backup ရှိပါက ပြန်ထည့်ပါ။');}
 }
 
@@ -337,7 +345,7 @@ function renderAtt(){
   $('attPresentPct').textContent=ss.length?(c['တက်']/ss.length*100).toFixed(1)+'%':'0%';
   $('attAbsentPct').textContent=ss.length?(c['ပျက်']/ss.length*100).toFixed(1)+'%':'0%';
   let missing=ss.filter(s=>!STATUSES.includes(r[s.id])).length;
-  $('attStatusMessage').textContent=missing?'သတ်မှတ်ရန်ကျန်ရှိသူ '+missing+' ဦးရှိသည်။္ဂ':'အားလုံးကို သတ်မှတ်ပြီးပါပြီ။';
+  $('attStatusMessage').textContent=missing?'သတ်မှတ်ရန်ကျန်ရှိသူ '+missing+' ဦးရှိသည်။':'အားလုံးကို သတ်မှတ်ပြီးပါပြီ။';
   
   $('attendanceInputRows').innerHTML=ss.map((s,i)=>{
     let st=r[s.id]||'',hide=!s.name.toLowerCase().includes(q)&&!s.sid.toLowerCase().includes(q);
@@ -432,11 +440,19 @@ function generatePrincipalReport(){
     $('principalAbsentRows').innerHTML='<tr><td colspan="6">ကျောင်းသားမရှိသေးပါ။</td></tr>';
     return;
   }
-  let d=date.split('-'),
-  lines=['CHINDWIN FUTURE BRIGHT SCHOOL','နေ့စဉ်တက်ရောက်မှုအစီရင်ခံစာ','ရက်စွဲ='+d[2]+'/'+d[1]+'/'+d[0],'အတန်း='+cls,'စာရင်းရှိ='+ss.length,'ပျက်/ခွင့်ကျောင်းသား='];
-  
+  let d=date.split('-');
   let absentList=ss.filter(s=>['ပျက်','ခွင့်မဲ့','ခွင့်','နောက်ကျ'].includes(r[s.id]));
-  lines.push(...(absentList.length?absentList.map(s=>s.name+' ('+(r[s.id]||'မသတ်မှတ်ရသေး')+')'):['မရှိပါ']));
+  
+  // သင်လိုချင်သည့် ကျောင်းအုပ်ထံပို့မည့် အစီရင်ခံစာ ပုံစံအတိုင်း ပြင်ဆင်ထားခြင်း
+  let lines=[
+    'CHINDWIN FUTURE BRIGHT SCHOOL',
+    'နေ့စဉ်တက်ရောက်မှုအစီရင်ခံစာ',
+    'ရက်စွဲ='+d[2]+'/'+d[1]+'/'+d[0],
+    'အတန်း='+cls,
+    'စာရင်းရှိ='+ss.length,
+    'ပျက်ကွက်ကျောင်းသား='+(absentList.length?absentList.map(s=>s.name).join(', '):'မရှိပါ')
+  ];
+
   $('principalOutput').value=lines.join('\n');
   
   $('principalAbsentRows').innerHTML=absentList.map((s,i)=>{
@@ -451,6 +467,25 @@ function generatePrincipalReport(){
 $('generatePrincipal').onclick=generatePrincipalReport;
 $('principalClass').onchange=generatePrincipalReport;
 $('principalDate').onchange=generatePrincipalReport;
+$('principalPhone').onchange=save;
+
+// ကျောင်းအုပ်ထံ SMS တိုက်ရိုက်ပို့မည့် ခလုတ်
+$('sendPrincipalSms').onclick=()=>{
+  let phone=$('principalPhone').value.trim();
+  let text=$('principalOutput').value;
+  if(!text){alert('အစီရင်ခံစာ ပြုလုပ်ပါ။');return;}
+  if(!phone){
+    phone=prompt('ကျောင်းအုပ်ကြီး၏ ဖုန်းနံပါတ် ဖြည့်ပါ:');
+    if(phone){
+      $('principalPhone').value=phone;
+      save();
+    }else{
+      return;
+    }
+  }
+  let smsLink='sms:'+phone+'?body='+encodeURIComponent(text);
+  window.location.href=smsLink;
+};
 
 $('copyPrincipal').onclick=async()=>{
   let v=$('principalOutput').value;
@@ -489,6 +524,7 @@ $('restoreFile').onchange=()=>{
       let x=JSON.parse(rd.result);
       if(!Array.isArray(x.students)||!x.attendance)throw Error();
       db=x;
+      if(db.principalPhone)$('principalPhone').value=db.principalPhone;
       if(save()){renderStudents();renderAtt();renderMonth();generatePrincipalReport();msg('Backup ပြန်ထည့်ပြီးပါပြီ။');}
     }catch(e){alert('Backup ဖိုင် မမှန်ပါ။');}
   };
@@ -501,6 +537,7 @@ function init(){
   $('attDate').value=today();
   $('principalDate').value=today();
   $('monthValue').value=monthNow();
+  if(db.principalPhone)$('principalPhone').value=db.principalPhone;
   renderStudents();
   renderAtt();
   renderMonth();
