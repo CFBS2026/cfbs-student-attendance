@@ -95,7 +95,7 @@ textarea{min-height:180px;line-height:1.6;resize:vertical}
             <div class="field"><label>မွေးသက္ကရာဇ် *</label><input id="sdob" type="date" required></div>
             <div class="field"><label>မိဘအမည် *</label><input id="sparent" required></div>
             <div class="field"><label>ကျား / မ *</label><select id="sgender"><option value="ကျား">ကျား</option><option value="မ">မ</option></select></div>
-            <div class="field"><label>မိဘဖုန်းနံပါတ်</label><input id="sphone" inputmode="tel" placeholder="09xxxxxxxxx"></div>
+            <div class="field"><label>ဖုန်း</label><input id="sphone" inputmode="tel"></div>
             <div class="field"><label>လိပ်စာ</label><input id="saddress"></div>
             <div class="field"><label>အခြေအနေ</label><select id="sactive"><option value="yes">လက်ရှိတက်ရောက်</option><option value="no">ကျောင်းမှထွက် / ယာယီမရှိ</option></select></div>
           </div>
@@ -199,7 +199,7 @@ textarea{min-height:180px;line-height:1.6;resize:vertical}
         <div class="field"><label>ရက်စွဲ</label><input id="principalDate" type="date"></div>
         <div class="field"><label>ကျောင်းအုပ်ဖုန်းနံပါတ်</label><input id="principalPhone" placeholder="09xxxxxxxxx"></div>
       </div>
-      <p class="notice">တက်ရောက်သူအရေအတွက်နှင့် ပျက်ကွက်သူစာရင်းကို ဖော်ပြမည်။ <b>"📱 SMS ပို့ရန်"</b> ခလုတ်ကို နှိပ်ရုံဖြင့် ဖုန်းနံပါတ် ထပ်ရိုက်စရာမလိုဘဲ အသင့်ပါပြီးသား SMS ပို့နိုင်ပါသည်။</p>
+      <p class="notice">တက်ရောက်သူအရေအတွက်နှင့် ပျက်ကွက်သူစာရင်းကို ဖော်ပြမည်။ ကျောင်းအုပ်ထံ သို့မဟုတ် မိဘများထံ SMS ပို့နိုင်ပါသည်။</p>
       <div class="actions no-print">
         <button class="primary" id="generatePrincipal">အစီရင်ခံစာ ပြုလုပ်ရန်</button>
         <button id="sendPrincipalSms" style="background:#10b981;color:#fff">📱 ကျောင်းအုပ်ထံ SMS ပို့ရန်</button>
@@ -443,6 +443,7 @@ function generatePrincipalReport(){
   let d=date.split('-');
   let absentList=ss.filter(s=>['ပျက်','ခွင့်မဲ့','ခွင့်','နောက်ကျ'].includes(r[s.id]));
   
+  // သင်လိုချင်သည့် ကျောင်းအုပ်ထံပို့မည့် အစီရင်ခံစာ ပုံစံအတိုင်း ပြင်ဆင်ထားခြင်း
   let lines=[
     'CHINDWIN FUTURE BRIGHT SCHOOL',
     'နေ့စဉ်တက်ရောက်မှုအစီရင်ခံစာ',
@@ -468,6 +469,7 @@ $('principalClass').onchange=generatePrincipalReport;
 $('principalDate').onchange=generatePrincipalReport;
 $('principalPhone').onchange=save;
 
+// ကျောင်းအုပ်ထံ SMS တိုက်ရိုက်ပို့မည့် ခလုတ်
 $('sendPrincipalSms').onclick=()=>{
   let phone=$('principalPhone').value.trim();
   let text=$('principalOutput').value;
