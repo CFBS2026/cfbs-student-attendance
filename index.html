@@ -55,6 +55,10 @@ textarea{min-height:180px;line-height:1.6;resize:vertical}
 .login-container{max-width:420px;margin:60px auto;padding:20px}
 .login-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:30px;box-shadow:0 10px 25px rgba(0,0,0,0.05);text-align:center}
 .login-card h2{color:var(--primary);margin-top:0;font-size:20px}
+.password-wrapper{position:relative}
+.password-wrapper input{padding-right:45px}
+.toggle-password{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:#64748b;padding:0;box-shadow:none}
+.toggle-password:hover{filter:none;transform:translateY(-50%)}
 
 @media(max-width:768px){nav{grid-template-columns:repeat(2,1fr)}header h1{font-size:18px}main{padding:8px}.card{padding:14px}.stats.five{display:flex;flex-wrap:nowrap;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory}.stats.five .stat{flex:0 0 120px;scroll-snap-align:start}.stats:not(.five){grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media print{header,nav,.no-print,button,.notice{display:none!important}body,main{background:#fff;padding:0}.tab.hidden{display:none!important}.card{border:0;box-shadow:none}}
@@ -70,11 +74,14 @@ textarea{min-height:180px;line-height:1.6;resize:vertical}
     <form id="loginForm">
       <div class="field" style="text-align:left">
         <label>Username (အသုံးပြုသူအမည်)</label>
-        <input type="text" id="loginUser" required style="text-transform:lowercase">
+        <input type="text" id="loginUser" required style="text-transform:lowercase" autocapitalize="none" autocomplete="off">
       </div>
       <div class="field" style="text-align:left">
         <label>Password (လျှို့ဝှက်နံပါတ်)</label>
-        <input type="password" id="loginPassword" required>
+        <div class="password-wrapper">
+          <input type="password" id="loginPassword" required autocomplete="current-password">
+          <button type="button" id="togglePasswordBtn" class="toggle-password" title="Password ကြည့်ရန်">👁️</button>
+        </div>
       </div>
       <div class="actions" style="margin-top:20px">
         <button class="primary" type="submit" style="width:100%">အကောင့်ဝင်မည်</button>
@@ -235,7 +242,8 @@ textarea{min-height:180px;line-height:1.6;resize:vertical}
       <p class="notice">တက်ရောက်သူအရေအတွက်နှင့် ပျက်ကွက်သူစာရင်းကို ဖော်ပြမည်။ ကျောင်းအုပ်ထံ သို့မဟုတ် မိဘများထံ SMS ပို့နိုင်ပါသည်။</p>
       <div class="actions no-print">
         <button class="primary" id="generatePrincipal">အစီရင်ခံစာ ပြုလုပ်ရန်</button>
-        <button id="sendPrincipalSms" style="background:#10b981;color:#fff">📱 ကျောင်းအုပ်ထံ SMS ပို့ရန်</button>
+        <button id="sendPrincipalSms" style="background:#10b981;color:#fff">📱 ကျောင်းအုပ်ထံ SMS ပို့ရန်</button>   
+      </div>
       <textarea id="principalOutput" placeholder="အစီရင်ခံစာကို ဤနေရာတွင် ပြသမည်။" readonly></textarea>
 
       <h3 style="color:var(--primary);margin-top:20px;font-size:16px">ပျက်ကွက် / ခွင့်ယူသူများ (မိဘထံ SMS ပို့ရန်)</h3>
@@ -323,6 +331,19 @@ function tab(n){
 
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
 
+// Toggle Password Visibility
+$('togglePasswordBtn').onclick = () => {
+  let pwd = $('loginPassword');
+  if (pwd.type === 'password') {
+    pwd.type = 'text';
+    $('togglePasswordBtn').textContent = '🙈';
+  } else {
+    pwd.type = 'password';
+    $('togglePasswordBtn').textContent = '👁️';
+  }
+};
+
+// Login Validation for KG to Grade 12 (Case-insensitive user check)
 $('loginForm').onsubmit = e => {
   e.preventDefault();
   let uInput = $('loginUser').value.trim().toLowerCase();
@@ -360,7 +381,7 @@ $('loginForm').onsubmit = e => {
     generatePrincipalReport();
     msg(matchedClass + ' အကောင့်ဖြင့် အောင်မြင်စွာ ဝင်ရောက်ပါပြီ။');
   } else {
-    alert('Username သို့မဟုတ် Password မှားယွင်းနေပါသည်။');
+    alert('Username သို့မဟုတ် Password မှားယွင်းနေပါသည်။ (ဥပမာ - g1_teacher / G1@12345)');
   }
 };
 
@@ -369,6 +390,8 @@ $('logoutButton').onclick = () => {
     currentClass = '';
     $('loginUser').value = '';
     $('loginPassword').value = '';
+    $('loginPassword').type = 'password';
+    $('togglePasswordBtn').textContent = '👁️';
     $('mainAppSection').classList.add('hidden');
     $('loginSection').classList.remove('hidden');
   }
@@ -576,7 +599,8 @@ $('copyPrincipal').onclick=async()=>{
 
 $('sharePrincipal').onclick=async()=>{
   let v=$('principalOutput').value;
-  if(!v){alert('အစီရင်ခံစာကို အရင်ပြုလုပ်ပါ။');return;}
+  if(!v){alert('အစီရင်ခံစာကို အရင်ပြုလုပ်ပါ။');return;
+  }
   if(navigator.share){
     try{await navigator.share({title:'CHINDWIN FUTURE BRIGHT',text:v});}catch(e){}
   }else{
