@@ -74,12 +74,12 @@ textarea{min-height:180px;line-height:1.6;resize:vertical}
     <form id="loginForm">
       <div class="field" style="text-align:left">
         <label>Username (အသုံးပြုသူအမည်)</label>
-        <input type="text" id="loginUser" required style="text-transform:lowercase" autocapitalize="none" autocomplete="off">
+        <input type="text" id="loginUser" required autocomplete="off">
       </div>
       <div class="field" style="text-align:left">
         <label>Password (လျှို့ဝှက်နံပါတ်)</label>
         <div class="password-wrapper">
-          <input type="password" id="loginPassword" required autocomplete="current-password">
+          <input type="password" id="loginPassword" required autocomplete="off">
           <button type="button" id="togglePasswordBtn" class="toggle-password" title="Password ကြည့်ရန်">👁️</button>
         </div>
       </div>
@@ -135,7 +135,7 @@ textarea{min-height:180px;line-height:1.6;resize:vertical}
             <div class="field"><label>မွေးသက္ကရာဇ် *</label><input id="sdob" type="date" required></div>
             <div class="field"><label>မိဘအမည် *</label><input id="sparent" required></div>
             <div class="field"><label>ကျား / မ *</label><select id="sgender"><option value="ကျား">ကျား</option><option value="မ">မ</option></select></div>
-            <div class="field"><label>မိဘဖုန်းနံပါတ်</label><input id="sphone" inputmode="tel"></div>
+            <div class="field"><label>ဖုန်း</label><input id="sphone" inputmode="tel"></div>
             <div class="field"><label>လိပ်စာ</label><input id="saddress"></div>
             <div class="field"><label>အခြေအနေ</label><select id="sactive"><option value="yes">လက်ရှိတက်ရောက်</option><option value="no">ကျောင်းမှထွက် / ယာယီမရှိ</option></select></div>
           </div>
@@ -148,7 +148,7 @@ textarea{min-height:180px;line-height:1.6;resize:vertical}
       <div class="tablewrap">
         <table>
           <thead>
-            <tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>မွေးသက္ကရာဇ်</th><th>မိဘအမည်</th><th>မိဘဖုန်းနံပါတ်</th><th>လိပ်စာ</th><th>အခြေအနေ</th><th class="no-print">လုပ်ဆောင်ချက်</th></tr>
+            <tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>မွေးသက္ကရာဇ်</th><th>မိဘအမည်</th><th>ဖုန်း</th><th>လိပ်စာ</th><th>အခြေအနေ</th><th class="no-print">လုပ်ဆောင်ချက်</th></tr>
           </thead>
           <tbody id="studentRows"></tbody>
         </table>
@@ -182,9 +182,9 @@ textarea{min-height:180px;line-height:1.6;resize:vertical}
         </table>
       </div>
       <div class="actions no-print">
+        <button class="primary" id="saveAttendance">တက်ရောက်မှု သိမ်းရန်</button>
         <button id="markAllPresent" style="background:#10b981;color:#fff">အားလုံးတက်</button>
         <button id="markAllAbsent" style="background:#ef4444;color:#fff">အားလုံးပျက်</button>
-        <button class="primary" id="saveAttendance">တက်ရောက်မှု သိမ်းရန်</button>
         <button id="printAttendance" style="background:#64748b;color:#fff">ပုံနှိပ် / PDF</button>
       </div>
       <h3 style="color:var(--primary);margin-top:20px;font-size:16px">နေ့စဉ်တက်ရောက်မှု စာရင်းရလဒ်</h3>
@@ -242,7 +242,9 @@ textarea{min-height:180px;line-height:1.6;resize:vertical}
       <p class="notice">တက်ရောက်သူအရေအတွက်နှင့် ပျက်ကွက်သူစာရင်းကို ဖော်ပြမည်။ ကျောင်းအုပ်ထံ သို့မဟုတ် မိဘများထံ SMS ပို့နိုင်ပါသည်။</p>
       <div class="actions no-print">
         <button class="primary" id="generatePrincipal">အစီရင်ခံစာ ပြုလုပ်ရန်</button>
-        <button id="sendPrincipalSms" style="background:#10b981;color:#fff">📱 ကျောင်းအုပ်ထံ SMS ပို့ရန်</button>   
+        <button id="sendPrincipalSms" style="background:#10b981;color:#fff">📱 ကျောင်းအုပ်ထံ SMS ပို့ရန်</button>
+        <button id="copyPrincipal" style="background:#64748b;color:#fff">စာသားကူးရန်</button>
+        <button id="sharePrincipal" style="background:#0ea5e9;color:#fff">မျှဝေရန်</button>
       </div>
       <textarea id="principalOutput" placeholder="အစီရင်ခံစာကို ဤနေရာတွင် ပြသမည်။" readonly></textarea>
 
@@ -250,7 +252,7 @@ textarea{min-height:180px;line-height:1.6;resize:vertical}
       <div class="tablewrap">
         <table>
           <thead>
-            <tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>အခြေအနေ</th><th>မိဘဖုန်းနံပါတ်</th><th class="no-print">SMS ပို့ရန်</th></tr>
+            <tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>အခြေအနေ</th><th>မိဘဖုန်း</th><th class="no-print">SMS ပို့ရန်</th></tr>
           </thead>
           <tbody id="principalAbsentRows"></tbody>
         </table>
@@ -331,7 +333,7 @@ function tab(n){
 
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
 
-// Toggle Password Visibility
+// Toggle Password Visibility (Eye Open/Close)
 $('togglePasswordBtn').onclick = () => {
   let pwd = $('loginPassword');
   if (pwd.type === 'password') {
@@ -343,7 +345,7 @@ $('togglePasswordBtn').onclick = () => {
   }
 };
 
-// Login Validation for KG to Grade 12 (Case-insensitive user check)
+// Login Form Submit with validation
 $('loginForm').onsubmit = e => {
   e.preventDefault();
   let uInput = $('loginUser').value.trim().toLowerCase();
@@ -351,20 +353,20 @@ $('loginForm').onsubmit = e => {
   
   let matchedClass = '';
   
-  if(uInput === 'kg_teacher' && pInput === 'KG@12345') {
+  if (uInput === 'kg_teacher' && pInput === 'KG@12345') {
     matchedClass = 'KG';
   } else {
-    for(let i = 1; i <= 12; i++) {
+    for (let i = 1; i <= 12; i++) {
       let expectedUser = 'g' + i + '_teacher';
       let expectedPass = 'G' + i + '@12345';
-      if(uInput === expectedUser && pInput === expectedPass) {
+      if (uInput === expectedUser && pInput === expectedPass) {
         matchedClass = 'Grade ' + i;
         break;
       }
     }
   }
   
-  if(matchedClass) {
+  if (matchedClass) {
     currentClass = matchedClass;
     $('loginSection').classList.add('hidden');
     $('mainAppSection').classList.remove('hidden');
@@ -386,7 +388,7 @@ $('loginForm').onsubmit = e => {
 };
 
 $('logoutButton').onclick = () => {
-  if(confirm('အကောင့်မှ ထွက်မည်မှာ သေချာပါသလား။')) {
+  if (confirm('အကောင့်မှ ထွက်မည်မှာ သေချာပါသလား။')) {
     currentClass = '';
     $('loginUser').value = '';
     $('loginPassword').value = '';
@@ -599,8 +601,7 @@ $('copyPrincipal').onclick=async()=>{
 
 $('sharePrincipal').onclick=async()=>{
   let v=$('principalOutput').value;
-  if(!v){alert('အစီရင်ခံစာကို အရင်ပြုလုပ်ပါ။');return;
-  }
+  if(!v){alert('အစီရင်ခံစာကို အရင်ပြုလုပ်ပါ။');return;}
   if(navigator.share){
     try{await navigator.share({title:'CHINDWIN FUTURE BRIGHT',text:v});}catch(e){}
   }else{
