@@ -22,28 +22,31 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set Up Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Build Debug APK with Gradle
         run: |
-          # Create minimal Android project structure
-          mkdir -p android/app/src/main/assets
-          mkdir -p android/app/src/main/java/com/cfbs/attendance
+          set -e
           
-          # Copy index.html to Android assets
-          if [ -f index.html ]; then
-            cp index.html android/app/src/main/assets/index.html
-          else
+          # Check index.html exists
+          if [ ! -f index.html ]; then
             echo "ERROR: index.html not found!"
             exit 1
           fi
 
-          # Create basic build.gradle and settings.gradle for Android
-          cd android
-          echo "include ':app'" > settings.gradle
-          
-          cat << 'EOF' > build.gradle
+          # Create minimal Android project structure
+          mkdir -p android/app/src/main/assets
+          mkdir -p android/app/src/main/java/com/cfbs/attendance
+          mkdir -p android/app/src/main/res/values
+
+          cp index.html android/app/src/main/assets/index.html
+
+          # settings.gradle
+          cat << 'EOF' > android/settings.gradle
+          rootProject.name = "CFBS Attendance"
+          include(':app')
+          EOF
+
+          # build.gradle (project)
+          cat << 'EOF' > android/build.gradle
           buildscript {
               repositories {
                   google()
@@ -61,8 +64,8 @@ jobs:
           }
           EOF
 
-          mkdir -p app
-          cat << 'EOF' > app/build.gradle
+          # app/build.gradle
+          cat << 'EOF' > android/app/build.gradle
           plugins {
               id 'com.android.application'
           }
@@ -79,7 +82,8 @@ jobs:
           }
           EOF
 
-          cat << 'EOF' > app/src/main/AndroidManifest.xml
+          # AndroidManifest.xml
+          cat << 'EOF' > android/app/src/main/AndroidManifest.xml
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.INTERNET" />
               <application android:usesCleartextTraffic="true" android:label="CFBS Attendance">
@@ -93,8 +97,8 @@ jobs:
           </manifest>
           EOF
 
-          mkdir -p app/src/main/java/com/cfbs/attendance
-          cat << 'EOF' > app/src/main/java/com/cfbs/attendance/MainActivity.java
+          # MainActivity.java
+          cat << 'EOF' > android/app/src/main/java/com/cfbs/attendance/MainActivity.java
           package com.cfbs.attendance;
           import android.app.Activity;
           import android.os.Bundle;
@@ -115,9 +119,18 @@ jobs:
           }
           EOF
 
-          chmod +x gradlew || true
-          # Run gradle build
-          ./gradlew assembleDebug
+          # strings.xml
+          cat << 'EOF' > android/app/src/main/res/values/strings.xml
+          <resources>
+              <string name="app_name">CFBS Attendance</string>
+          </resources>
+          EOF
+
+          # Download Gradle and Build APK
+          cd android
+          wget -q https://services.gradle.org/distributions/gradle-8.5-bin.zip
+          unzip -q gradle-8.5-bin.zip
+          ./gradle-8.5/bin/gradle assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
