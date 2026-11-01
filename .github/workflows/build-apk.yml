@@ -44,12 +44,11 @@ jobs:
         with:
           gradle-version: '8.5'
 
-      - name: Create Android Project with Icon
+      - name: Create Android Project with Original Design Support
         shell: bash
         run: |
           set -e
 
-          # Create necessary directories
           mkdir -p android/app/src/main/assets
           mkdir -p android/app/src/main/java/com/cfbs/attendance
           mkdir -p android/app/src/main/res/values
@@ -59,12 +58,11 @@ jobs:
           mkdir -p android/app/src/main/res/mipmap-xxhdpi
           mkdir -p android/app/src/main/res/mipmap-xxxhdpi
 
-          # Copy index.html
+          # Copy original index.html directly into assets
           cp index.html android/app/src/main/assets/index.html
 
-          # Handle App Icon if icon.png exists
+          # Copy icon if available
           if [ -f icon.png ]; then
-            echo "icon.png found, copying to mipmap folders..."
             cp icon.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
             cp icon.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
             cp icon.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
@@ -75,8 +73,6 @@ jobs:
             cp icon.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
             cp icon.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
             cp icon.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
-          else
-            echo "WARNING: icon.png not found, default icon will be used."
           fi
 
           cat > android/settings.gradle <<'EOF'
@@ -132,11 +128,12 @@ jobs:
                   android:label="CFBS Attendance"
                   android:icon="@mipmap/ic_launcher"
                   android:roundIcon="@mipmap/ic_launcher"
-                  android:theme="@android:style/Theme.Material.Light.NoActionBar"
+                  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
                   android:usesCleartextTraffic="true">
                   <activity
                       android:name=".MainActivity"
-                      android:exported="true">
+                      android:exported="true"
+                      android:configChanges="orientation|keyboardHidden|screenSize">
                       <intent-filter>
                           <action android:name="android.intent.action.MAIN"/>
                           <category android:name="android.intent.category.LAUNCHER"/>
@@ -166,12 +163,18 @@ jobs:
                   webView = new WebView(this);
                   WebSettings settings = webView.getSettings();
                   
+                  // မူရင်း ဒီဇိုင်းနှင့် CSS များ အပြည့်အဝ ပေါ်လာစေရန် Settings များ
                   settings.setJavaScriptEnabled(true);
                   settings.setDomStorageEnabled(true);
                   settings.setDatabaseEnabled(true);
                   settings.setAllowFileAccess(true);
+                  settings.setAllowContentAccess(true);
                   settings.setLoadsImagesAutomatically(true);
                   settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+                  settings.setLoadWithOverviewMode(true);
+                  settings.setUseWideViewPort(true);
+                  settings.setBuiltInZoomControls(false);
+                  settings.setDisplayZoomControls(false);
 
                   webView.setWebViewClient(new WebViewClient());
                   webView.setWebChromeClient(new WebChromeClient());
@@ -209,7 +212,7 @@ jobs:
             exit 1
           fi
           ls -lh "$APK"
-          echo "APK build successful with custom icon"
+          echo "APK build successful with original design settings"
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
