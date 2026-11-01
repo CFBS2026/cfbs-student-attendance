@@ -21,12 +21,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Verify Dashboard
+      - name: Check Dashboard
+        shell: bash
         run: |
           if [ ! -f index.html ]; then
             echo "ERROR: index.html not found"
             exit 1
           fi
+          echo "Dashboard found successfully"
 
       - name: Set Up Java 17
         uses: actions/setup-java@v4
@@ -36,12 +38,21 @@ jobs:
 
       - name: Set Up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: '16.0'
+          accept-android-sdk-licenses: true
+          packages: |
+            platform-tools
+            platforms;android-35
+            build-tools;35.0.0
 
-      - name: Install Android SDK Packages
+      - name: Verify Android SDK
+        shell: bash
         run: |
-          sdkmanager --install \
-            "platforms;android-35" \
-            "build-tools;35.0.0"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          sdkmanager --version
+          adb version
+          ls "$ANDROID_HOME/platforms/android-35"
 
       - name: Create Android Project
         shell: bash
@@ -110,8 +121,7 @@ jobs:
               <application
                   android:theme="@android:style/Theme.Material.Light.NoActionBar"
                   android:label="CFBS Student Attendance"
-                  android:allowBackup="true"
-                  android:usesCleartextTraffic="true">
+                  android:allowBackup="true">
 
                   <activity
                       android:name=".MainActivity"
@@ -179,23 +189,26 @@ jobs:
           </resources>
           EOF
 
-      - name: Generate Gradle Wrapper
-        run: |
-          gradle wrapper \
-            --gradle-version 8.9 \
-            --distribution-type bin
-        working-directory: android
+      - name: Set Up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
 
-      - name: Verify Gradle Version
+      - name: Generate Gradle Wrapper
+        working-directory: android
+        run: |
+          gradle wrapper --gradle-version 8.9 --distribution-type bin
+
+      - name: Verify Gradle
+        working-directory: android
         run: |
           chmod +x gradlew
           ./gradlew --version
-        working-directory: android
 
-      - name: Build Debug APK
+      - name: Build APK
+        working-directory: android
         run: |
           ./gradlew clean assembleDebug --no-daemon
-        working-directory: android
 
       - name: Verify APK
         run: |
