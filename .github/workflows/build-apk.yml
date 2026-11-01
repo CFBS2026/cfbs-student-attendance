@@ -93,7 +93,7 @@ jobs:
               defaultConfig {
                   applicationId 'com.cfbs.attendance'
                   minSdk 23
-                  targetSdk 28
+                  targetSdk 34
                   versionCode 1
                   versionName '1.0'
               }
@@ -102,6 +102,7 @@ jobs:
 
           cat > android/app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.INTERNET" />
               <application
                   android:label="CFBS Attendance"
                   android:theme="@android:style/Theme.Material.Light.NoActionBar"
@@ -126,6 +127,7 @@ jobs:
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
           import android.webkit.WebSettings;
+          import android.webkit.WebChromeClient;
 
           public class MainActivity extends Activity {
               private WebView webView;
@@ -136,10 +138,17 @@ jobs:
 
                   webView = new WebView(this);
                   WebSettings settings = webView.getSettings();
+                  
+                  // LocalStorage နှင့် Database များကို အပြည့်အစုံ ဖွင့်ပေးခြင်း
                   settings.setJavaScriptEnabled(true);
                   settings.setDomStorageEnabled(true);
+                  settings.setDatabaseEnabled(true);
                   settings.setAllowFileAccess(true);
+                  settings.setLoadsImagesAutomatically(true);
+                  settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+
                   webView.setWebViewClient(new WebViewClient());
+                  webView.setWebChromeClient(new WebChromeClient());
 
                   setContentView(webView);
                   webView.loadUrl("file:///android_asset/index.html");
