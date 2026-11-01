@@ -6,6 +6,13 @@ on:
     branches:
       - main
       - master
+    paths:
+      - 'index.html'
+      - 'android/**'
+      - '.github/workflows/**'
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -16,20 +23,30 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Check HTML File
+        run: |
+          echo "Checking index.html..."
+          if [ ! -f index.html ]; then
+            echo "::error::index.html not found in repository root"
+            exit 1
+          fi
+          echo "index.html found"
+
       - name: Set Up Java 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '17'
 
-      - name: Build Debug APK with Gradle
+      - name: Set Up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.5'
+
+      - name: Create Android Project
+        shell: bash
         run: |
           set -e
-          
-          if [ ! -f index.html ]; then
-            echo "ERROR: index.html not found!"
-            exit 1
-          fi
 
           mkdir -p android/app/src/main/assets
           mkdir -p android/app/src/main/java/com/cfbs/attendance
@@ -37,94 +54,132 @@ jobs:
 
           cp index.html android/app/src/main/assets/index.html
 
-          cat << 'EOF' > android/settings.gradle
+          cat > android/settings.gradle <<'EOF'
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+
           rootProject.name = "CFBS Attendance"
-          include(':app')
+          include(":app")
           EOF
 
-          cat << 'EOF' > android/build.gradle
-          buildscript {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-              dependencies {
-                  classpath 'com.android.tools.build:gradle:8.1.4'
-              }
-          }
-          allprojects {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
+          cat > android/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application' version '8.1.4' apply false
           }
           EOF
 
-          cat << 'EOF' > android/app/build.gradle
+          cat > android/app/build.gradle <<'EOF'
           plugins {
               id 'com.android.application'
           }
+
           android {
               namespace 'com.cfbs.attendance'
               compileSdk 34
+
               defaultConfig {
                   applicationId 'com.cfbs.attendance'
-                  minSdk 21
-                  targetSdk 34
+                  minSdk 23
+                  targetSdk 28
                   versionCode 1
-                  versionName "1.0"
+                  versionName '1.0'
               }
           }
           EOF
 
-          cat << 'EOF' > android/app/src/main/AndroidManifest.xml
+          cat > android/app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-              <uses-permission android:name="android.permission.INTERNET" />
-              <application android:usesCleartextTraffic="true" android:label="CFBS Attendance">
-                  <activity android:name=".MainActivity" android:exported="true">
+              <application
+                  android:label="CFBS Attendance"
+                  android:theme="@android:style/Theme.Material.Light.NoActionBar"
+                  android:usesCleartextTraffic="true">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true">
                       <intent-filter>
-                          <action android:name="android.intent.action.MAIN" />
-                          <category android:name="android.intent.category.LAUNCHER" />
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
                       </intent-filter>
                   </activity>
               </application>
           </manifest>
           EOF
 
-          cat << 'EOF' > android/app/src/main/java/com/cfbs/attendance/MainActivity.java
+          cat > android/app/src/main/java/com/cfbs/attendance/MainActivity.java <<'EOF'
           package com.cfbs.attendance;
+
           import android.app.Activity;
           import android.os.Bundle;
           import android.webkit.WebView;
+          import android.webkit.WebViewClient;
           import android.webkit.WebSettings;
 
           public class MainActivity extends Activity {
+              private WebView webView;
+
               @Override
               protected void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
-                  WebView webView = new WebView(this);
+
+                  webView = new WebView(this);
                   WebSettings settings = webView.getSettings();
                   settings.setJavaScriptEnabled(true);
                   settings.setDomStorageEnabled(true);
-                  webView.loadUrl("file:///android_asset/index.html");
+                  settings.setAllowFileAccess(true);
+                  webView.setWebViewClient(new WebViewClient());
+
                   setContentView(webView);
+                  webView.loadUrl("file:///android_asset/index.html");
+              }
+
+              @Override
+              public void onBackPressed() {
+                  if (webView != null && webView.canGoBack()) {
+                      webView.goBack();
+                  } else {
+                      super.onBackPressed();
+                  }
               }
           }
           EOF
 
-          cat << 'EOF' > android/app/src/main/res/values/strings.xml
+          cat > android/app/src/main/res/values/strings.xml <<'EOF'
           <resources>
               <string name="app_name">CFBS Attendance</string>
           </resources>
           EOF
 
-          cd android
-          wget -q https://services.gradle.org/distributions/gradle-8.5-bin.zip
-          unzip -q gradle-8.5-bin.zip
-          ./gradle-8.5/bin/gradle assembleDebug
+      - name: Build Debug APK
+        working-directory: android
+        run: gradle assembleDebug --stacktrace
+
+      - name: Verify APK
+        run: |
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          if [ ! -f "$APK" ]; then
+            echo "::error::APK file was not generated"
+            exit 1
+          fi
+          ls -lh "$APK"
+          echo "APK build successful"
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: CFBS-Student-Attendance-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
