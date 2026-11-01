@@ -1,310 +1,126 @@
-
-name: Build CFBS Student Attendance APK
+name: Build CFBS Attendance APK
 
 on:
   workflow_dispatch:
   push:
     branches:
       - main
-    paths:
-      - 'index.html'
-      - '.github/workflows/build-apk.yml'
-      - 'android/**'
-
-permissions:
-  contents: read
+      - master
 
 jobs:
   build:
-    name: Build CFBS Attendance APK
+    name: Build APK
     runs-on: ubuntu-latest
 
-    env:
-      ANDROID_HOME: /usr/local/lib/android/sdk
-      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
-
     steps:
-
-      # 1. Download Repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. Check HTML
-      - name: Verify Dashboard
-        shell: bash
-        run: |
-          set -e
-
-          if [ ! -f index.html ]; then
-            echo "ERROR: index.html not found"
-            exit 1
-          fi
-
-          echo "Dashboard verified"
-          ls -lh index.html
-
-      # 3. Install Java 17
-      - name: Set Up Java
+      - name: Set Up Java 17
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: '17'
 
-      # 4. Check Android SDK
-      - name: Verify Android SDK
-        shell: bash
+      - name: Set Up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build Debug APK with Gradle
         run: |
-          set -e
-
-          if [ ! -d "$ANDROID_HOME" ]; then
-            echo "ERROR: Android SDK not found"
-            exit 1
-          fi
-
-          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" \
-            -name sdkmanager -type f | head -n 1)
-
-          if [ -z "$SDKMANAGER" ]; then
-            echo "ERROR: sdkmanager not found"
-            exit 1
-          fi
-
-          echo "SDKMANAGER=$SDKMANAGER" >> "$GITHUB_ENV"
-
-          echo "Android SDK found"
-          "$SDKMANAGER" --version
-
-      # 5. Accept SDK Licenses
-      - name: Accept Android Licenses
-        shell: bash
-        run: |
-          yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
-
-      # 6. Install SDK Packages
-      - name: Install Android Packages
-        shell: bash
-        run: |
-          set -e
-
-          "$SDKMANAGER" --install \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0"
-
-      # 7. Create Android Project
-      - name: Create Android Project
-        shell: bash
-        run: |
-          set -e
-
+          # Create minimal Android project structure
           mkdir -p android/app/src/main/assets
           mkdir -p android/app/src/main/java/com/cfbs/attendance
-          mkdir -p android/app/src/main/res/values
+          
+          # Copy index.html to Android assets
+          if [ -f index.html ]; then
+            cp index.html android/app/src/main/assets/index.html
+          else
+            echo "ERROR: index.html not found!"
+            exit 1
+          fi
 
-          cp index.html android/app/src/main/assets/index.html
-
-          cat > android/settings.gradle <<'EOF'
-          pluginManagement {
+          # Create basic build.gradle and settings.gradle for Android
+          cd android
+          echo "include ':app'" > settings.gradle
+          
+          cat << 'EOF' > build.gradle
+          buildscript {
               repositories {
                   google()
                   mavenCentral()
-                  gradlePluginPortal()
+              }
+              dependencies {
+                  classpath 'com.android.tools.build:gradle:8.1.4'
               }
           }
-
-          dependencyResolutionManagement {
-              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+          allprojects {
               repositories {
                   google()
                   mavenCentral()
               }
           }
-
-          rootProject.name = "CFBS Attendance"
-          include(":app")
           EOF
 
-          cat > android/build.gradle <<'EOF'
-          plugins {
-              id 'com.android.application' version '8.7.3' apply false
-          }
-          EOF
-
-          cat > android/gradle.properties <<'EOF'
-          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
-          android.useAndroidX=true
-          android.nonTransitiveRClass=true
-          EOF
-
-          cat > android/app/build.gradle <<'EOF'
+          mkdir -p app
+          cat << 'EOF' > app/build.gradle
           plugins {
               id 'com.android.application'
           }
-
           android {
               namespace 'com.cfbs.attendance'
-              compileSdk 35
-
+              compileSdk 34
               defaultConfig {
                   applicationId 'com.cfbs.attendance'
-                  minSdk 23
-                  targetSdk 35
+                  minSdk 21
+                  targetSdk 34
                   versionCode 1
-                  versionName '1.0.0'
+                  versionName "1.0"
               }
           }
           EOF
 
-          cat > android/app/src/main/AndroidManifest.xml <<'EOF'
+          cat << 'EOF' > app/src/main/AndroidManifest.xml
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
               <uses-permission android:name="android.permission.INTERNET" />
-
-              <application
-                  android:theme="@android:style/Theme.Material.Light.NoActionBar"
-                  android:label="CFBS Student Attendance"
-                  android:allowBackup="true"
-                  android:usesCleartextTraffic="true">
-
-                  <activity
-                      android:name=".MainActivity"
-                      android:exported="true">
-
+              <application android:usesCleartextTraffic="true" android:label="CFBS Attendance">
+                  <activity android:name=".MainActivity" android:exported="true">
                       <intent-filter>
-                          <action android:name="android.intent.action.MAIN"/>
-                          <category android:name="android.intent.category.LAUNCHER"/>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
                       </intent-filter>
-
                   </activity>
-
               </application>
           </manifest>
           EOF
 
-          cat > android/app/src/main/java/com/cfbs/attendance/MainActivity.java <<'EOF'
+          mkdir -p app/src/main/java/com/cfbs/attendance
+          cat << 'EOF' > app/src/main/java/com/cfbs/attendance/MainActivity.java
           package com.cfbs.attendance;
-
           import android.app.Activity;
           import android.os.Bundle;
           import android.webkit.WebView;
-          import android.webkit.WebViewClient;
-          import android.webkit.WebChromeClient;
           import android.webkit.WebSettings;
-          import android.view.ViewGroup;
 
           public class MainActivity extends Activity {
-
-              private WebView webView;
-
               @Override
               protected void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
-
-                  webView = new WebView(this);
-
+                  WebView webView = new WebView(this);
                   WebSettings settings = webView.getSettings();
                   settings.setJavaScriptEnabled(true);
                   settings.setDomStorageEnabled(true);
-                  settings.setDatabaseEnabled(true);
-                  settings.setAllowFileAccess(true);
-
-                  webView.setWebViewClient(new WebViewClient());
-                  webView.setWebChromeClient(new WebChromeClient());
-
-                  webView.setLayoutParams(
-                      new ViewGroup.LayoutParams(
-                          ViewGroup.LayoutParams.MATCH_PARENT,
-                          ViewGroup.LayoutParams.MATCH_PARENT
-                      )
-                  );
-
-                  setContentView(webView);
-
                   webView.loadUrl("file:///android_asset/index.html");
-              }
-
-              @Override
-              public void onBackPressed() {
-                  if (webView != null && webView.canGoBack()) {
-                      webView.goBack();
-                  } else {
-                      super.onBackPressed();
-                  }
-              }
-
-              @Override
-              protected void onDestroy() {
-                  if (webView != null) {
-                      webView.destroy();
-                      webView = null;
-                  }
-                  super.onDestroy();
+                  setContentView(webView);
               }
           }
           EOF
 
-          cat > android/app/src/main/res/values/strings.xml <<'EOF'
-          <resources>
-              <string name="app_name">CFBS Student Attendance</string>
-          </resources>
-          EOF
+          chmod +x gradlew || true
+          # Run gradle build
+          ./gradlew assembleDebug
 
-      # 8. Download Exact Gradle 8.9
-      - name: Install Gradle 8.9
-        shell: bash
-        run: |
-          set -e
-
-          cd "$RUNNER_TEMP"
-
-          curl -fL --retry 3 \
-            https://services.gradle.org/distributions/gradle-8.9-bin.zip \
-            -o gradle-8.9-bin.zip
-
-          unzip -q gradle-8.9-bin.zip
-
-          echo "$RUNNER_TEMP/gradle-8.9/bin" >> "$GITHUB_PATH"
-
-          "$RUNNER_TEMP/gradle-8.9/bin/gradle" --version
-
-      # 9. Verify Java and Gradle
-      - name: Verify Build Environment
-        shell: bash
-        run: |
-          set -e
-          java -version
-          gradle --version
-
-      # 10. Build APK
-      - name: Build CFBS APK
-        working-directory: android
-        shell: bash
-        run: |
-          set -e
-
-          gradle clean assembleDebug --no-daemon
-
-      # 11. Verify APK
-      - name: Verify APK File
-        shell: bash
-        run: |
-          set -e
-
-          APK="android/app/build/outputs/apk/debug/app-debug.apk"
-
-          if [ ! -s "$APK" ]; then
-            echo "ERROR: APK was not generated"
-            exit 1
-          fi
-
-          echo "APK BUILD SUCCESSFUL"
-          ls -lh "$APK"
-
-      # 12. Upload APK
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: CFBS-Student-Attendance-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
-          retention-days: 14
