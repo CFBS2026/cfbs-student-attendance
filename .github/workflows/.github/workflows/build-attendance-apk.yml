@@ -4,6 +4,8 @@ name: Build CFBS Student Attendance APK
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - 'index.html'
       - '.github/workflows/build-apk.yml'
@@ -17,46 +19,84 @@ jobs:
     name: Build CFBS Attendance APK
     runs-on: ubuntu-latest
 
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
     steps:
+
+      # 1. Download Repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Check Dashboard
+      # 2. Check HTML
+      - name: Verify Dashboard
         shell: bash
         run: |
+          set -e
+
           if [ ! -f index.html ]; then
             echo "ERROR: index.html not found"
             exit 1
           fi
-          echo "Dashboard found successfully"
 
-      - name: Set Up Java 17
+          echo "Dashboard verified"
+          ls -lh index.html
+
+      # 3. Install Java 17
+      - name: Set Up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Set Up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          cmdline-tools-version: '16.0'
-          accept-android-sdk-licenses: true
-          packages: |
-            platform-tools
-            platforms;android-35
-            build-tools;35.0.0
-
+      # 4. Check Android SDK
       - name: Verify Android SDK
         shell: bash
         run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          sdkmanager --version
-          adb version
-          ls "$ANDROID_HOME/platforms/android-35"
+          set -e
 
+          if [ ! -d "$ANDROID_HOME" ]; then
+            echo "ERROR: Android SDK not found"
+            exit 1
+          fi
+
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" \
+            -name sdkmanager -type f | head -n 1)
+
+          if [ -z "$SDKMANAGER" ]; then
+            echo "ERROR: sdkmanager not found"
+            exit 1
+          fi
+
+          echo "SDKMANAGER=$SDKMANAGER" >> "$GITHUB_ENV"
+
+          echo "Android SDK found"
+          "$SDKMANAGER" --version
+
+      # 5. Accept SDK Licenses
+      - name: Accept Android Licenses
+        shell: bash
+        run: |
+          yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
+
+      # 6. Install SDK Packages
+      - name: Install Android Packages
+        shell: bash
+        run: |
+          set -e
+
+          "$SDKMANAGER" --install \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0"
+
+      # 7. Create Android Project
       - name: Create Android Project
         shell: bash
         run: |
+          set -e
+
           mkdir -p android/app/src/main/assets
           mkdir -p android/app/src/main/java/com/cfbs/attendance
           mkdir -p android/app/src/main/res/values
@@ -118,10 +158,13 @@ jobs:
           cat > android/app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+              <uses-permission android:name="android.permission.INTERNET" />
+
               <application
                   android:theme="@android:style/Theme.Material.Light.NoActionBar"
                   android:label="CFBS Student Attendance"
-                  android:allowBackup="true">
+                  android:allowBackup="true"
+                  android:usesCleartextTraffic="true">
 
                   <activity
                       android:name=".MainActivity"
@@ -147,6 +190,7 @@ jobs:
           import android.webkit.WebViewClient;
           import android.webkit.WebChromeClient;
           import android.webkit.WebSettings;
+          import android.view.ViewGroup;
 
           public class MainActivity extends Activity {
 
@@ -167,6 +211,13 @@ jobs:
                   webView.setWebViewClient(new WebViewClient());
                   webView.setWebChromeClient(new WebChromeClient());
 
+                  webView.setLayoutParams(
+                      new ViewGroup.LayoutParams(
+                          ViewGroup.LayoutParams.MATCH_PARENT,
+                          ViewGroup.LayoutParams.MATCH_PARENT
+                      )
+                  );
+
                   setContentView(webView);
 
                   webView.loadUrl("file:///android_asset/index.html");
@@ -180,6 +231,15 @@ jobs:
                       super.onBackPressed();
                   }
               }
+
+              @Override
+              protected void onDestroy() {
+                  if (webView != null) {
+                      webView.destroy();
+                      webView = null;
+                  }
+                  super.onDestroy();
+              }
           }
           EOF
 
@@ -189,33 +249,59 @@ jobs:
           </resources>
           EOF
 
-      - name: Set Up Gradle 8.9
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
+      # 8. Download Exact Gradle 8.9
+      - name: Install Gradle 8.9
+        shell: bash
+        run: |
+          set -e
 
-      - name: Generate Gradle Wrapper
+          cd "$RUNNER_TEMP"
+
+          curl -fL --retry 3 \
+            https://services.gradle.org/distributions/gradle-8.9-bin.zip \
+            -o gradle-8.9-bin.zip
+
+          unzip -q gradle-8.9-bin.zip
+
+          echo "$RUNNER_TEMP/gradle-8.9/bin" >> "$GITHUB_PATH"
+
+          "$RUNNER_TEMP/gradle-8.9/bin/gradle" --version
+
+      # 9. Verify Java and Gradle
+      - name: Verify Build Environment
+        shell: bash
+        run: |
+          set -e
+          java -version
+          gradle --version
+
+      # 10. Build APK
+      - name: Build CFBS APK
         working-directory: android
+        shell: bash
         run: |
-          gradle wrapper --gradle-version 8.9 --distribution-type bin
+          set -e
 
-      - name: Verify Gradle
-        working-directory: android
+          gradle clean assembleDebug --no-daemon
+
+      # 11. Verify APK
+      - name: Verify APK File
+        shell: bash
         run: |
-          chmod +x gradlew
-          ./gradlew --version
+          set -e
 
-      - name: Build APK
-        working-directory: android
-        run: |
-          ./gradlew clean assembleDebug --no-daemon
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
 
-      - name: Verify APK
-        run: |
-          test -f android/app/build/outputs/apk/debug/app-debug.apk
-          ls -lh android/app/build/outputs/apk/debug/app-debug.apk
+          if [ ! -s "$APK" ]; then
+            echo "ERROR: APK was not generated"
+            exit 1
+          fi
 
-      - name: Upload APK
+          echo "APK BUILD SUCCESSFUL"
+          ls -lh "$APK"
+
+      # 12. Upload APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: CFBS-Student-Attendance-APK
