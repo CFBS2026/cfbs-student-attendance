@@ -1,58 +1,165 @@
 name: Build CFBS Student Attendance APK
 
 on:
-  workflow_dispatch:
-  push:
-    paths:
-      - 'index.html'
-      - '.github/workflows/build-attendance-apk.yml'
-      - 'android/**'
+workflow_dispatch:
+push:
+paths:
+- 'index.html'
+- '.github/workflows/build-apk.yml'
+- 'android/**'
 
 permissions:
-  contents: read
+contents: read
 
 jobs:
-  build:
-    name: Build Attendance APK
-    runs-on: ubuntu-latest
+build:
+name: Build CFBS Attendance APK
+runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout Attendance Repository
-        uses: actions/checkout@v4
+steps:
+  - name: Checkout Repository
+    uses: actions/checkout@v4
 
-      - name: Verify Attendance Dashboard
-        run: |
-          test -f index.html || {
-            echo "ERROR: Attendance index.html not found"
-            exit 1
+  - name: Verify Dashboard
+    run: |
+      test -f index.html || {
+        echo "ERROR: index.html not found"
+        exit 1
+      }
+
+  - name: Set Up Java
+    uses: actions/setup-java@v4
+    with:
+      distribution: temurin
+      java-version: '17'
+
+  - name: Set Up Gradle
+    uses: gradle/actions/setup-gradle@v4
+    with:
+      gradle-version: '8.9'
+
+  - name: Create Android Project
+    run: |
+      mkdir -p android/app/src/main/assets
+      mkdir -p android/app/src/main/java/com/cfbs/attendance
+
+      cp index.html android/app/src/main/assets/index.html
+
+      cat > android/settings.gradle <<'EOF'
+      pluginManagement {
+          repositories {
+              google()
+              mavenCentral()
+              gradlePluginPortal()
           }
+      }
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Verify Android Project
-        run: |
-          test -f android/gradlew || {
-            echo "ERROR: Android project and Gradle wrapper are required"
-            exit 1
+      dependencyResolutionManagement {
+          repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+          repositories {
+              google()
+              mavenCentral()
           }
+      }
 
-      - name: Build Attendance APK
-        working-directory: android
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug
+      rootProject.name = "CFBSStudentAttendance"
+      include(":app")
+      EOF
 
-      - name: Upload Attendance APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: CFBS-Student-Attendance-APK
-          path: android/app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
-          retention-days: 14
+      cat > android/build.gradle <<'EOF'
+      plugins {
+          id 'com.android.application' version '8.7.3' apply false
+      }
+      EOF
+
+      cat > android/gradle.properties <<'EOF'
+      org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+      android.useAndroidX=true
+      EOF
+
+      cat > android/app/build.gradle <<'EOF'
+      plugins {
+          id 'com.android.application'
+      }
+
+      android {
+          namespace 'com.cfbs.attendance'
+          compileSdk 35
+
+          defaultConfig {
+              applicationId 'com.cfbs.attendance'
+              minSdk 23
+              targetSdk 35
+              versionCode 1
+              versionName '1.0.0'
+          }
+      }
+      EOF
+
+      cat > android/app/src/main/AndroidManifest.xml <<'EOF'
+      <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+          <application
+              android:theme="@android:style/Theme.Material.Light.NoActionBar"
+              android:label="CFBS Student Attendance"
+              android:allowBackup="true">
+              <activity
+                  android:name=".MainActivity"
+                  android:exported="true">
+                  <intent-filter>
+                      <action android:name="android.intent.action.MAIN"/>
+                      <category android:name="android.intent.category.LAUNCHER"/>
+                  </intent-filter>
+              </activity>
+          </application>
+      </manifest>
+      EOF
+
+      cat > android/app/src/main/java/com/cfbs/attendance/MainActivity.java <<'EOF'
+      package com.cfbs.attendance;
+
+      import android.app.Activity;
+      import android.os.Bundle;
+      import android.webkit.WebView;
+      import android.webkit.WebChromeClient;
+      import android.webkit.WebViewClient;
+
+      public class MainActivity extends Activity {
+          @Override
+          protected void onCreate(Bundle savedInstanceState) {
+              super.onCreate(savedInstanceState);
+
+              WebView webView = new WebView(this);
+              webView.getSettings().setJavaScriptEnabled(true);
+              webView.getSettings().setDomStorageEnabled(true);
+              webView.setWebChromeClient(new WebChromeClient());
+              webView.setWebViewClient(new WebViewClient());
+
+              setContentView(webView);
+              webView.loadUrl("file:///android_asset/index.html");
+          }
+      }
+      EOF
+
+      cd android
+      gradle wrapper --gradle-version 8.9
+
+  - name: Set Up Android SDK
+    uses: android-actions/setup-android@v3
+
+  - name: Install Android SDK Packages
+    run: |
+      sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+  - name: Build APK
+    working-directory: android
+    run: |
+      chmod +x gradlew
+      ./gradlew assembleDebug
+
+  - name: Upload APK
+    uses: actions/upload-artifact@v4
+    with:
+      name: CFBS-Student-Attendance-APK
+      path: android/app/build/outputs/apk/debug/*.apk
+      if-no-files-found: error
+      retention-days: 14
