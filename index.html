@@ -70,6 +70,7 @@ const $=id=>document.getElementById(id);
 const CLASSES=['KG'].concat(Array.from({length:12},(_,i)=>'Grade '+(i+1)));
 const STATUSES=['တက်','ပျက်','ခွင့်','ခွင့်မဲ့','နောက်ကျ'];
 const KEY='CFBS_CLASS_TEACHER_ATTENDANCE_V1';
+const SESSION_KEY=KEY+'_SESSION';
 let db={students:[],attendance:{},principalPhone:''},currentClass='';
 function makeId(){return 's'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -86,8 +87,29 @@ function tab(n){document.querySelectorAll('.tab').forEach(el=>el.classList.toggl
 document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>tab(b.dataset.tab)));
 $('togglePasswordBtn').addEventListener('click',()=>{const p=$('loginPassword');const show=p.type==='password';p.type=show?'text':'password';$('togglePasswordBtn').textContent=show?'ဖျောက်ရန်':'ပြရန်';$('togglePasswordBtn').setAttribute('aria-label',show?'Password ဖျောက်ရန်':'Password ပြရန်')});
 function matchLogin(u,p){if(u==='kg_teacher'&&p==='KG@12345')return 'KG';for(let i=1;i<=12;i++){if(u==='g'+i+'_teacher'&&p==='G'+i+'@12345')return 'Grade '+i}return ''}
-$('loginForm').addEventListener('submit',function(e){e.preventDefault();const u=$('loginUser').value.trim().toLowerCase(),p=$('loginPassword').value.trim(),cls=matchLogin(u,p);if(!cls){alert('Username သို့မဟုတ် Password မှားယွင်းနေပါသည်။');return}currentClass=cls;$('loginSection').classList.add('hidden');$('mainAppSection').classList.remove('hidden');$('headerClassName').textContent='STUDENT ATTENDANCE DASHBOARD - '+cls;$('currentClassNameDisplay').textContent=cls;renderStudents();renderAtt();renderMonth();generatePrincipalReport();msg(cls+' အကောင့်ဖြင့် ဝင်ရောက်ပြီးပါပြီ။')});
-$('logoutButton').addEventListener('click',()=>{if(confirm('အကောင့်မှ ထွက်မည်မှာ သေချာပါသလား။')){currentClass='';$('loginForm').reset();$('loginPassword').type='password';$('togglePasswordBtn').textContent='ပြရန်';$('mainAppSection').classList.add('hidden');$('loginSection').classList.remove('hidden')}});
+function showClassApp(cls,showMessage){
+ currentClass=cls;
+ try{localStorage.setItem(SESSION_KEY,cls)}catch(e){}
+ $('loginSection').classList.add('hidden');$('mainAppSection').classList.remove('hidden');
+ $('headerClassName').textContent='STUDENT ATTENDANCE DASHBOARD - '+cls;
+ $('currentClassNameDisplay').textContent=cls;
+ renderStudents();renderAtt();renderMonth();generatePrincipalReport();
+ if(showMessage)msg(cls+' အကောင့်ဖြင့် ဝင်ရောက်ပြီးပါပြီ။')
+}
+$('loginForm').addEventListener('submit',function(e){
+ e.preventDefault();
+ const u=$('loginUser').value.trim().toLowerCase(),p=$('loginPassword').value.trim(),cls=matchLogin(u,p);
+ if(!cls){alert('Username သို့မဟုတ် Password မှားယွင်းနေပါသည်။');return}
+ showClassApp(cls,true);
+});
+$('logoutButton').addEventListener('click',()=>{
+ if(confirm('အကောင့်မှ ထွက်မည်မှာ သေချာပါသလား။')){
+  save();currentClass='';
+  try{localStorage.removeItem(SESSION_KEY)}catch(e){}
+  $('loginForm').reset();$('loginPassword').type='password';$('togglePasswordBtn').textContent='ပြရန်';
+  $('mainAppSection').classList.add('hidden');$('loginSection').classList.remove('hidden');
+ }
+});
 function renderStudents(){const cls=currentClass,q=$('studentSearch').value.trim().toLowerCase(),all=people(cls,false),active=all.filter(s=>s.active),list=all.filter(s=>String(s.name).toLowerCase().includes(q)||String(s.sid).toLowerCase().includes(q));$('totalStudents').textContent=active.length;$('totalBoys').textContent=active.filter(s=>s.gender==='ကျား').length;$('totalGirls').textContent=active.filter(s=>s.gender==='မ').length;$('studentRows').innerHTML=list.map((s,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(s.sid)+'</td><td>'+esc(s.name)+'</td><td>'+esc(s.gender)+'</td><td>'+esc(s.dob)+'</td><td>'+esc(s.parent)+'</td><td>'+esc(s.phone||'-')+'</td><td>'+esc(s.address||'-')+'</td><td>'+(s.active?'လက်ရှိတက်ရောက်':'ကျောင်းမှထွက် / ယာယီမရှိ')+'</td><td class="no-print"><button class="small primary" data-edit="'+esc(s.id)+'">ပြင်ရန်</button> <button class="small" data-toggle="'+esc(s.id)+'">'+(s.active?'ကျောင်းမှထွက်':'ပြန်တက်')+'</button></td></tr>').join('')||'<tr><td colspan="10">စာရင်းမရှိသေးပါ။</td></tr>'}
 $('studentSearch').addEventListener('input',renderStudents);
 $('showStudentForm').addEventListener('click',()=>{$('studentForm').reset();$('editStudentId').value='';$('sactive').value='yes';$('studentFormBox').classList.remove('hidden')});
@@ -105,12 +127,33 @@ function renderMonth(){if(!currentClass)return;const cls=currentClass,m=$('month
 $('monthValue').addEventListener('change',renderMonth);$('printMonthly').addEventListener('click',()=>window.print());
 function generatePrincipalReport(){if(!currentClass)return;const cls=currentClass,date=$('principalDate').value,ss=people(cls,true),r=record(cls,date);if(!date)return;if(!ss.length){$('principalOutput').value='ကျောင်းသားစာရင်း မရှိသေးပါ။';$('principalAbsentRows').innerHTML='<tr><td colspan="6">ကျောင်းသားမရှိသေးပါ။</td></tr>';return}const d=date.split('-'),absentList=ss.filter(s=>['ပျက်','ခွင့်မဲ့','ခွင့်','နောက်ကျ'].includes(r[s.id]));const lines=['CHINDWIN FUTURE BRIGHT SCHOOL','နေ့စဉ်တက်ရောက်မှုအစီရင်ခံစာ','ရက်စွဲ='+d[2]+'/'+d[1]+'/'+d[0],'အတန်း='+cls,'စာရင်းရှိ='+ss.length,'ပျက်ကွက်ကျောင်းသား='+(absentList.length?absentList.map(s=>s.name).join(', '):'မရှိပါ')];$('principalOutput').value=lines.join('\n');$('principalAbsentRows').innerHTML=absentList.map((s,i)=>{const dateStr=d[2]+'/'+d[1]+'/'+d[0],phone=s.phone||'',txt='CHINDWIN FUTURE BRIGHT SCHOOL\n'+cls+'မှ '+s.name+'သည် '+dateStr+'ရက်နေ့တွင် ပျက်ကွက်သူ ဖြစ်ကြောင်း အသိပေးအပ်ပါသည်။',link=phone?'sms:'+encodeURIComponent(phone)+'?body='+encodeURIComponent(txt):'';return '<tr><td>'+(i+1)+'</td><td>'+esc(s.sid)+'</td><td>'+esc(s.name)+'</td><td>'+esc(r[s.id]||'ပျက်')+'</td><td>'+esc(phone||'ဖုန်းနံပါတ်မရှိ')+'</td><td class="no-print">'+(phone?'<a href="'+link+'" style="display:inline-block;padding:6px 10px;background:#10b981;color:white;border-radius:6px;text-decoration:none">📱 SMS ပို့ရန်</a>':'-')+'</td></tr>'}).join('')||'<tr><td colspan="6">ယနေ့ ပျက်ကွက်/ခွင့်ယူသူ မရှိပါ။</td></tr>'}
 $('generatePrincipal').addEventListener('click',generatePrincipalReport);$('principalDate').addEventListener('change',generatePrincipalReport);$('principalPhone').addEventListener('change',save);
-$('sendPrincipalSms').addEventListener('click',()=>{const text=$('principalOutput').value;let phone=$('principalPhone').value.trim();if(!text){alert('အစီရင်ခံစာ ပြုလုပ်ပါ။');return}if(!phone){phone=prompt('ကျောင်းအုပ်ကြီး၏ ဖုန်းနံပါတ် ဖြည့်ပါ:');if(!phone)return;$('principalPhone').value=phone;save()}window.location.href='sms:'+encodeURIComponent(phone)+'?body='+encodeURIComponent(text)});
-$('copyPrincipal').addEventListener('click',async()=>{const v=$('principalOutput').value;if(!v){alert('အစီရင်ခံစာကို အရင်ပြုလုပ်ပါ။');return}try{await navigator.clipboard.writeText(v)}catch(e){$('principalOutput').focus();$('principalOutput').select();document.execCommand('copy')}msg('စာသားကူးယူပြီးပါပြီ။')});
+function openSms(phone,text){
+ const cleanPhone=String(phone||'').trim().replace(/[\\s()-]/g,'');
+ if(!cleanPhone){alert('ဖုန်းနံပါတ် မှန်ကန်စွာ ဖြည့်ပါ။');return}
+ save();
+ const href='sms:'+cleanPhone+'?body='+encodeURIComponent(String(text||''));
+ const a=document.createElement('a');a.href=href;a.style.display='none';
+ document.body.appendChild(a);a.click();a.remove();
+}
+$('sendPrincipalSms').addEventListener('click',()=>{
+ const text=$('principalOutput').value;let phone=$('principalPhone').value.trim();
+ if(!text){alert('အစီရင်ခံစာ ပြုလုပ်ပါ။');return}
+ if(!phone){phone=prompt('ကျောင်းအုပ်ကြီး၏ ဖုန်းနံပါတ် ဖြည့်ပါ:');if(!phone)return;$('principalPhone').value=phone;save()}
+ openSms(phone,text);
+});
+if($('copyPrincipal'))$('copyPrincipal').addEventListener('click',async()=>{const v=$('principalOutput').value;if(!v){alert('အစီရင်ခံစာကို အရင်ပြုလုပ်ပါ။');return}try{await navigator.clipboard.writeText(v)}catch(e){$('principalOutput').focus();$('principalOutput').select();document.execCommand('copy')}msg('စာသားကူးယူပြီးပါပြီ။')});
 $('backupButton').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='CFBS-Backup-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)});
 $('chooseRestore').addEventListener('click',()=>$('restoreFile').click());
 $('restoreFile').addEventListener('change',()=>{const f=$('restoreFile').files[0];if(!f)return;if(!confirm('လက်ရှိအချက်အလက်များကို Backup ဖြင့် အစားထိုးမည်။ ဆက်လုပ်မလား။')){$('restoreFile').value='';return}const rd=new FileReader();rd.onload=()=>{try{const x=JSON.parse(rd.result);if(!x||!Array.isArray(x.students)||!x.attendance||typeof x.attendance!=='object')throw Error('invalid');db={students:x.students,attendance:x.attendance,principalPhone:x.principalPhone||''};$('principalPhone').value=db.principalPhone;if(save()){renderStudents();renderAtt();renderMonth();generatePrincipalReport();msg('Backup ပြန်ထည့်ပြီးပါပြီ။')}}catch(e){alert('Backup ဖိုင် မမှန်ပါ။')}finally{$('restoreFile').value=''}};rd.readAsText(f)});
-function init(){load();$('attDate').value=today();$('principalDate').value=today();$('monthValue').value=monthNow();$('principalPhone').value=db.principalPhone||''}
+function init(){
+ load();$('attDate').value=today();$('principalDate').value=today();$('monthValue').value=monthNow();$('principalPhone').value=db.principalPhone||'';
+ try{
+  const savedClass=localStorage.getItem(SESSION_KEY);
+  if(savedClass&&CLASSES.includes(savedClass))showClassApp(savedClass,false);
+ }catch(e){}
+}
+window.addEventListener('pagehide',()=>{try{save()}catch(e){}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){try{save()}catch(e){}}});
 init();
 })();
 </script>
