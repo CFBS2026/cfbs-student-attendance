@@ -207,7 +207,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <div class="field"><label>အတန်းရွေးရန်</label><select id="reportClass"></select></div>
 </div>
 
-<h3>📊 လစဉ် စာရင်းချုပ် (ကျား / မ အတန်းချုပ်)</h3>
+<h3>📊 လစဉ် စာရင်းချုပ် (အတန်းလိုက် တစ်တန်းချင်း ချုပ်ရန်)</h3>
 <div id="monthlySummaryTable"></div>
 
 <h3 style="margin-top:20px">👨‍🎓 ကျောင်းသားတစ်ဦးချင်း လစဉ်မှတ်တမ်း ဇယား</h3>
@@ -346,11 +346,32 @@ function parseTeacherSMS(){
   absentNames.forEach(name=>{let st=matchSmsStudent(name,roster);if(!st)unmatched.push(name);else assignments[st.id]="absent";});
   roster.forEach(st=>{if(!assignments[st.id])assignments[st.id]="present";});
   
-  if(confirm(`${cls} အတန်း (${date}) အတွက် တက်ရောက်မှုစာရင်း မှတ်တမ်းတင်မည်လား။`)){
-    Object.keys(assignments).forEach(id=>{db.records[key(date,id)]=assignments[id];});
-    save();alert("သိမ်းဆည်းပြီးပါပြီ။");renderHome();renderAttendance();
-  }
+  let reviewHtml=`<div class="panel" style="background:#f8fafc;margin-top:12px">
+    <h3>🔍 SMS စစ်ဆေးချက် — ${esc(cls)} · ${esc(date)}</h3>
+    <p>စာရင်းရှိ: <b>${roster.length}</b> ဦး · ပျက်ကွက်သူ: <b>${absentNames.length}</b> ဦး</p>
+    <div class="tablewrap"><table><thead><tr><th>ကျောင်းဝင်အမှတ်</th><th>ကျောင်းသားအမည်</th><th>အခြေအနေ</th></tr></thead><tbody>
+    ${roster.map(st=>`<tr><td>${esc(st.sid)}</td><td>${esc(st.name)}</td><td>${esc(statusLabel[assignments[st.id]])}</td></tr>`).join("")}
+    </tbody></table></div>
+    <div class="actions" style="margin-top:10px">
+      <button class="green" onclick="confirmApplySMS('${cls}','${date}',{${roster.map(st=>`'${st.id}':'${assignments[st.id]}'`).join(',')}})">💾 စစ်ဆေးထားသော SMS မှတ်တမ်းသိမ်းရန်</button>
+      <button class="secondary" onclick="clearTeacherSMS()">SMS ရှင်းရန်</button>
+    </div>
+  </div>`;
+  $("smsReview").innerHTML=reviewHtml;
 }
+
+function confirmApplySMS(cls, date, recordsObj){
+  if(!confirm(`${cls} အတန်း၊ ${date} အတွက် တက်ရောက်မှုစာရင်းကို သိမ်းဆည်းမလား။`)) return;
+  Object.keys(recordsObj).forEach(id=>{
+    db.records[key(date, id)] = recordsObj[id];
+  });
+  save();
+  alert("တက်ရောက်မှုစာရင်း သိမ်းဆည်းပြီးပါပြီ။");
+  renderHome();
+  renderAttendance();
+  clearTeacherSMS();
+}
+
 function smsField(text,labels){for(let l of labels){let m=text.match(new RegExp("^\\s*"+l+"\\s*[:：=]\\s*(.*?)\\s*$","mi"));if(m)return m[1].trim()}return ""}
 function smsDate(text){let v=smsField(text,["ရက်စွဲ","နေ့စွဲ"]);let m=v.match(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);return m?m[0]:""}
 function normalizeClass(v){let x=(v||"").toLowerCase().replace("grade","").trim();return x.includes("kg")?"KG":"Grade "+parseInt(x)}
@@ -390,7 +411,7 @@ function saveTeacherPhones(){
   save();alert("အတန်းပိုင် ဖုန်းနံပါတ်များ သိမ်းဆည်းပြီးပါပြီ။");renderRemindSms();
 }
 
-// Monthly Summary & Detail Calculations
+// Monthly Summary & Detail Calculations (Class-by-Class Breakdown)
 function monthTally(arr,m){let t={present:0,absent:0,leave:0,unexcused:0,late:0};Object.keys(db.records).forEach(k=>{if(!k.startsWith(m+"-"))return;let id=k.split("|")[1];if(!arr.some(s=>s.id===id))return;let v=db.records[k];if(t[v]!==undefined)t[v]++});return t}
 function monthKeys(id,m){return Object.keys(db.records).filter(k=>k.startsWith(m+"-")&&k.endsWith("|"+id)&&["present","absent","leave","unexcused","late"].includes(db.records[k])).sort()}
 function pct(n,d){return d?Math.round(n/d*1000)/10:0}
@@ -399,6 +420,7 @@ function renderMonthly(){
   let m=$("reportMonth").value||today().slice(0,7),c=$("reportClass").value||"ALL";
   let active=list(c,false),arr=(c==="ALL"?active:active.filter(s=>s.className===c));
 
+  // If a specific class is selected, calculate for that class. If ALL, aggregate all.
   let boysCount = arr.filter(s => s.gender === "ကျား").length;
   let girlsCount = arr.filter(s => s.gender === "မ").length;
   let totalCount = boysCount + girlsCount;
@@ -433,16 +455,19 @@ function renderMonthly(){
   let girlsPct = girlsPossible ? ((girlsPresent / girlsPossible) * 100).toFixed(1) : 0;
   let totalPct = totalPossible ? ((totalPresent / totalPossible) * 100).toFixed(1) : 0;
 
+  let summaryTitle = c === "ALL" ? "စုစုပေါင်း (အတန်းအားလုံး ချုပ်ချက်)" : c + " အတန်း စာရင်းချုပ်";
+
   $("monthlySummaryTable").innerHTML = `
+    <div style="font-weight:bold;margin-bottom:6px;color:#193b63">📌 ${summaryTitle}</div>
     <div class="tablewrap">
       <table>
         <thead><tr><th>စဉ်</th><th>အချက်အလက်ခေါင်းစဉ်</th><th>ကျား</th><th>မ</th><th>ပေါင်း</th></tr></thead>
         <tbody>
-          <tr><td>၁</td><td><b>စာရင်းရှိဦးရေ</b></td><td>${boysCount}</td><td>${girlsCount}</td><td><b>${totalCount}</b></td></tr>
-          <tr><td>၂</td><td><b>ကျောင်းတက်ကြိမ်ပေါင်း</b></td><td>${boysPresent}</td><td>${girlsPresent}</td><td><b>${totalPresent}</b></td></tr>
-          <tr><td>၃</td><td><b>ပျမ်းမျှလာလူ</b></td><td>${boysAvg}</td><td>${girlsAvg}</td><td><b>${totalAvg}</b></td></tr>
-          <tr><td>၄</td><td><b>တက်ရောက်ရာခိုင်နှုန်း (%)</b></td><td>${boysPct}%</td><td>${girlsPct}%</td><td><b>${totalPct}%</b></td></tr>
-          <tr><td>၅</td><td><b>ပျက်ကွက်ကြိမ်ပေါင်း</b></td><td>${boysAbsent}</td><td>${girlsAbsent}</td><td><b>${totalAbsent}</b></td></tr>
+          <tr><td>၁</td><td>စာရင်းရှိဦးရေ</td><td>${boysCount}</td><td>${girlsCount}</td><td><b>${totalCount}</b></td></tr>
+          <tr><td>၂</td><td>ကျောင်းတက်ကြိမ်ပေါင်း</td><td>${boysPresent}</td><td>${girlsPresent}</td><td><b>${totalPresent}</b></td></tr>
+          <tr><td>၃</td><td>ပျမ်းမျှလာလူ</td><td>${boysAvg}</td><td>${girlsAvg}</td><td><b>${totalAvg}</b></td></tr>
+          <tr><td>၄</td><td>တက်ရောက်ရာခိုင်နှုန်း (%)</td><td>${boysPct}%</td><td>${girlsPct}%</td><td><b>${totalPct}%</b></td></tr>
+          <tr><td>၅</td><td>ပျက်ကွက်ကြိမ်ပေါင်း</td><td>${boysAbsent}</td><td>${girlsAbsent}</td><td><b>${totalAbsent}</b></td></tr>
         </tbody>
       </table>
     </div>
