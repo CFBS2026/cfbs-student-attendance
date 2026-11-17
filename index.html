@@ -34,7 +34,7 @@ textarea{min-height:70px;resize:vertical}
 .stat.red{background:#fee2e2}.stat.red strong{color:#991b1b}
 .stat.yellow{background:#fef3c7}.stat.yellow strong{color:#92400e}
 .tablewrap{overflow-x:auto;max-width:100%;border:1px solid #e2e8f0;border-radius:8px}
-table{border-collapse:collapse;width:100%;min-width:600px;font-size:12px}
+table{border-collapse:collapse;width:100%;min-width:700px;font-size:12px}
 th,td{padding:9px 8px;border-bottom:1px solid #e2e8f0;text-align:left;white-space:nowrap}
 th{background:#eff4fa;color:#193b63}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
@@ -53,7 +53,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
 <div class="nav-drawer" id="navDrawer">
   <h3>📌 မီနူးများ</h3>
-  <button data-page="home" class="active" onclick="setPage('home')">📊 ပင်မစာမျက်နှာ </button>
+  <button data-page="home" class="active" onclick="setPage('home')">📊 ပင်မစာမျက်နှာ</button>
   <button data-page="students" onclick="setPage('students')">👨‍🎓 ကျောင်းသားစာရင်း</button>
   <button data-page="attendance" onclick="setPage('attendance')">📅 အတန်းလိုက် တက်ရောက်မှု</button>
   <button data-page="sms" onclick="setPage('sms')">📩 အတန်းပိုင် SMS ဖတ်ရန်</button>
@@ -336,7 +336,7 @@ function renderStudents(){
   let active=list(c);
   $("classTotal").textContent=active.length;$("boys").textContent=active.filter(s=>s.gender==="ကျား").length;$("girls").textContent=active.filter(s=>s.gender==="မ").length;$("className").textContent=c;
   const statusText=s=>s.active===false?"ကျောင်းထွက်":(s.active==="paused"?"ယာယီရပ်နား":"တက်ရောက်ဆဲ");
-  $("studentTable").innerHTML=arr.length?`<div class="tablewrap"><table style="min-width:850px"><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>မွေးသက္ကရာဇ်</th><th>မိဘအမည်</th><th>မိဘဖုန်းနံပါတ်</th><th>အခြေအနေ</th><th>ပြင်/ဖျက်</th></tr></thead><tbody>${arr.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.sid)}</td><td>${esc(s.name)}</td><td>${esc(s.gender)}</td><td>${esc(s.dob||"-")}</td><td>${esc(s.parentName||"-")}</td><td>${esc(s.phone||"-")}</td><td>${statusText(s)}</td><td><button class="secondary" onclick="editStudent('${s.id}')">ပြင်</button> <button class="danger" onclick="deleteStudent('${s.id}')">ဖျက်</button></td></tr>`).join("")}</tbody></table></div>`:'<p class="muted">စာရင်းမရှိပါ။</p>';
+  $("studentTable").innerHTML=arr.length?`<div class="tablewrap"><table style="min-width:950px"><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>မွေးသက္ကရာဇ်</th><th>မိဘအမည်</th><th>မိဘဖုန်းနံပါတ်</th><th>နေရပ်လိပ်စာ</th><th>အခြေအနေ</th><th>ပြင်/ဖျက်</th></tr></thead><tbody>${arr.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.sid)}</td><td>${esc(s.name)}</td><td>${esc(s.gender)}</td><td>${esc(s.dob||"-")}</td><td>${esc(s.parentName||"-")}</td><td>${esc(s.phone||"-")}</td><td>${esc(s.address||"-")}</td><td>${statusText(s)}</td><td><button class="secondary" onclick="editStudent('${s.id}')">ပြင်</button> <button class="danger" onclick="deleteStudent('${s.id}')">ဖျက်</button></td></tr>`).join("")}</tbody></table></div>`:'<p class="muted">စာရင်းမရှိပါ။</p>';
 }
 
 // Attendance Table
@@ -540,7 +540,7 @@ function renderMonthly(){
       <td>${totalAbsent}</td>
       <td>${lv}</td>
       <td>${un}</td>
-      <td>${lt}</td>
+      <td>${totalLt}</td>
       <td>${attPct}</td>
       <td>${abPct}</td>
     </tr>`;
