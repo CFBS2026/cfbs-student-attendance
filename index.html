@@ -53,7 +53,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
 <div class="nav-drawer" id="navDrawer">
   <h3>📌 မီနူးများ</h3>
-  <button data-page="home" class="active" onclick="setPage('home')">📊 ပင်မစာမျက်နှာ</button>
+  <button data-page="home" class="active" onclick="setPage('home')">📊 ဒက်ရှ်ဘုတ် စာရင်းချုပ်</button>
   <button data-page="students" onclick="setPage('students')">👨‍🎓 ကျောင်းသားစာရင်း</button>
   <button data-page="attendance" onclick="setPage('attendance')">📅 အတန်းလိုက် တက်ရောက်မှု</button>
   <button data-page="sms" onclick="setPage('sms')">📩 အတန်းပိုင် SMS ဖတ်ရန်</button>
@@ -64,7 +64,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <header>
 <div class="brand">
 <button class="menu-toggle" onclick="toggleDrawer()" aria-label="Menu"><span></span><span></span><span></span></button>
-<div class="logo">👑</div>
+<div class="logo">CFB</div>
 <div>
 <h1>CHINDWIN FUTURE BRIGHT SCHOOL</h1>
 <p>STUDENT ATTENDANCE DASHBOARD · Budalin Township</p>
@@ -204,18 +204,25 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <h2>📈 လအလိုက် အစီရင်ခံစာ</h2>
 <div class="row">
 <div class="field"><label>လရွေးရန်</label><input id="reportMonth" type="month"></div>
-<div class="field"><label>အတန်းရွေးရန်</label><select id="reportClass"></select></div>
+<div class="field"><label>အတန်းရွေးရန် (တစ်တန်းချင်းချုပ်ရန်)</label><select id="reportClass"><option value="all">အတန်းအားလုံး</option></select></div>
 </div>
 
-<h3>📊 လစဉ် စာရင်းချုပ်</h3>
-<div id="monthlySummaryTable"></div>
+<div class="muted" style="margin-bottom:10px"><span id="monthlyInfoLabel"></span></div>
 
-<h3 style="margin-top:20px">👨‍🎓 ကျောင်းသားတစ်ဦးချင်း လစဉ်မှတ်တမ်း ဇယား</h3>
-<div id="monthlyTable"></div>
+<h3 style="margin-top:10px">📚 အတန်းအလိုက် လစဉ်စာရင်းချုပ်</h3>
+<div id="monthlyClassSummaryTable"></div>
 
-<h3 style="margin-top:20px">📅 ကျောင်းသားတစ်ဦးချင်း ရက်စွဲအလိုက် အသေးစိတ်ကြည့်ရန်</h3>
-<div class="row"><div class="field"><label>ကျောင်းသားရွေးရန်</label><select id="detailStudent"></select></div></div>
-<div id="studentDetail"></div>
+<div id="singleClassDetailContainer">
+  <h3 style="margin-top:20px">📊 <span id="selectedClassNameTitle">KG</span> အတန်း — လစဉ် စာရင်းချုပ် (ကျား / မ)</h3>
+  <div id="monthlySummaryTable"></div>
+
+  <h3 style="margin-top:20px">👨‍🎓 ကျောင်းသားတစ်ဦးချင်း လစဉ်မှတ်တမ်း ဇယား</h3>
+  <div id="monthlyTable"></div>
+
+  <h3 style="margin-top:20px">📅 ကျောင်းသားတစ်ဦးချင်း ရက်စွဲအလိုက် အသေးစိတ်ကြည့်ရန်</h3>
+  <div class="row"><div class="field"><label>ကျောင်းသားရွေးရန်</label><select id="detailStudent"></select></div></div>
+  <div id="studentDetail"></div>
+</div>
 
 <div class="actions" style="margin-top:15px">
   <button onclick="window.print()">🖨️ ပုံနှိပ်ရန်</button>
@@ -331,7 +338,7 @@ function renderStudents(){
   let active=list(c);
   $("classTotal").textContent=active.length;$("boys").textContent=active.filter(s=>s.gender==="ကျား").length;$("girls").textContent=active.filter(s=>s.gender==="မ").length;$("className").textContent=c;
   const statusText=s=>s.active===false?"ကျောင်းထွက်":(s.active==="paused"?"ယာယီရပ်နား":"တက်ရောက်ဆဲ");
-  $("studentTable").innerHTML=arr.length?`<div class="tablewrap"><table style="min-width:850px"><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>မွေးသက္ကရာဇ်</th><th>မိဘအမည်</th><th>မိဘဖုန်းနံပါတ်</th><th>နေရပ်လိပ်စာ</th><th>အခြေအနေ</th><th>ပြင်/ဖျက်</th></tr></thead><tbody>${arr.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.sid)}</td><td>${esc(s.name)}</td><td>${esc(s.gender)}</td><td>${esc(s.dob||"-")}</td><td>${esc(s.parentName||"-")}</td><td>${esc(s.phone||"-")}</td><td>${statusText(s)}</td><td><button class="secondary" onclick="editStudent('${s.id}')">ပြင်</button> <button class="danger" onclick="deleteStudent('${s.id}')">ဖျက်</button></td></tr>`).join("")}</tbody></table></div>`:'<p class="muted">စာရင်းမရှိပါ။</p>';
+  $("studentTable").innerHTML=arr.length?`<div class="tablewrap"><table style="min-width:850px"><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>မွေးသက္ကရာဇ်</th><th>မိဘအမည်</th><th>မိဘဖုန်းနံပါတ်</th><th>အခြေအနေ</th><th>ပြင်/ဖျက်</th></tr></thead><tbody>${arr.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.sid)}</td><td>${esc(s.name)}</td><td>${esc(s.gender)}</td><td>${esc(s.dob||"-")}</td><td>${esc(s.parentName||"-")}</td><td>${esc(s.phone||"-")}</td><td>${statusText(s)}</td><td><button class="secondary" onclick="editStudent('${s.id}')">ပြင်</button> <button class="danger" onclick="deleteStudent('${s.id}')">ဖျက်</button></td></tr>`).join("")}</tbody></table></div>`:'<p class="muted">စာရင်းမရှိပါ။</p>';
 }
 
 // Attendance Table
@@ -485,21 +492,112 @@ function saveTeacherPhones(){
   save();alert("အတန်းပိုင် ဖုန်းနံပါတ်များ သိမ်းဆည်းပြီးပါပြီ။");renderRemindSms();
 }
 
-// Monthly Summary Calculations with Exact User Rules
+// Monthly Summary Calculations
 function monthTally(arr,m){let t={present:0,absent:0,leave:0,unexcused:0,late:0};Object.keys(db.records).forEach(k=>{if(!k.startsWith(m+"-"))return;let id=k.split("|")[1];if(!arr.some(s=>s.id===id))return;let v=db.records[k];if(t[v]!==undefined)t[v]++});return t}
 function monthKeys(id,m){return Object.keys(db.records).filter(k=>k.startsWith(m+"-")&&k.endsWith("|"+id)&&["present","absent","leave","unexcused","late"].includes(db.records[k])).sort()}
 
 function renderMonthly(){
   let m=$("reportMonth").value||today().slice(0,7);
-  let c=$("reportClass").value||classes[0];
-  let arr=list(c,false);
+  let selectedClass=$("reportClass").value;
+  let isAll = (selectedClass === "all");
 
-  // 1. စာရင်းရှိ (ကျား၊ မ)
+  $("monthlyInfoLabel").textContent = `ရွေးထားသောလ: ${m} · အတန်း: ${isAll ? "အတန်းအားလုံး" : selectedClass} · မှတ်တမ်းမရှိသေးသောရက်များကို ပျက်ကွက်ဟု မတွက်ပါ။`;
+  $("singleClassDetailContainer").style.display = isAll ? "none" : "block";
+
+  // 1. Render Overall Class-wise Monthly Summary Table with TOTAL Row at Bottom
+  let totalStCount = 0, totalP = 0, totalAb = 0, totalLv = 0, totalUn = 0, totalLt = 0;
+
+  let classSummaryRows = classes.map(cls => {
+    let students = list(cls, false);
+    let stCount = students.length;
+    let p=0, ab=0, lv=0, un=0, lt=0;
+    students.forEach(s => {
+      let keys = monthKeys(s.id, m);
+      keys.forEach(k => {
+        let st = db.records[k];
+        if(st==="present") p++;
+        if(st==="absent") ab++;
+        if(st==="leave") lv++;
+        if(st==="unexcused") un++;
+        if(st==="late") lt++;
+      });
+    });
+    let totalPresent = p + lt;
+    let totalAbsent = ab + un;
+    let totalRecorded = totalPresent + totalAbsent + lv;
+    let attPct = totalRecorded ? Math.round((totalPresent / totalRecorded) * 1000)/10 + "%" : "—";
+    let abPct = totalRecorded ? Math.round((totalAbsent / totalRecorded) * 1000)/10 + "%" : "—";
+
+    totalStCount += stCount;
+    totalP += totalPresent;
+    totalAb += totalAbsent;
+    totalLv += lv;
+    totalUn += un;
+    totalLt += lt;
+
+    return `<tr>
+      <td><b>${esc(cls)}</b></td>
+      <td>${stCount}</td>
+      <td>${totalPresent}</td>
+      <td>${totalAbsent}</td>
+      <td>${lv}</td>
+      <td>${un}</td>
+      <td>${lt}</td>
+      <td>${attPct}</td>
+      <td>${abPct}</td>
+    </tr>`;
+  }).join("");
+
+  let grandRecorded = totalP + totalAb + totalLv;
+  let grandAttPct = grandRecorded ? Math.round((totalP / grandRecorded) * 1000)/10 + "%" : "—";
+  let grandAbPct = grandRecorded ? Math.round((totalAb / grandRecorded) * 1000)/10 + "%" : "—";
+
+  let totalRow = `
+    <tr style="background:#eff4fa;font-weight:bold;border-top:2px solid #cbd5e1">
+      <td>စုစုပေါင်း</td>
+      <td>${totalStCount}</td>
+      <td>${totalP}</td>
+      <td>${totalAb}</td>
+      <td>${totalLv}</td>
+      <td>${totalUn}</td>
+      <td>${totalLt}</td>
+      <td>${grandAttPct}</td>
+      <td>${grandAbPct}</td>
+    </tr>
+  `;
+
+  $("monthlyClassSummaryTable").innerHTML = `
+    <div class="tablewrap">
+      <table style="min-width:700px">
+        <thead>
+          <tr>
+            <th>အတန်း</th>
+            <th>ကျောင်းသားဦးရေ</th>
+            <th>တက်</th>
+            <th>ပျက်</th>
+            <th>ခွင့်</th>
+            <th>ခွင့်မဲ့</th>
+            <th>နောက်ကျ</th>
+            <th>တက် %</th>
+            <th>ပျက် %</th>
+          </tr>
+        </thead>
+        <tbody>${classSummaryRows}${totalRow}</tbody>
+      </table>
+    </div>
+  `;
+
+  if(isAll) return;
+
+  // 2. Render Single Class Detailed Monthly Report
+  let c = selectedClass;
+  $("selectedClassNameTitle").textContent = c;
+  let arr = list(c, false);
+
   let boysCount = arr.filter(s => s.gender === "ကျား").length;
   let girlsCount = arr.filter(s => s.gender === "မ").length;
   let totalCount = boysCount + girlsCount;
 
-  // 2. ကျောင်းတက်ကြိမ်ပေါင်း (တစ်ရက်လျှင် ၂ ကြိမ် - မနက်/နေ့လယ်)
   let boysPresentCalls = 0, girlsPresentCalls = 0;
   let boysAbsentCalls = 0, girlsAbsentCalls = 0;
 
@@ -520,7 +618,6 @@ function renderMonthly(){
   let totalPresentCalls = boysPresentCalls + girlsPresentCalls;
   let totalAbsentCalls = boysAbsentCalls + girlsAbsentCalls;
 
-  // ယခုလ ကျောင်းခေါ်ကြိမ် (ကျောင်းဖွင့်ရက် × 2)
   let daysInMonthSet = new Set();
   Object.keys(db.records).forEach(k=>{
     if(k.startsWith(m+"-")) daysInMonthSet.add(k.split("|")[0]);
@@ -528,17 +625,14 @@ function renderMonthly(){
   let schoolDays = Math.max(daysInMonthSet.size, 1);
   let monthTotalCalls = schoolDays * 2;
 
-  // 3. ပျမ်းမျှလာလူ = ကျား/မ ကျောင်းခေါ်ကြိမ်ပေါင်း ÷ ယခုလ ကျောင်းခေါ်ကြိမ် (ပေါင်း = ကျား + မ)
   let boysAvg = monthTotalCalls ? (boysPresentCalls / monthTotalCalls) : 0;
   let girlsAvg = monthTotalCalls ? (girlsPresentCalls / monthTotalCalls) : 0;
   let totalAvg = boysAvg + girlsAvg;
 
-  // 4. ပျမ်းမျှခေါ်ကြိမ် = ကျား/မ ခေါ်ကြိမ် စုစုပေါင်း ÷ ကျား/မ စာရင်းရှိ (ပေါင်း = ကျား+မ ခေါ်ကြိမ်ပေါင်း ÷ ကျား+မ စာရင်းရှိ)
   let boysCallAvg = boysCount ? (boysPresentCalls / boysCount) : 0;
   let girlsCallAvg = girlsCount ? (girlsPresentCalls / girlsCount) : 0;
   let totalCallAvg = totalCount ? (totalPresentCalls / totalCount) : 0;
 
-  // 5. ကျောင်းတက်ရာခိုင်နှုန်း (%) = ပျမ်းမျှလာလူ ÷ စာရင်းရှိ × 100
   let boysPct = boysCount ? ((boysAvg / boysCount) * 100) : 0;
   let girlsPct = girlsCount ? ((girlsAvg / girlsCount) * 100) : 0;
   let totalPct = totalCount ? ((totalAvg / totalCount) * 100) : 0;
