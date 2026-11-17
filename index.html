@@ -169,7 +169,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <section id="sms" class="page hidden">
 <div class="panel">
 <h2>📩 အတန်းပိုင်ဆီက ပို့လာတဲ့ SMS ကို ထည့်ရန်</h2>
-<p class="muted">အတန်းပိုင်ဆရာ/မ ပို့လာသော SMS ကို ကူးထည့်ပါ။ SMS ထဲပါသော ရက်စွဲအတိုင်း (အရင်ရက်များအပါအဝင်) တိုက်စစ်ပြီး သိမ်းဆည်းနိုင်ပါသည်။</p>
+<p class="muted">အတန်းပိုင်ဆရာ/မ ပို့လာသော SMS ကို ကူးထည့်ပါ။ ရက်စွဲနှင့် ကျောင်းသားစာရင်း တကယ်ရှိမှ၊ ကိုက်ညီမှသာ သိမ်းဆည်းခွင့်ပြုပါမည်။</p>
 <label for="smsText">အတန်းပိုင်ပို့လာသော SMS စာသား</label>
 <textarea id="smsText" rows="8" placeholder="CHINDWIN FUTURE BRIGHT SCHOOL&#10;နေ့စဉ်တက်ရောက်မှုအစီရင်ခံစာ&#10;ရက်စွဲ = 15/11/2026&#10;အတန်း = KG&#10;စာရင်းရှိ = 30&#10;ပျက်ကွက်ကျောင်းသား = မောင်မောင်"></textarea>
 <div class="actions">
@@ -334,36 +334,57 @@ function renderAttendance(){
   $("attendanceTable").innerHTML=`<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>ကျောင်းသားအမည်</th><th>အခြေအနေ</th></tr></thead><tbody>${a.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.sid)}</td><td>${esc(s.name)}</td><td>${status(s,d)==="pending"?'<span class="tag pending">မမှတ်ရသေး</span>':`<span class="tag sent">${statusLabel[status(s,d)]}</span>`}</td></tr>`).join("")||'<tr><td colspan="4">ကျောင်းသားမရှိပါ။</td></tr>'}</tbody></table></div>`;
 }
 
-// Teacher SMS Parser with Automatic Date Parsing from SMS Text & Strict Validation
+// Strict Date Validator Function (Checks if YYYY-MM-DD is a real calendar date)
+function isValidDate(dateStr) {
+  let parts = dateStr.split("-");
+  if(parts.length !== 3) return false;
+  let year = parseInt(parts[0], 10);
+  let month = parseInt(parts[1], 10);
+  let day = parseInt(parts[2], 10);
+  
+  if(isNaN(year) || isNaN(month) || isNaN(day)) return false;
+  if(month < 1 || month > 12) return false;
+  
+  // Check days in month (handling leap years correctly)
+  let d = new Date(year, month - 1, day);
+  return d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
+}
+
+// Teacher SMS Parser with Strict Date & Roster Validation
 function parseTeacherSMS(){
   let text=$("smsText").value.trim();if(!text){alert("SMS စာသားထည့်ပါ။");return}
   let cls=normalizeClass(smsField(text,["အတန်း","အတန်းအမည်","Class"]));
-  let date=smsDate(text); // Extracts exact date from SMS text (e.g. 15/11/2026 -> 2026-11-15)
+  let date=smsDate(text); // Extracted date string (YYYY-MM-DD)
 
-  if(!date){alert("SMS ထဲတွင် ရက်စွဲ (Date) မတွေ့ပါ သို့မဟုတ် ပုံစံမမှန်ပါ။ (ဥပမာ - ရက်စွဲ = 15/11/2026 ဟု ထည့်ပါ)");return}
+  let errors=[];
+  if(!date || !isValidDate(date)){
+    errors.push(`⚠️ SMS ထဲပါသော ရက်စွဲ (${date || "မတွေ့ပါ"}) သည် တကယ်မရှိသော (သို့မဟုတ်) မှားယွင်းနေသော ရက်စွဲဖြစ်နေပါသည် (ဥပမာ - လတွင်မရှိသည့်ရက် သို့မဟုတ် 0 ရက်)။`);
+  }
+
   let smsTotalStr=smsField(text,["စာရင်းရှိ","စုစုပေါင်း","Total"]);
   let smsTotal=parseInt(smsTotalStr)||0;
 
-  if(!cls){alert("အတန်းအမည် မတွေ့ပါ။");return}
-  let roster=list(cls);if(!roster.length){alert("ထိုအတန်းအတွက် ကျောင်းသားစာရင်း မရှိပါ။");return}
+  if(!cls){errors.push("⚠️ အတန်းအမည် မတွေ့ပါ။");}
+  let roster=cls?list(cls):[];
+  if(cls && !roster.length){errors.push(`⚠️ ${cls} အတန်းအတွက် ကျောင်းသားစာရင်း မရှိပါ။`);}
 
   let absentNames=parseNameList(text,["ပျက်ကွက်ကျောင်းသား","ပျက်ကွက်သူ","ပျက်သူ"]);
   let assignments={},unmatchedNames=[];
 
-  absentNames.forEach(name=>{
-    let st=matchSmsStudent(name,roster);
-    if(!st) unmatchedNames.push(name);
-    else assignments[st.id]="absent";
-  });
+  if(roster.length > 0){
+    absentNames.forEach(name=>{
+      let st=matchSmsStudent(name,roster);
+      if(!st) unmatchedNames.push(name);
+      else assignments[st.id]="absent";
+    });
+    roster.forEach(st=>{if(!assignments[st.id])assignments[st.id]="present";});
 
-  roster.forEach(st=>{if(!assignments[st.id])assignments[st.id]="present";});
-
-  let errors=[];
-  if(smsTotal>0 && smsTotal!==roster.length){
-    errors.push(`⚠️ စာရင်းရှိဦးရေ မကိုက်ညီပါ (SMS ထဲတွင် ${smsTotal} ဦးဟု ပါရှိသော်လည်း၊ စာရင်းရှိသည်မှာ ${roster.length} ဦး ဖြစ်နေပါသည်)။`);
-  }
-  if(unmatchedNames.length>0){
-    errors.push(`⚠️ အောက်ပါပျက်ကွက်သူ အမည်များသည် ကျောင်းသားစာရင်းနှင့် မကိုက်ညီပါ (သို့မဟုတ်) စာရင်းထဲတွင် မရှိပါ:<br><b>${unmatchedNames.join(", ")}</b>`);
+    if(smsTotal>0 && smsTotal!==roster.length){
+      errors.push(`⚠️ စာရင်းရှိဦးရေ မကိုက်ညီပါ (SMS ထဲတွင် ${smsTotal} ဦးဟု ပါရှိသော်လည်း၊ စာရင်းရှိသည်မှာ ${roster.length} ဦး ဖြစ်နေပါသည်)။`);
+    }
+    if(unmatchedNames.length>0){
+      errors.push(`⚠️ အောက်ပါပျက်ကွက်သူ အမည်များသည် ကျောင်းသားစာရင်းနှင့် မကိုက်ညီပါ:<br><b>${unmatchedNames.join(", ")}</b>`);
+    }
   }
 
   let reviewHtml="";
@@ -371,7 +392,7 @@ function parseTeacherSMS(){
     reviewHtml=`<div class="panel" style="background:#fff5f5;border-color:#fecaca;margin-top:12px">
       <h3>❌ SMS စာရင်း တိုက်ဆိုင်စစ်ဆေးမှု မအောင်မြင်ပါ</h3>
       <div class="alert-box">${errors.join("<br>")}</div>
-      <p class="muted">ကျေးဇူးပြု၍ SMS စာသား သို့မဟုတ် ကျောင်းသားစာရင်းကို ပြန်လည်စစ်ဆေးပါ။ စာရင်းမကိုက်ညီသဖြင့် သိမ်းဆည်းခွင့် မပြုပါ။</p>
+      <p class="muted">ကျေးဇူးပြု၍ SMS စာသား (ရက်စွဲ၊ အတန်းနှင့် နာမည်များ) ကို ပြန်လည်စစ်ဆေးပါ။ အချက်အလက် မမှန်ကန်ပါက သိမ်းဆည်းခွင့် မပြုပါ။</p>
       <div class="actions"><button class="danger" onclick="clearTeacherSMS()">SMS ရှင်းရန် / ပြန်ပြင်ရန်</button></div>
     </div>`;
   }else{
@@ -404,16 +425,14 @@ function confirmApplySMS(cls, date, recordsObj){
 
 function smsField(text,labels){for(let l of labels){let m=text.match(new RegExp("^\\s*"+l+"\\s*[:：=]\\s*(.*?)\\s*$","mi"));if(m)return m[1].trim()}return ""}
 
-// Improved smsDate parser supporting DD/MM/YYYY, YYYY-MM-DD, etc. and converting to YYYY-MM-DD format
+// Robust Date Parser
 function smsDate(text){
   let v=smsField(text,["ရက်စွဲ","နေ့စွဲ","Date"]);
   if(!v) return "";
-  // Check YYYY-MM-DD or YYYY/MM/DD
   let m1 = v.match(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
   if(m1) return m1[1]+"-"+String(m1[2]).padStart(2,"0")+"-"+String(m1[3]).padStart(2,"0");
-  // Check DD/MM/YYYY or DD-MM-YYYY
   let m2 = v.match(/(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
-  if(m2) return m3 = m2[3]+"-"+String(m2[2]).padStart(2,"0")+"-"+String(m2[1]).padStart(2,"0");
+  if(m2) return m2[3]+"-"+String(m2[2]).padStart(2,"0")+"-"+String(m2[1]).padStart(2,"0");
   return "";
 }
 
