@@ -3,16 +3,16 @@
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#172033;font-family:Arial,"Noto Sans Myanmar",sans-serif}
 header{background:#193b63;color:#fff;padding:12px 14px;border-bottom:2px solid #d5ad53;position:sticky;top:0;z-index:100}
-header .brand{display:flex;align-items:center;gap:12px;max-width:1150px;margin:auto}
-.menu-toggle{background:transparent;border:1px solid #d5ad53;border-radius:6px;width:38px;height:38px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:pointer;padding:0}
+header .brand{display:flex;align-items:center;gap:12px;max-width:1150px;margin:auto;position:relative;z-index:101}
+.menu-toggle{background:transparent;border:1px solid #d5ad53;border-radius:6px;width:38px;height:38px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:pointer;padding:0;position:relative;z-index:102}
 .menu-toggle span{display:block;width:20px;height:2px;background:#d5ad53;border-radius:2px}
 .logo{width:38px;height:38px;flex-shrink:0;border-radius:50%;background:#fff;color:#193b63;display:grid;place-items:center;font-size:18px;font-weight:bold}
 header h1{font-size:15px;margin:0 0 2px}header p{font-size:11px;color:#dbeafe;margin:1px 0}
 
 /* Slide Drawer Navigation */
-.drawer-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:999;display:none}
+.drawer-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:9998;display:none}
 .drawer-overlay.open{display:block}
-.nav-drawer{position:fixed;top:0;left:-280px;width:280px;height:100%;background:#fff;z-index:1000;box-shadow:4px 0 15px rgba(0,0,0,0.1);transition:left 0.3s ease;padding:20px 15px;display:flex;flex-direction:column;gap:8px}
+.nav-drawer{position:fixed;top:0;left:-280px;width:280px;height:100%;background:#fff;z-index:9999;box-shadow:4px 0 15px rgba(0,0,0,0.1);transition:left 0.3s ease;padding:20px 15px;display:flex;flex-direction:column;gap:8px}
 .nav-drawer.open{left:0}
 .nav-drawer h3{font-size:14px;color:#193b63;margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid #e2e8f0}
 .nav-drawer button{background:#fff;color:#172033;border:1px solid #e2e8f0;text-align:left;padding:10px 12px;font-size:13px;border-radius:8px;font-weight:bold;cursor:pointer;display:flex;align-items:center;gap:8px}
@@ -53,7 +53,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
 <div class="nav-drawer" id="navDrawer">
   <h3>📌 မီနူးများ</h3>
-  <button data-page="home" class="active" onclick="setPage('home')">📊 ပင်မစာမျက်နှာ</button>
+  <button data-page="home" class="active" onclick="setPage('home')">📊 ဒက်ရှ်ဘုတ် စာရင်းချုပ်</button>
   <button data-page="students" onclick="setPage('students')">👨‍🎓 ကျောင်းသားစာရင်း</button>
   <button data-page="attendance" onclick="setPage('attendance')">📅 အတန်းလိုက် တက်ရောက်မှု</button>
   <button data-page="sms" onclick="setPage('sms')">📩 အတန်းပိုင် SMS ဖတ်ရန်</button>
@@ -64,7 +64,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <header>
 <div class="brand">
 <button class="menu-toggle" onclick="toggleDrawer()" aria-label="Menu"><span></span><span></span><span></span></button>
-<div class="logo">👑</div>
+<div class="logo">CFB</div>
 <div>
 <h1>CHINDWIN FUTURE BRIGHT SCHOOL</h1>
 <p>STUDENT ATTENDANCE DASHBOARD · Budalin Township</p>
@@ -204,7 +204,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <h2>📈 လအလိုက် အစီရင်ခံစာ</h2>
 <div class="row">
 <div class="field"><label>လရွေးရန်</label><input id="reportMonth" type="month"></div>
-<div class="field"><label>အတန်းရွေးရန်</label><select id="reportClass"><option value="all">အတန်းအားလုံး</option></select></div>
+<div class="field"><label>အတန်းရွေးရန် (တစ်တန်းချင်းချုပ်ရန်)</label><select id="reportClass"><option value="all">အတန်းအားလုံး</option></select></div>
 </div>
 
 <div class="muted" style="margin-bottom:10px"><span id="monthlyInfoLabel"></span></div>
@@ -238,6 +238,8 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 const classes=["KG",...Array.from({length:12},(_,i)=>"Grade "+(i+1))];
 const statuses=[["present","တက်"],["absent","ပျက်"],["leave","ခွင့်"],["unexcused","ခွင့်မဲ့"],["late","နောက်ကျ"]];
 const statusLabel={present:"တက်",absent:"ပျက်",leave:"ခွင့်",unexcused:"ခွင့်မဲ့",late:"နောက်ကျ",pending:"မမှတ်ရသေး"};
+const names=[["မောင်မင်းခန့်","ကျား"],["မသဇင်","မ"],["မောင်ကောင်းမြတ်","ကျား"]];
+
 let db;
 try{db=JSON.parse(localStorage.getItem("CFBS_ATTENDANCE_DASHBOARD_V3")||"null")}catch(e){}
 if(!db||!Array.isArray(db.students)){
