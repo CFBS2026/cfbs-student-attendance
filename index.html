@@ -334,27 +334,19 @@ function renderAttendance(){
   $("attendanceTable").innerHTML=`<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>ကျောင်းသားအမည်</th><th>အခြေအနေ</th></tr></thead><tbody>${a.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.sid)}</td><td>${esc(s.name)}</td><td>${status(s,d)==="pending"?'<span class="tag pending">မမှတ်ရသေး</span>':`<span class="tag sent">${statusLabel[status(s,d)]}</span>`}</td></tr>`).join("")||'<tr><td colspan="4">ကျောင်းသားမရှိပါ။</td></tr>'}</tbody></table></div>`;
 }
 
-// Strict Date Validator Function (Checks if YYYY-MM-DD is a real calendar date)
 function isValidDate(dateStr) {
   let parts = dateStr.split("-");
   if(parts.length !== 3) return false;
-  let year = parseInt(parts[0], 10);
-  let month = parseInt(parts[1], 10);
-  let day = parseInt(parts[2], 10);
-  
-  if(isNaN(year) || isNaN(month) || isNaN(day)) return false;
-  if(month < 1 || month > 12) return false;
-  
-  // Check days in month (handling leap years correctly)
+  let year = parseInt(parts[0], 10), month = parseInt(parts[1], 10), day = parseInt(parts[2], 10);
+  if(isNaN(year) || isNaN(month) || isNaN(day) || month < 1 || month > 12) return false;
   let d = new Date(year, month - 1, day);
   return d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
 }
 
-// Teacher SMS Parser with Strict Date & Roster Validation
 function parseTeacherSMS(){
   let text=$("smsText").value.trim();if(!text){alert("SMS စာသားထည့်ပါ။");return}
   let cls=normalizeClass(smsField(text,["အတန်း","အတန်းအမည်","Class"]));
-  let date=smsDate(text); // Extracted date string (YYYY-MM-DD)
+  let date=smsDate(text);
 
   let errors=[];
   if(!date || !isValidDate(date)){
@@ -425,7 +417,6 @@ function confirmApplySMS(cls, date, recordsObj){
 
 function smsField(text,labels){for(let l of labels){let m=text.match(new RegExp("^\\s*"+l+"\\s*[:：=]\\s*(.*?)\\s*$","mi"));if(m)return m[1].trim()}return ""}
 
-// Robust Date Parser
 function smsDate(text){
   let v=smsField(text,["ရက်စွဲ","နေ့စွဲ","Date"]);
   if(!v) return "";
@@ -487,7 +478,7 @@ function saveTeacherPhones(){
   save();alert("အတန်းပိုင် ဖုန်းနံပါတ်များ သိမ်းဆည်းပြီးပါပြီ။");renderRemindSms();
 }
 
-// Monthly Summary Calculations
+// Monthly Summary Calculations with Exact User Rules
 function monthTally(arr,m){let t={present:0,absent:0,leave:0,unexcused:0,late:0};Object.keys(db.records).forEach(k=>{if(!k.startsWith(m+"-"))return;let id=k.split("|")[1];if(!arr.some(s=>s.id===id))return;let v=db.records[k];if(t[v]!==undefined)t[v]++});return t}
 function monthKeys(id,m){return Object.keys(db.records).filter(k=>k.startsWith(m+"-")&&k.endsWith("|"+id)&&["present","absent","leave","unexcused","late"].includes(db.records[k])).sort()}
 
@@ -496,10 +487,12 @@ function renderMonthly(){
   let c=$("reportClass").value||classes[0];
   let arr=list(c,false);
 
+  // 1. စာရင်းရှိ (ကျား၊ မ)
   let boysCount = arr.filter(s => s.gender === "ကျား").length;
   let girlsCount = arr.filter(s => s.gender === "မ").length;
   let totalCount = boysCount + girlsCount;
 
+  // 2. ကျောင်းတက်ကြိမ်ပေါင်း (ကျား၊ မ စုစုပေါင်း ခေါ်ကြိမ်)
   let boysPresentCount = 0, girlsPresentCount = 0;
   let boysAbsentCount = 0, girlsAbsentCount = 0;
 
@@ -520,10 +513,24 @@ function renderMonthly(){
   let totalPresentCount = boysPresentCount + girlsPresentCount;
   let totalAbsentCount = boysAbsentCount + girlsAbsentCount;
 
-  let boysAvg = boysCount ? (boysPresentCount / boysCount).toFixed(1) : 0;
-  let girlsAvg = girlsCount ? (girlsPresentCount / girlsCount).toFixed(1) : 0;
-  let totalAvg = totalCount ? (totalPresentCount / totalCount).toFixed(1) : 0;
+  // Get total school days in month from records or default 22
+  let daysInMonthSet = new Set();
+  Object.keys(db.records).forEach(k=>{
+    if(k.startsWith(m+"-")) daysInMonthSet.add(k.split("|")[0]);
+  });
+  let schoolDays = Math.max(daysInMonthSet.size, 1);
 
+  // 3. ပျမ်းမျှလာလူ = ကျား/မ ကျောင်းခေါ်ကြိမ်ပေါင်း ÷ ယခုလ ကျောင်းတက်ရက်
+  let boysAvg = schoolDays ? (boysPresentCount / schoolDays).toFixed(1) : 0;
+  let girlsAvg = schoolDays ? (girlsPresentCount / schoolDays).toFixed(1) : 0;
+  let totalAvg = schoolDays ? (totalPresentCount / schoolDays).toFixed(1) : 0;
+
+  // 4. ပျမ်းမျှခေါ်ကြိမ် = ကျား/မ ခေါ်ကြိမ် စုစုပေါင်း ÷ ကျား/မ ကျောင်းသားအရေအတွက် (ပေါင်းကွက်တွင် ကျား+မ ခေါ်ကြိမ်ပေါင်း ÷ ကျား+မ စာရင်းရှိ)
+  let boysCallAvg = boysCount ? (boysPresentCount / boysCount).toFixed(1) : 0;
+  let girlsCallAvg = girlsCount ? (girlsPresentCount / girlsCount).toFixed(1) : 0;
+  let totalCallAvg = totalCount ? (totalPresentCount / totalCount).toFixed(1) : 0;
+
+  // 5. ကျောင်းတက်ရာခိုင်နှုန်း (%) = ကျား/မ ပျမ်းမျှလာလူ ÷ ကျား/မ စာရင်းရှိ × 100
   let boysPct = boysCount ? ((Number(boysAvg) / boysCount) * 100).toFixed(1) : 0;
   let girlsPct = girlsCount ? ((Number(girlsAvg) / girlsCount) * 100).toFixed(1) : 0;
   let totalPct = totalCount ? ((Number(totalAvg) / totalCount) * 100).toFixed(1) : 0;
@@ -537,8 +544,9 @@ function renderMonthly(){
           <tr><td>၁</td><td><b>စာရင်းရှိဦးရေ</b></td><td>${boysCount}</td><td>${girlsCount}</td><td><b>${totalCount}</b></td></tr>
           <tr><td>၂</td><td><b>ကျောင်းတက်ကြိမ်ပေါင်း</b></td><td>${boysPresentCount}</td><td>${girlsPresentCount}</td><td><b>${totalPresentCount}</b></td></tr>
           <tr><td>၃</td><td><b>ပျမ်းမျှလာလူ</b></td><td>${boysAvg}</td><td>${girlsAvg}</td><td><b>${totalAvg}</b></td></tr>
-          <tr><td>၄</td><td><b>တက်ရောက်ရာခိုင်နှုန်း (%)</b></td><td>${boysPct}%</td><td>${girlsPct}%</td><td><b>${totalPct}%</b></td></tr>
-          <tr><td>၅</td><td><b>ပျက်ကွက်ကြိမ်ပေါင်း</b></td><td>${boysAbsentCount}</td><td>${girlsAbsentCount}</td><td><b>${totalAbsentCount}</b></td></tr>
+          <tr><td>၄</td><td><b>ပျမ်းမျှခေါ်ကြိမ်</b></td><td>${boysCallAvg}</td><td>${girlsCallAvg}</td><td><b>${totalCallAvg}</b></td></tr>
+          <tr><td>၅</td><td><b>ကျောင်းတက်ရာခိုင်နှုန်း (%)</b></td><td>${boysPct}%</td><td>${girlsPct}%</td><td><b>${totalPct}%</b></td></tr>
+          <tr><td>၆</td><td><b>ပျက်ကွက်ကြိမ်ပေါင်း</b></td><td>${boysAbsentCount}</td><td>${girlsAbsentCount}</td><td><b>${totalAbsentCount}</b></td></tr>
         </tbody>
       </table>
     </div>
