@@ -53,7 +53,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
 <div class="nav-drawer" id="navDrawer">
   <h3>📌 မီနူးများ</h3>
-  <button data-page="home" class="active" onclick="setPage('home')">📊 ဒက်ရှ်ဘုတ် စာရင်းချုပ်</button>
+  <button data-page="home" class="active" onclick="setPage('home')">📊 ပင်မစာမျက်နှာ</button>
   <button data-page="students" onclick="setPage('students')">👨‍🎓 ကျောင်းသားစာရင်း</button>
   <button data-page="attendance" onclick="setPage('attendance')">📅 အတန်းလိုက် တက်ရောက်မှု</button>
   <button data-page="sms" onclick="setPage('sms')">📩 အတန်းပိုင် SMS ဖတ်ရန်</button>
@@ -64,9 +64,9 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <header>
 <div class="brand">
 <button class="menu-toggle" onclick="toggleDrawer()" aria-label="Menu"><span></span><span></span><span></span></button>
-<div class="logo">CFB</div>
+<div class="logo">👑</div>
 <div>
-<h1>CHINDWIN FUTURE BRIGHT SCHOOL</h1>
+<h2>CHINDWIN FUTURE BRIGHT SCHOOL</h2>
 <p>STUDENT ATTENDANCE DASHBOARD · Budalin Township</p>
 </div>
 </div>
@@ -249,6 +249,7 @@ function list(c,includeInactive=false){return db.students.filter(s=>s.className=
 function key(d,id){return d+"|"+id}
 function status(s,d){return db.records[key(d,s.id)]||"pending"}
 function tally(arr,d){let o={present:0,absent:0,leave:0,unexcused:0,late:0,pending:0};arr.forEach(s=>o[status(s,d)]++);return o}
+function pct(n,d){return d?Math.round(n/d*1000)/10:0}
 
 function fillSelects(){
   classes.forEach(c=>{
@@ -301,30 +302,36 @@ function toggleStudentForm(force){
 function saveStudentForm(){
   let id=$("editId").value,sid=$("sid").value.trim(),name=$("sname").value.trim(),c=$("studentClass").value;
   if(!sid||!name){alert("ကျောင်းဝင်အမှတ်နှင့် အမည်ထည့်ပါ။");return;}
-  let data={sid,name,gender:$("gender").value,className:c,dob:$("dob").value,admissionDate:$("admissionDate").value,parentName:$("parentName").value.trim(),phone:$("phone").value.trim(),address:$("address").value.trim(),active:$("active").value==="true"};
+  let actVal=$("active").value;
+  let activeState=actVal==="true"?true:(actVal==="paused"?"paused":false);
+  let data={sid,name,gender:$("gender").value,className:c,dob:$("dob").value,admissionDate:$("admissionDate").value,parentName:$("parentName").value.trim(),phone:$("phone").value.trim(),address:$("address").value.trim(),active:activeState};
   if(id){let i=db.students.findIndex(s=>s.id===id);if(i>=0)db.students[i]={...db.students[i],...data};}
   else db.students.push({id:"stu"+Date.now(),...data});
   save();clearStudentForm();toggleStudentForm(false);renderStudents();renderHome();
 }
-function clearStudentForm(){["editId","sid","sname","dob","admissionDate","parentName","phone","address"].forEach(id=>$(id).value="");}
+function clearStudentForm(){["editId","sid","sname","dob","admissionDate","parentName","phone","address"].forEach(id=>$(id).value="");$("active").value="true";}
 function editStudent(id){
   let s=db.students.find(x=>x.id===id);if(!s)return;
   toggleStudentForm(true);
   $("editId").value=s.id;$("sid").value=s.sid||"";$("sname").value=s.name||"";$("gender").value=s.gender||"ကျား";
   $("studentClass").value=s.className;$("dob").value=s.dob||"";$("admissionDate").value=s.admissionDate||"";
-  $("parentName").value=s.parentName||"";$("phone").value=s.phone||"";$("address").value=s.address||"";$("active").value=String(s.active);
+  $("parentName").value=s.parentName||"";$("phone").value=s.phone||"";$("address").value=s.address||"";
+  $("active").value=s.active==="paused"?"paused":(s.active===false?"false":"true");
 }
 function deleteStudent(id){
   let s=db.students.find(x=>x.id===id);if(!s)return;
-  if(!confirm(`${s.name} ကို ကျောင်းသားစာရင်းမှ ဖယ်ရှားမလား။`))return;
-  s.active=false;save();renderStudents();renderHome();
+  if(!confirm(`${s.name} ကို ကျောင်းသားစာရင်းမှ အပြီးအပိုင် ဖျက်ပစ်မလား။`))return;
+  db.students=db.students.filter(x=>x.id!==id);
+  Object.keys(db.records).forEach(k=>{if(k.endsWith("|"+id))delete db.records[k];});
+  save();renderStudents();renderHome();
 }
 function renderStudents(){
   let c=$("listClass").value||"KG",q=$("search").value.trim().toLowerCase(),all=$("listStatus").value==="all";
-  let arr=db.students.filter(s=>s.className===c&&(all||s.active!==false)).filter(s=>(s.name||"").toLowerCase().includes(q)||(s.sid||"").toLowerCase().includes(q));
+  let arr=db.students.filter(s=>s.className===c&&(all||(s.active===true||s.active===undefined))).filter(s=>(s.name||"").toLowerCase().includes(q)||(s.sid||"").toLowerCase().includes(q));
   let active=list(c);
   $("classTotal").textContent=active.length;$("boys").textContent=active.filter(s=>s.gender==="ကျား").length;$("girls").textContent=active.filter(s=>s.gender==="မ").length;$("className").textContent=c;
-  $("studentTable").innerHTML=arr.length?`<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>ဖုန်း</th><th>အခြေအနေ</th><th>ပြင်/ဖယ်</th></tr></thead><tbody>${arr.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.sid)}</td><td>${esc(s.name)}</td><td>${esc(s.gender)}</td><td>${esc(s.phone||"-")}</td><td>${s.active===false?"ကျောင်းထွက်":"တက်ရောက်ဆဲ"}</td><td><button class="secondary" onclick="editStudent('${s.id}')">ပြင်</button> <button class="danger" onclick="deleteStudent('${s.id}')">ဖယ်</button></td></tr>`).join("")}</tbody></table></div>`:'<p class="muted">စာရင်းမရှိပါ။</p>';
+  const statusText=s=>s.active===false?"ကျောင်းထွက်":(s.active==="paused"?"ယာယီရပ်နား":"တက်ရောက်ဆဲ");
+  $("studentTable").innerHTML=arr.length?`<div class="tablewrap"><table style="min-width:850px"><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>မွေးသက္ကရာဇ်</th><th>မိဘအမည်</th><th>မိဘဖုန်းနံပါတ်</th><th>အခြေအနေ</th><th>ပြင်/ဖျက်</th></tr></thead><tbody>${arr.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.sid)}</td><td>${esc(s.name)}</td><td>${esc(s.gender)}</td><td>${esc(s.dob||"-")}</td><td>${esc(s.parentName||"-")}</td><td>${esc(s.phone||"-")}</td><td>${statusText(s)}</td><td><button class="secondary" onclick="editStudent('${s.id}')">ပြင်</button> <button class="danger" onclick="deleteStudent('${s.id}')">ဖျက်</button></td></tr>`).join("")}</tbody></table></div>`:'<p class="muted">စာရင်းမရှိပါ။</p>';
 }
 
 // Attendance Table
@@ -492,61 +499,62 @@ function renderMonthly(){
   let girlsCount = arr.filter(s => s.gender === "မ").length;
   let totalCount = boysCount + girlsCount;
 
-  // 2. ကျောင်းတက်ကြိမ်ပေါင်း (ကျား၊ မ စုစုပေါင်း ခေါ်ကြိမ်)
-  let boysPresentCount = 0, girlsPresentCount = 0;
-  let boysAbsentCount = 0, girlsAbsentCount = 0;
+  // 2. ကျောင်းတက်ကြိမ်ပေါင်း (တစ်ရက်လျှင် ၂ ကြိမ် - မနက်/နေ့လယ်)
+  let boysPresentCalls = 0, girlsPresentCalls = 0;
+  let boysAbsentCalls = 0, girlsAbsentCalls = 0;
 
   arr.forEach(s => {
     let keys = monthKeys(s.id, m);
     keys.forEach(k => {
       let st = db.records[k];
       if (s.gender === "ကျား") {
-        if (st === "present" || st === "late" || st === "leave") boysPresentCount++;
-        if (st === "absent" || st === "unexcused") boysAbsentCount++;
+        if (st === "present" || st === "late" || st === "leave") boysPresentCalls += 2;
+        if (st === "absent" || st === "unexcused") boysAbsentCalls += 2;
       } else {
-        if (st === "present" || st === "late" || st === "leave") girlsPresentCount++;
-        if (st === "absent" || st === "unexcused") girlsAbsentCount++;
+        if (st === "present" || st === "late" || st === "leave") girlsPresentCalls += 2;
+        if (st === "absent" || st === "unexcused") girlsAbsentCalls += 2;
       }
     });
   });
 
-  let totalPresentCount = boysPresentCount + girlsPresentCount;
-  let totalAbsentCount = boysAbsentCount + girlsAbsentCount;
+  let totalPresentCalls = boysPresentCalls + girlsPresentCalls;
+  let totalAbsentCalls = boysAbsentCalls + girlsAbsentCalls;
 
-  // Get total school days in month from records or default 22
+  // ယခုလ ကျောင်းခေါ်ကြိမ် (ကျောင်းဖွင့်ရက် × 2)
   let daysInMonthSet = new Set();
   Object.keys(db.records).forEach(k=>{
     if(k.startsWith(m+"-")) daysInMonthSet.add(k.split("|")[0]);
   });
   let schoolDays = Math.max(daysInMonthSet.size, 1);
+  let monthTotalCalls = schoolDays * 2;
 
-  // 3. ပျမ်းမျှလာလူ = ကျား/မ ကျောင်းခေါ်ကြိမ်ပေါင်း ÷ ယခုလ ကျောင်းတက်ရက်
-  let boysAvg = schoolDays ? (boysPresentCount / schoolDays).toFixed(1) : 0;
-  let girlsAvg = schoolDays ? (girlsPresentCount / schoolDays).toFixed(1) : 0;
-  let totalAvg = schoolDays ? (totalPresentCount / schoolDays).toFixed(1) : 0;
+  // 3. ပျမ်းမျှလာလူ = ကျား/မ ကျောင်းခေါ်ကြိမ်ပေါင်း ÷ ယခုလ ကျောင်းခေါ်ကြိမ် (ပေါင်း = ကျား + မ)
+  let boysAvg = monthTotalCalls ? (boysPresentCalls / monthTotalCalls) : 0;
+  let girlsAvg = monthTotalCalls ? (girlsPresentCalls / monthTotalCalls) : 0;
+  let totalAvg = boysAvg + girlsAvg;
 
-  // 4. ပျမ်းမျှခေါ်ကြိမ် = ကျား/မ ခေါ်ကြိမ် စုစုပေါင်း ÷ ကျား/မ ကျောင်းသားအရေအတွက် (ပေါင်းကွက်တွင် ကျား+မ ခေါ်ကြိမ်ပေါင်း ÷ ကျား+မ စာရင်းရှိ)
-  let boysCallAvg = boysCount ? (boysPresentCount / boysCount).toFixed(1) : 0;
-  let girlsCallAvg = girlsCount ? (girlsPresentCount / girlsCount).toFixed(1) : 0;
-  let totalCallAvg = totalCount ? (totalPresentCount / totalCount).toFixed(1) : 0;
+  // 4. ပျမ်းမျှခေါ်ကြိမ် = ကျား/မ ခေါ်ကြိမ် စုစုပေါင်း ÷ ကျား/မ စာရင်းရှိ (ပေါင်း = ကျား+မ ခေါ်ကြိမ်ပေါင်း ÷ ကျား+မ စာရင်းရှိ)
+  let boysCallAvg = boysCount ? (boysPresentCalls / boysCount) : 0;
+  let girlsCallAvg = girlsCount ? (girlsPresentCalls / girlsCount) : 0;
+  let totalCallAvg = totalCount ? (totalPresentCalls / totalCount) : 0;
 
-  // 5. ကျောင်းတက်ရာခိုင်နှုန်း (%) = ကျား/မ ပျမ်းမျှလာလူ ÷ ကျား/မ စာရင်းရှိ × 100
-  let boysPct = boysCount ? ((Number(boysAvg) / boysCount) * 100).toFixed(1) : 0;
-  let girlsPct = girlsCount ? ((Number(girlsAvg) / girlsCount) * 100).toFixed(1) : 0;
-  let totalPct = totalCount ? ((Number(totalAvg) / totalCount) * 100).toFixed(1) : 0;
+  // 5. ကျောင်းတက်ရာခိုင်နှုန်း (%) = ပျမ်းမျှလာလူ ÷ စာရင်းရှိ × 100
+  let boysPct = boysCount ? ((boysAvg / boysCount) * 100) : 0;
+  let girlsPct = girlsCount ? ((girlsAvg / girlsCount) * 100) : 0;
+  let totalPct = totalCount ? ((totalAvg / totalCount) * 100) : 0;
 
   $("monthlySummaryTable").innerHTML = `
-    <div style="font-weight:bold;margin-bottom:6px;color:#193b63">📌 ${esc(c)} အတန်း — လစဉ် စာရင်းချုပ် (ကျား / မ)</div>
+    <div style="font-weight:bold;margin-bottom:6px;color:#193b63">📌 ${esc(c)} အတန်း — လစဉ် စာရင်းချုပ် (ကျား / မ) · ယခုလကျောင်းခေါ်ကြိမ်: ${monthTotalCalls}</div>
     <div class="tablewrap">
       <table>
         <thead><tr><th>စဉ်</th><th>အချက်အလက်ခေါင်းစဉ်</th><th>ကျား</th><th>မ</th><th>ပေါင်း</th></tr></thead>
         <tbody>
           <tr><td>၁</td><td><b>စာရင်းရှိဦးရေ</b></td><td>${boysCount}</td><td>${girlsCount}</td><td><b>${totalCount}</b></td></tr>
-          <tr><td>၂</td><td><b>ကျောင်းတက်ကြိမ်ပေါင်း</b></td><td>${boysPresentCount}</td><td>${girlsPresentCount}</td><td><b>${totalPresentCount}</b></td></tr>
-          <tr><td>၃</td><td><b>ပျမ်းမျှလာလူ</b></td><td>${boysAvg}</td><td>${girlsAvg}</td><td><b>${totalAvg}</b></td></tr>
-          <tr><td>၄</td><td><b>ပျမ်းမျှခေါ်ကြိမ်</b></td><td>${boysCallAvg}</td><td>${girlsCallAvg}</td><td><b>${totalCallAvg}</b></td></tr>
-          <tr><td>၅</td><td><b>ကျောင်းတက်ရာခိုင်နှုန်း (%)</b></td><td>${boysPct}%</td><td>${girlsPct}%</td><td><b>${totalPct}%</b></td></tr>
-          <tr><td>၆</td><td><b>ပျက်ကွက်ကြိမ်ပေါင်း</b></td><td>${boysAbsentCount}</td><td>${girlsAbsentCount}</td><td><b>${totalAbsentCount}</b></td></tr>
+          <tr><td>၂</td><td><b>ကျောင်းတက်ကြိမ်ပေါင်း</b></td><td>${boysPresentCalls}</td><td>${girlsPresentCalls}</td><td><b>${totalPresentCalls}</b></td></tr>
+          <tr><td>၃</td><td><b>ပျမ်းမျှလာလူ</b></td><td>${boysAvg.toFixed(2)}</td><td>${girlsAvg.toFixed(2)}</td><td><b>${totalAvg.toFixed(2)}</b></td></tr>
+          <tr><td>၄</td><td><b>ပျမ်းမျှခေါ်ကြိမ်</b></td><td>${boysCallAvg.toFixed(1)}</td><td>${girlsCallAvg.toFixed(1)}</td><td><b>${totalCallAvg.toFixed(1)}</b></td></tr>
+          <tr><td>၅</td><td><b>ကျောင်းတက်ရာခိုင်နှုန်း (%)</b></td><td>${boysPct.toFixed(1)}%</td><td>${girlsPct.toFixed(1)}%</td><td><b>${totalPct.toFixed(1)}%</b></td></tr>
+          <tr><td>၆</td><td><b>ပျက်ကွက်ကြိမ်ပေါင်း</b></td><td>${boysAbsentCalls}</td><td>${girlsAbsentCalls}</td><td><b>${totalAbsentCalls}</b></td></tr>
         </tbody>
       </table>
     </div>
@@ -606,6 +614,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("attDate").onchange = renderAttendance;
   $("attClass").onchange = renderAttendance;
   $("listClass").onchange = renderStudents;
+  $("listStatus").onchange = renderStudents;
   $("search").oninput = renderStudents;
   $("smsCheckDate").onchange = renderRemindSms;
   $("reportMonth").onchange = renderMonthly;
