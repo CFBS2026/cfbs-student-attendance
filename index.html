@@ -45,6 +45,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 .tag{display:inline-block;border-radius:20px;padding:3px 8px;background:#e0f2fe;color:#075985;font-size:11px}
 .tag.sent{background:#dcfce7;color:#166534}
 .tag.pending{background:#fee2e2;color:#991b1b}
+.alert-box{background:#fee2e2;color:#991b1b;padding:10px;border-radius:8px;font-size:12px;margin-bottom:10px;border:1px solid #fecaca}
 @media(min-width:700px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style></head><body>
 
@@ -168,9 +169,9 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <section id="sms" class="page hidden">
 <div class="panel">
 <h2>📩 အတန်းပိုင်ဆီက ပို့လာတဲ့ SMS ကို ထည့်ရန်</h2>
-<p class="muted">အတန်းပိုင်ဆရာ/မ ပို့လာသော SMS ကို ကူးထည့်ပါ။ ပျက်ကွက်သူအမည်များကို အတန်းစာရင်းနှင့် တိုက်စစ်ပြီး သိမ်းဆည်းနိုင်ပါသည်။</p>
+<p class="muted">အတန်းပိုင်ဆရာ/မ ပို့လာသော SMS ကို ကူးထည့်ပါ။ SMS ထဲပါသော ရက်စွဲအတိုင်း (အရင်ရက်များအပါအဝင်) တိုက်စစ်ပြီး သိမ်းဆည်းနိုင်ပါသည်။</p>
 <label for="smsText">အတန်းပိုင်ပို့လာသော SMS စာသား</label>
-<textarea id="smsText" rows="8" placeholder="CHINDWIN FUTURE BRIGHT SCHOOL&#10;နေ့စဉ်တက်ရောက်မှုအစီရင်ခံစာ&#10;ရက်စွဲ = 26/10/2026&#10;အတန်း = KG&#10;စာရင်းရှိ = 30&#10;ပျက်ကွက်ကျောင်းသား = မောင်မောင်"></textarea>
+<textarea id="smsText" rows="8" placeholder="CHINDWIN FUTURE BRIGHT SCHOOL&#10;နေ့စဉ်တက်ရောက်မှုအစီရင်ခံစာ&#10;ရက်စွဲ = 15/11/2026&#10;အတန်း = KG&#10;စာရင်းရှိ = 30&#10;ပျက်ကွက်ကျောင်းသား = မောင်မောင်"></textarea>
 <div class="actions">
 <button onclick="parseTeacherSMS()">🔎 စာတိုဖတ်ယူပြီး စစ်ရန်</button>
 <button class="secondary" onclick="clearTeacherSMS()">ရှင်းရန်</button>
@@ -183,7 +184,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <section id="remind_sms" class="page hidden">
 <div class="panel">
 <h2>📲 အတန်းပိုင်ဆီသို့ SMS ဖြင့် စာရင်းတောင်းခံရန်</h2>
-<p class="muted">ရွေးချယ်ထားသော ရက်စွဲတွင် အတန်းတက်စာရင်း ပို့ပြီးသောအတန်းများနှင့် မပို့ရသေးသော (Pending) အတန်းများကို ခွဲခြားပြသထားပါသည်။ မပို့ရသေးပါက အောက်ပါအတိုင်း အတန်းပိုင်ဆီသို့ တိုက်ရိုက် SMS ပို့နိုင်ပါသည်။</p>
+<p class="muted">ရွေးချယ်ထားသော ရက်စွဲတွင် အတန်းတက်စာရင်း ပို့ပြီးသောအတန်းများနှင့် မပို့ရသေးသော (Pending) အတန်းများကို ခွဲခြားပြသထားပါသည်။</p>
 <div class="row" style="margin-top:10px">
 <div class="field"><label>ရက်စွဲရွေးရန်</label><input id="smsCheckDate" type="date"></div>
 </div>
@@ -192,7 +193,6 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 
 <div class="panel">
 <h3>☎️ အတန်းပိုင်ဆရာ/မ ဖုန်းနံပါတ်များ သတ်မှတ်ရန်</h3>
-<p class="muted">အတန်းတစ်ခုချင်းစီအတွက် အတန်းပိုင်ဆရာ/မ၏ ဖုန်းနံပါတ်များကို သိမ်းဆည်းထားပါ။</p>
 <div id="teacherPhoneTable"></div>
 <div class="actions" style="margin-top:10px"><button class="green" onclick="saveTeacherPhones()">💾 ဖုန်းနံပါတ်များ သိမ်းရန်</button></div>
 </div>
@@ -253,10 +253,8 @@ function tally(arr,d){let o={present:0,absent:0,leave:0,unexcused:0,late:0,pendi
 function fillSelects(){
   classes.forEach(c=>{
     let opt=`<option value="${esc(c)}">${esc(c)}</option>`;
-    ["studentClass","listClass","attClass"].forEach(id=>$(id).insertAdjacentHTML("beforeend",opt));
+    ["studentClass","listClass","attClass","reportClass"].forEach(id=>$(id).insertAdjacentHTML("beforeend",opt));
   });
-  // Note: Monthly report requires a specific class to be selected for individual class summary as requested
-  $("reportClass").innerHTML=classes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
 }
 
 // Drawer Toggle
@@ -336,48 +334,99 @@ function renderAttendance(){
   $("attendanceTable").innerHTML=`<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>ကျောင်းသားအမည်</th><th>အခြေအနေ</th></tr></thead><tbody>${a.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.sid)}</td><td>${esc(s.name)}</td><td>${status(s,d)==="pending"?'<span class="tag pending">မမှတ်ရသေး</span>':`<span class="tag sent">${statusLabel[status(s,d)]}</span>`}</td></tr>`).join("")||'<tr><td colspan="4">ကျောင်းသားမရှိပါ။</td></tr>'}</tbody></table></div>`;
 }
 
-// Teacher SMS Parser
+// Teacher SMS Parser with Automatic Date Parsing from SMS Text & Strict Validation
 function parseTeacherSMS(){
   let text=$("smsText").value.trim();if(!text){alert("SMS စာသားထည့်ပါ။");return}
-  let cls=normalizeClass(smsField(text,["အတန်း","အတန်းအမည်","Class"]));let date=smsDate(text)||today();
+  let cls=normalizeClass(smsField(text,["အတန်း","အတန်းအမည်","Class"]));
+  let date=smsDate(text); // Extracts exact date from SMS text (e.g. 15/11/2026 -> 2026-11-15)
+
+  if(!date){alert("SMS ထဲတွင် ရက်စွဲ (Date) မတွေ့ပါ သို့မဟုတ် ပုံစံမမှန်ပါ။ (ဥပမာ - ရက်စွဲ = 15/11/2026 ဟု ထည့်ပါ)");return}
+  let smsTotalStr=smsField(text,["စာရင်းရှိ","စုစုပေါင်း","Total"]);
+  let smsTotal=parseInt(smsTotalStr)||0;
+
   if(!cls){alert("အတန်းအမည် မတွေ့ပါ။");return}
-  let roster=list(cls);if(!roster.length){alert("ကျောင်းသားစာရင်းမရှိပါ။");return}
+  let roster=list(cls);if(!roster.length){alert("ထိုအတန်းအတွက် ကျောင်းသားစာရင်း မရှိပါ။");return}
+
   let absentNames=parseNameList(text,["ပျက်ကွက်ကျောင်းသား","ပျက်ကွက်သူ","ပျက်သူ"]);
-  let assignments={},unmatched=[];
-  absentNames.forEach(name=>{let st=matchSmsStudent(name,roster);if(!st)unmatched.push(name);else assignments[st.id]="absent";});
+  let assignments={},unmatchedNames=[];
+
+  absentNames.forEach(name=>{
+    let st=matchSmsStudent(name,roster);
+    if(!st) unmatchedNames.push(name);
+    else assignments[st.id]="absent";
+  });
+
   roster.forEach(st=>{if(!assignments[st.id])assignments[st.id]="present";});
-  
-  let reviewHtml=`<div class="panel" style="background:#f8fafc;margin-top:12px">
-    <h3>🔍 SMS စစ်ဆေးချက် — ${esc(cls)} · ${esc(date)}</h3>
-    <p>စာရင်းရှိ: <b>${roster.length}</b> ဦး · ပျက်ကွက်သူ: <b>${absentNames.length}</b> ဦး</p>
-    <div class="tablewrap"><table><thead><tr><th>ကျောင်းဝင်အမှတ်</th><th>ကျောင်းသားအမည်</th><th>အခြေအနေ</th></tr></thead><tbody>
-    ${roster.map(st=>`<tr><td>${esc(st.sid)}</td><td>${esc(st.name)}</td><td>${esc(statusLabel[assignments[st.id]])}</td></tr>`).join("")}
-    </tbody></table></div>
-    <div class="actions" style="margin-top:10px">
-      <button class="green" onclick="confirmApplySMS('${cls}','${date}',{${roster.map(st=>`'${st.id}':'${assignments[st.id]}'`).join(',')}})">💾 စစ်ဆေးထားသော SMS မှတ်တမ်းသိမ်းရန်</button>
-      <button class="secondary" onclick="clearTeacherSMS()">SMS ရှင်းရန်</button>
-    </div>
-  </div>`;
+
+  let errors=[];
+  if(smsTotal>0 && smsTotal!==roster.length){
+    errors.push(`⚠️ စာရင်းရှိဦးရေ မကိုက်ညီပါ (SMS ထဲတွင် ${smsTotal} ဦးဟု ပါရှိသော်လည်း၊ စာရင်းရှိသည်မှာ ${roster.length} ဦး ဖြစ်နေပါသည်)။`);
+  }
+  if(unmatchedNames.length>0){
+    errors.push(`⚠️ အောက်ပါပျက်ကွက်သူ အမည်များသည် ကျောင်းသားစာရင်းနှင့် မကိုက်ညီပါ (သို့မဟုတ်) စာရင်းထဲတွင် မရှိပါ:<br><b>${unmatchedNames.join(", ")}</b>`);
+  }
+
+  let reviewHtml="";
+  if(errors.length>0){
+    reviewHtml=`<div class="panel" style="background:#fff5f5;border-color:#fecaca;margin-top:12px">
+      <h3>❌ SMS စာရင်း တိုက်ဆိုင်စစ်ဆေးမှု မအောင်မြင်ပါ</h3>
+      <div class="alert-box">${errors.join("<br>")}</div>
+      <p class="muted">ကျေးဇူးပြု၍ SMS စာသား သို့မဟုတ် ကျောင်းသားစာရင်းကို ပြန်လည်စစ်ဆေးပါ။ စာရင်းမကိုက်ညီသဖြင့် သိမ်းဆည်းခွင့် မပြုပါ။</p>
+      <div class="actions"><button class="danger" onclick="clearTeacherSMS()">SMS ရှင်းရန် / ပြန်ပြင်ရန်</button></div>
+    </div>`;
+  }else{
+    reviewHtml=`<div class="panel" style="background:#f8fafc;margin-top:12px">
+      <h3>✅ SMS စစ်ဆေးချက် မှန်ကန်သည် — ${esc(cls)} · ရက်စွဲ: <span style="color:#047857">${esc(date)}</span></h3>
+      <p>စာရင်းရှိ: <b>${roster.length}</b> ဦး · ပျက်ကွက်သူ: <b>${absentNames.length}</b> ဦး (စာရင်း အတိအကျ ကိုက်ညီသည်)</p>
+      <div class="tablewrap"><table><thead><tr><th>ကျောင်းဝင်အမှတ်</th><th>ကျောင်းသားအမည်</th><th>အခြေအနေ</th></tr></thead><tbody>
+      ${roster.map(st=>`<tr><td>${esc(st.sid)}</td><td>${esc(st.name)}</td><td>${esc(statusLabel[assignments[st.id]])}</td></tr>`).join("")}
+      </tbody></table></div>
+      <div class="actions" style="margin-top:10px">
+        <button class="green" onclick="confirmApplySMS('${cls}','${date}',{${roster.map(st=>`'${st.id}':'${assignments[st.id]}'`).join(',')}})">💾 ${esc(date)} ရက်စွဲအတွက် မှတ်တမ်းသိမ်းရန်</button>
+        <button class="secondary" onclick="clearTeacherSMS()">SMS ရှင်းရန်</button>
+      </div>
+    </div>`;
+  }
   $("smsReview").innerHTML=reviewHtml;
 }
 
 function confirmApplySMS(cls, date, recordsObj){
-  if(!confirm(`${cls} အတန်း၊ ${date} အတွက် တက်ရောက်မှုစာရင်းကို သိမ်းဆည်းမလား။`)) return;
+  if(!confirm(`${cls} အတန်း၊ ရက်စွဲ (${date}) အတွက် တက်ရောက်မှုစာရင်းကို သိမ်းဆည်းမလား။`)) return;
   Object.keys(recordsObj).forEach(id=>{
     db.records[key(date, id)] = recordsObj[id];
   });
   save();
-  alert("တက်ရောက်မှုစာရင်း သိမ်းဆည်းပြီးပါပြီ။");
+  alert(`ရက်စွဲ (${date}) အတွက် တက်ရောက်မှုစာရင်း သိမ်းဆည်းပြီးပါပြီ။`);
   renderHome();
   renderAttendance();
   clearTeacherSMS();
 }
 
 function smsField(text,labels){for(let l of labels){let m=text.match(new RegExp("^\\s*"+l+"\\s*[:：=]\\s*(.*?)\\s*$","mi"));if(m)return m[1].trim()}return ""}
-function smsDate(text){let v=smsField(text,["ရက်စွဲ","နေ့စွဲ"]);let m=v.match(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);return m?m[0]:""}
+
+// Improved smsDate parser supporting DD/MM/YYYY, YYYY-MM-DD, etc. and converting to YYYY-MM-DD format
+function smsDate(text){
+  let v=smsField(text,["ရက်စွဲ","နေ့စွဲ","Date"]);
+  if(!v) return "";
+  // Check YYYY-MM-DD or YYYY/MM/DD
+  let m1 = v.match(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+  if(m1) return m1[1]+"-"+String(m1[2]).padStart(2,"0")+"-"+String(m1[3]).padStart(2,"0");
+  // Check DD/MM/YYYY or DD-MM-YYYY
+  let m2 = v.match(/(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
+  if(m2) return m3 = m2[3]+"-"+String(m2[2]).padStart(2,"0")+"-"+String(m2[1]).padStart(2,"0");
+  return "";
+}
+
 function normalizeClass(v){let x=(v||"").toLowerCase().replace("grade","").trim();return x.includes("kg")?"KG":"Grade "+parseInt(x)}
-function parseNameList(text,labels){let v=smsField(text,labels);return v?v.split(/[,,\/၊]+/).map(s=>s.trim()).filter(Boolean):[]}
-function matchSmsStudent(name,arr){let clean=name.replace(/\s/g,"").toLowerCase();return arr.find(s=>s.name.replace(/\s/g,"").toLowerCase()===clean)}
+function parseNameList(text,labels){
+  let v=smsField(text,labels);
+  if(!v || v.includes("မရှိ") || v.includes("none") || v.toLowerCase().includes("no")) return [];
+  return v.split(/[,,\/၊]+/).map(s=>s.trim()).filter(Boolean);
+}
+function matchSmsStudent(name,arr){
+  let clean=name.replace(/\s/g,"").toLowerCase();
+  return arr.find(s=>s.name.replace(/\s/g,"").toLowerCase()===clean);
+}
 function clearTeacherSMS(){$("smsText").value="";$("smsReview").innerHTML="";}
 
 // Remind SMS
@@ -419,7 +468,7 @@ function saveTeacherPhones(){
   save();alert("အတန်းပိုင် ဖုန်းနံပါတ်များ သိမ်းဆည်းပြီးပါပြီ။");renderRemindSms();
 }
 
-// Monthly Summary Calculations based on user rules
+// Monthly Summary Calculations
 function monthTally(arr,m){let t={present:0,absent:0,leave:0,unexcused:0,late:0};Object.keys(db.records).forEach(k=>{if(!k.startsWith(m+"-"))return;let id=k.split("|")[1];if(!arr.some(s=>s.id===id))return;let v=db.records[k];if(t[v]!==undefined)t[v]++});return t}
 function monthKeys(id,m){return Object.keys(db.records).filter(k=>k.startsWith(m+"-")&&k.endsWith("|"+id)&&["present","absent","leave","unexcused","late"].includes(db.records[k])).sort()}
 
@@ -428,12 +477,10 @@ function renderMonthly(){
   let c=$("reportClass").value||classes[0];
   let arr=list(c,false);
 
-  // 1. စာရင်းရှိဦးရေ (ကျား၊ မ)
   let boysCount = arr.filter(s => s.gender === "ကျား").length;
   let girlsCount = arr.filter(s => s.gender === "မ").length;
   let totalCount = boysCount + girlsCount;
 
-  // 2. ကျောင်းတက်ကြိမ်ပေါင်း (ကျား၊ မ စုစုပေါင်း ခေါ်ကြိမ်)
   let boysPresentCount = 0, girlsPresentCount = 0;
   let boysAbsentCount = 0, girlsAbsentCount = 0;
 
@@ -454,13 +501,10 @@ function renderMonthly(){
   let totalPresentCount = boysPresentCount + girlsPresentCount;
   let totalAbsentCount = boysAbsentCount + girlsAbsentCount;
 
-  // 3. ပျမ်းမျှလာလူ = ကျား/မ ကျောင်းခေါ်ကြိမ်ပေါင်း ÷ ကျား/မ ကျောင်းသားအရေအတွက် (သို့မဟုတ် တစ်လကျောင်းဖွင့်ရက်)
-  // According to user: ပျှမ်းမျှလာလူ က ကျား၊မ ခွဲပြီးတွက်ချက်ရတာဖြစ်တယ်, ကျားစုစုပေါင်း ကျောင်းခေါ်ကြိမ် ÷ ကျား ကျောင်းသားအရေအတွက်
   let boysAvg = boysCount ? (boysPresentCount / boysCount).toFixed(1) : 0;
   let girlsAvg = girlsCount ? (girlsPresentCount / girlsCount).toFixed(1) : 0;
   let totalAvg = totalCount ? (totalPresentCount / totalCount).toFixed(1) : 0;
 
-  // 4. ကျောင်းတက်ရာခိုင်နှုန်း (%) = ကျား ပျှမ်းမျှလာလူ ÷ ကျား စာရင်းရှိ (သို့မဟုတ် သတ်မှတ်ဖော်မြူလာ)
   let boysPct = boysCount ? ((Number(boysAvg) / boysCount) * 100).toFixed(1) : 0;
   let girlsPct = girlsCount ? ((Number(girlsAvg) / girlsCount) * 100).toFixed(1) : 0;
   let totalPct = totalCount ? ((Number(totalAvg) / totalCount) * 100).toFixed(1) : 0;
