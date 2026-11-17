@@ -204,10 +204,10 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <h2>📈 လအလိုက် အစီရင်ခံစာ</h2>
 <div class="row">
 <div class="field"><label>လရွေးရန်</label><input id="reportMonth" type="month"></div>
-<div class="field"><label>အတန်းရွေးရန်</label><select id="reportClass"></select></div>
+<div class="field"><label>အတန်းရွေးရန် (တစ်တန်းချင်းချုပ်ရန်)</label><select id="reportClass"></select></div>
 </div>
 
-<h3>📊 လစဉ် စာရင်းချုပ် (အတန်းလိုက် တစ်တန်းချင်း ချုပ်ရန်)</h3>
+<h3>📊 လစဉ် စာရင်းချုပ် (ကျား / မ အတန်းလိုက် တစ်တန်းချင်း ချုပ်ချက်)</h3>
 <div id="monthlySummaryTable"></div>
 
 <h3 style="margin-top:20px">👨‍🎓 ကျောင်းသားတစ်ဦးချင်း လစဉ်မှတ်တမ်း ဇယား</h3>
@@ -255,7 +255,8 @@ function fillSelects(){
     let opt=`<option value="${esc(c)}">${esc(c)}</option>`;
     ["studentClass","listClass","attClass"].forEach(id=>$(id).insertAdjacentHTML("beforeend",opt));
   });
-  $("reportClass").innerHTML='<option value="ALL">အတန်းအားလုံး</option>'+classes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
+  // Note: Monthly report requires a specific class to be selected for individual class summary as requested
+  $("reportClass").innerHTML=classes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
 }
 
 // Drawer Toggle
@@ -382,7 +383,7 @@ function clearTeacherSMS(){$("smsText").value="";$("smsReview").innerHTML="";}
 // Remind SMS
 function renderRemindSms(){
   let d=$("smsCheckDate").value||today();
-  let statusRows="",phoneRows="";
+  let statusRows="",phoneRows="",submittedCount=0,pendingCount=0;
 
   classes.forEach(cls=>{
     let students=list(cls);
@@ -392,6 +393,8 @@ function renderRemindSms(){
     students.forEach(s=>{if(db.records[key(d,s.id)] && db.records[key(d,s.id)]!=="pending") marked++;});
     let isSubmitted=(marked>0 && marked>=students.length*0.7);
     
+    if(isSubmitted) submittedCount++; else pendingCount++;
+
     let statusBadge=isSubmitted?'<span class="tag sent">✅ စာရင်းပို့ပြီး (Submitted)</span>':'<span class="tag pending">❌ မပို့ရသေးပါ (Pending)</span>';
     let teacherPhone=db.teacherPhones[cls]||"";
     
@@ -402,7 +405,12 @@ function renderRemindSms(){
     phoneRows+=`<div class="field" style="min-width:180px"><label>${esc(cls)} အတန်းပိုင် ဖုန်း</label><input type="tel" id="tphone_${cls}" value="${esc(teacherPhone)}" placeholder="09xxxxxxxxx"></div>`;
   });
 
-  $("teacherSmsList").innerHTML=`<div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>ဦးရေ</th><th>စာရင်းပေးပို့မှု အခြေအနေ</th><th>အတန်းပိုင်ဖုန်း</th><th>လုပ်ဆောင်ချက်</th></tr></thead><tbody>${statusRows}</tbody></table></div>`;
+  $("teacherSmsList").innerHTML=`
+    <div class="stats" style="margin-bottom:12px">
+      <div class="stat green"><strong>${submittedCount}</strong><small>SMS ပို့ပြီး</small></div>
+      <div class="stat red"><strong>${pendingCount}</strong><small>မပို့ရသေး</small></div>
+    </div>
+    <div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>ဦးရေ</th><th>စာရင်းပေးပို့မှု အခြေအနေ</th><th>အတန်းပိုင်ဖုန်း</th><th>လုပ်ဆောင်ချက်</th></tr></thead><tbody>${statusRows}</tbody></table></div>`;
   $("teacherPhoneTable").innerHTML=`<div class="row">${phoneRows}</div>`;
 }
 
@@ -411,63 +419,63 @@ function saveTeacherPhones(){
   save();alert("အတန်းပိုင် ဖုန်းနံပါတ်များ သိမ်းဆည်းပြီးပါပြီ။");renderRemindSms();
 }
 
-// Monthly Summary & Detail Calculations (Class-by-Class Breakdown)
+// Monthly Summary Calculations based on user rules
 function monthTally(arr,m){let t={present:0,absent:0,leave:0,unexcused:0,late:0};Object.keys(db.records).forEach(k=>{if(!k.startsWith(m+"-"))return;let id=k.split("|")[1];if(!arr.some(s=>s.id===id))return;let v=db.records[k];if(t[v]!==undefined)t[v]++});return t}
 function monthKeys(id,m){return Object.keys(db.records).filter(k=>k.startsWith(m+"-")&&k.endsWith("|"+id)&&["present","absent","leave","unexcused","late"].includes(db.records[k])).sort()}
-function pct(n,d){return d?Math.round(n/d*1000)/10:0}
 
 function renderMonthly(){
-  let m=$("reportMonth").value||today().slice(0,7),c=$("reportClass").value||"ALL";
-  let active=list(c,false),arr=(c==="ALL"?active:active.filter(s=>s.className===c));
+  let m=$("reportMonth").value||today().slice(0,7);
+  let c=$("reportClass").value||classes[0];
+  let arr=list(c,false);
 
-  // If a specific class is selected, calculate for that class. If ALL, aggregate all.
+  // 1. စာရင်းရှိဦးရေ (ကျား၊ မ)
   let boysCount = arr.filter(s => s.gender === "ကျား").length;
   let girlsCount = arr.filter(s => s.gender === "မ").length;
   let totalCount = boysCount + girlsCount;
 
-  let boysPresent = 0, girlsPresent = 0;
-  let boysAbsent = 0, girlsAbsent = 0;
-  let schoolDays = 20;
+  // 2. ကျောင်းတက်ကြိမ်ပေါင်း (ကျား၊ မ စုစုပေါင်း ခေါ်ကြိမ်)
+  let boysPresentCount = 0, girlsPresentCount = 0;
+  let boysAbsentCount = 0, girlsAbsentCount = 0;
 
   arr.forEach(s => {
     let keys = monthKeys(s.id, m);
     keys.forEach(k => {
       let st = db.records[k];
       if (s.gender === "ကျား") {
-        if (st === "present" || st === "late") boysPresent++;
-        if (st === "absent" || st === "unexcused") boysAbsent++;
+        if (st === "present" || st === "late" || st === "leave") boysPresentCount++;
+        if (st === "absent" || st === "unexcused") boysAbsentCount++;
       } else {
-        if (st === "present" || st === "late") girlsPresent++;
-        if (st === "absent" || st === "unexcused") girlsAbsent++;
+        if (st === "present" || st === "late" || st === "leave") girlsPresentCount++;
+        if (st === "absent" || st === "unexcused") girlsAbsentCount++;
       }
     });
   });
 
-  let totalPresent = boysPresent + girlsPresent;
-  let totalAbsent = boysAbsent + girlsAbsent;
-  let boysAvg = boysCount ? (boysPresent / schoolDays).toFixed(1) : 0;
-  let girlsAvg = girlsCount ? (girlsPresent / schoolDays).toFixed(1) : 0;
-  let totalAvg = totalCount ? (totalPresent / schoolDays).toFixed(1) : 0;
-  let boysPossible = boysCount * schoolDays;
-  let girlsPossible = girlsCount * schoolDays;
-  let totalPossible = totalCount * schoolDays;
-  let boysPct = boysPossible ? ((boysPresent / boysPossible) * 100).toFixed(1) : 0;
-  let girlsPct = girlsPossible ? ((girlsPresent / girlsPossible) * 100).toFixed(1) : 0;
-  let totalPct = totalPossible ? ((totalPresent / totalPossible) * 100).toFixed(1) : 0;
+  let totalPresentCount = boysPresentCount + girlsPresentCount;
+  let totalAbsentCount = boysAbsentCount + girlsAbsentCount;
 
-  let summaryTitle = c === "ALL" ? "စုစုပေါင်း (အတန်းအားလုံး ချုပ်ချက်)" : c + " အတန်း စာရင်းချုပ်";
+  // 3. ပျမ်းမျှလာလူ = ကျား/မ ကျောင်းခေါ်ကြိမ်ပေါင်း ÷ ကျား/မ ကျောင်းသားအရေအတွက် (သို့မဟုတ် တစ်လကျောင်းဖွင့်ရက်)
+  // According to user: ပျှမ်းမျှလာလူ က ကျား၊မ ခွဲပြီးတွက်ချက်ရတာဖြစ်တယ်, ကျားစုစုပေါင်း ကျောင်းခေါ်ကြိမ် ÷ ကျား ကျောင်းသားအရေအတွက်
+  let boysAvg = boysCount ? (boysPresentCount / boysCount).toFixed(1) : 0;
+  let girlsAvg = girlsCount ? (girlsPresentCount / girlsCount).toFixed(1) : 0;
+  let totalAvg = totalCount ? (totalPresentCount / totalCount).toFixed(1) : 0;
+
+  // 4. ကျောင်းတက်ရာခိုင်နှုန်း (%) = ကျား ပျှမ်းမျှလာလူ ÷ ကျား စာရင်းရှိ (သို့မဟုတ် သတ်မှတ်ဖော်မြူလာ)
+  let boysPct = boysCount ? ((Number(boysAvg) / boysCount) * 100).toFixed(1) : 0;
+  let girlsPct = girlsCount ? ((Number(girlsAvg) / girlsCount) * 100).toFixed(1) : 0;
+  let totalPct = totalCount ? ((Number(totalAvg) / totalCount) * 100).toFixed(1) : 0;
 
   $("monthlySummaryTable").innerHTML = `
-    <div style="font-weight:bold;margin-bottom:6px;color:#193b63">📌 ${summaryTitle}</div>
+    <div style="font-weight:bold;margin-bottom:6px;color:#193b63">📌 ${esc(c)} အတန်း — လစဉ် စာရင်းချုပ် (ကျား / မ)</div>
     <div class="tablewrap">
       <table>
         <thead><tr><th>စဉ်</th><th>အချက်အလက်ခေါင်းစဉ်</th><th>ကျား</th><th>မ</th><th>ပေါင်း</th></tr></thead>
         <tbody>
-          <tr><td>၁</td><td>စာရင်းရှိဦးရေ</td><td>${boysCount}</td><td>${girlsCount}</td><td><b>${totalCount}</b></td></tr>
-          <tr><td>၂</td><td>ကျောင်းတက်ကြိမ်ပေါင်း</td><td>${boysPresent}</td><td>${girlsPresent}</td><td><b>${totalPresent}</b></td></tr>
-          <tr><td>၃</td><td>ပျမ်းမျှလာလူ</td><td>${boysAvg}</td><td>${girlsAvg}</td><td><b>${totalAvg}</b></td></tr>
-          <tr><td>၄</td><td>တက်ရောက်ရာခိုင်နှုန်း (%)</td><td>${boysPct}%</td><td>${girlsPct}%</td><td><b>${totalPct}%</b></td></tr>
-          <tr><td>၅</td><td>ပျက်ကွက်ကြိမ်ပေါင်း</td><td>${boysAbsent}</td><td>${girlsAbsent}</td><td><b>${totalAbsent}</b></td></tr>
+          <tr><td>၁</td><td><b>စာရင်းရှိဦးရေ</b></td><td>${boysCount}</td><td>${girlsCount}</td><td><b>${totalCount}</b></td></tr>
+          <tr><td>၂</td><td><b>ကျောင်းတက်ကြိမ်ပေါင်း</b></td><td>${boysPresentCount}</td><td>${girlsPresentCount}</td><td><b>${totalPresentCount}</b></td></tr>
+          <tr><td>၃</td><td><b>ပျမ်းမျှလာလူ</b></td><td>${boysAvg}</td><td>${girlsAvg}</td><td><b>${totalAvg}</b></td></tr>
+          <tr><td>၄</td><td><b>တက်ရောက်ရာခိုင်နှုန်း (%)</b></td><td>${boysPct}%</td><td>${girlsPct}%</td><td><b>${totalPct}%</b></td></tr>
+          <tr><td>၅</td><td><b>ပျက်ကွက်ကြိမ်ပေါင်း</b></td><td>${boysAbsentCount}</td><td>${girlsAbsentCount}</td><td><b>${totalAbsentCount}</b></td></tr>
         </tbody>
       </table>
     </div>
@@ -476,7 +484,7 @@ function renderMonthly(){
   let studentRows = arr.map(s => {
     let t = {present:0,absent:0,leave:0,unexcused:0,late:0}, keys = monthKeys(s.id, m);
     keys.forEach(k => { t[db.records[k]]++; });
-    let n = keys.length, att = pct(t.present+t.late, n), abs = pct(t.absent+t.unexcused, n);
+    let n = keys.length, att = n ? Math.round((t.present+t.late)/n*1000)/10 : 0, abs = n ? Math.round((t.absent+t.unexcused)/n*1000)/10 : 0;
     return `<tr><td>${esc(s.name)}</td><td>${esc(s.className)}</td><td>${esc(s.sid)}</td><td>${t.present}</td><td>${t.absent}</td><td>${t.leave}</td><td>${t.unexcused}</td><td>${t.late}</td><td>${n?att+"%":"—"}</td><td>${n?abs+"%":"—"}</td></tr>`;
   }).join("");
 
@@ -492,9 +500,7 @@ function renderMonthly(){
 function showDetail(id, m){
   if(!id){ $("studentDetail").innerHTML=""; return; }
   let s = db.students.find(x => x.id === id); if(!s) return;
-  let keys = monthKeys(id, m), t = {present:0,absent:0,leave:0,unexcused:0,late:0};
-  keys.forEach(k => t[db.records[k]]++);
-  let n = keys.length, att = pct(t.present+t.late, n), abs = pct(t.absent+t.unexcused, n);
+  let keys = monthKeys(id, m);
 
   $("studentDetail").innerHTML = `
     <div style="margin-top:10px">
