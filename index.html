@@ -179,7 +179,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 </div>
 </section>
 
-<!-- 5. TEACHER SMS REMINDER PAGE (NEW) -->
+<!-- 5. TEACHER SMS REMINDER PAGE -->
 <section id="remind_sms" class="page hidden">
 <div class="panel">
 <h2>📲 အတန်းပိုင်ဆီသို့ SMS ဖြင့် စာရင်းတောင်းခံရန်</h2>
@@ -198,7 +198,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 </div>
 </section>
 
-<!-- 6. MONTHLY PAGE -->
+<!-- 6. MONTHLY PAGE (WITH BOTH SUMMARY & DETAIL VIEWS) -->
 <section id="monthly" class="page hidden">
 <div class="panel">
 <h2>📈 လအလိုက် အစီရင်ခံစာ</h2>
@@ -206,11 +206,22 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <div class="field"><label>လရွေးရန်</label><input id="reportMonth" type="month"></div>
 <div class="field"><label>အတန်းရွေးရန်</label><select id="reportClass"></select></div>
 </div>
+
+<!-- NEW: Attendance Summary Table based on handwritten notes -->
+<h3>📊 လစဉ် စာရင်းချုပ် (ကျား / မ အတန်းချုပ်)</h3>
+<div id="monthlySummaryTable"></div>
+
+<h3 style="margin-top:20px">👨‍🎓 ကျောင်းသားတစ်ဦးချင်း လစဉ်မှတ်တမ်း ဇယား</h3>
 <div id="monthlyTable"></div>
-<h3>ကျောင်းသားတစ်ဦးချင်း လစဉ်မှတ်တမ်း</h3>
+
+<h3 style="margin-top:20px">📅 ကျောင်းသားတစ်ဦးချင်း ရက်စွဲအလိုက် အသေးစိတ်ကြည့်ရန်</h3>
 <div class="row"><div class="field"><label>ကျောင်းသားရွေးရန်</label><select id="detailStudent"></select></div></div>
 <div id="studentDetail"></div>
-<div class="actions"><button onclick="window.print()">🖨️ ပုံနှိပ်ရန်</button><button class="secondary" onclick="downloadBackup()">Backup ထုတ်ရန်</button></div>
+
+<div class="actions" style="margin-top:15px">
+  <button onclick="window.print()">🖨️ ပုံနှိပ်ရန်</button>
+  <button class="secondary" onclick="downloadBackup()">Backup ထုတ်ရန်</button>
+</div>
 </div>
 </section>
 
@@ -348,7 +359,7 @@ function parseNameList(text,labels){let v=smsField(text,labels);return v?v.split
 function matchSmsStudent(name,arr){let clean=name.replace(/\s/g,"").toLowerCase();return arr.find(s=>s.name.replace(/\s/g,"").toLowerCase()===clean)}
 function clearTeacherSMS(){$("smsText").value="";$("smsReview").innerHTML="";}
 
-// NEW: Remind SMS / Status Differentiation & Direct SMS Sender
+// Remind SMS
 function renderRemindSms(){
   let d=$("smsCheckDate").value||today();
   let statusRows="",phoneRows="";
@@ -356,33 +367,28 @@ function renderRemindSms(){
   classes.forEach(cls=>{
     let students=list(cls);
     if(students.length===0) return;
-    
-    // Check if attendance submitted (at least 80% or any marked)
     let marked=0;
     students.forEach(s=>{if(db.records[key(d,s.id)] && db.records[key(d,s.id)]!=="pending") marked++;});
     let isSubmitted=(marked>0 && marked>=students.length*0.7);
-    
-    let statusBadge=isSubmitted?'<span class="tag sent">✅ စာရင်းပို့ပြီး (Submitted)</span>':'<span class="tag pending">❌ မပို့ရသေးပါ (Pending)</span>';
+    let statusBadge=isSubmitted?'<span class="tag sent">✅ စာရင်းပို့ပြီး</span>':'<span class="tag pending">❌ မပို့ရသေးပါ</span>';
     let teacherPhone=db.teacherPhones[cls]||"";
-    
-    // Exact SMS Template requested by user
     let msg=`${cls} အတန်းပိုင်ခင်ဗျား ယနေ့အတွက် တက်ရောက်မှုစာရင်းမပို့ရသေးပါသဖြင့်အမြန်ဆုံးပို့ပေးပါရန် အသိပေးအပ်ပါသည်။\nCHINDWIN FUTURE BRIGHT SCHOOL\nကျောင်းအုပ်ကြီး`;
     let smsHref=teacherPhone?`sms:${teacherPhone}?body=${encodeURIComponent(msg)}`:`#`;
 
-    statusRows+=`<tr><td><b>${esc(cls)}</b></td><td>${students.length} ဦး</td><td>${statusBadge}</td><td>${teacherPhone?esc(teacherPhone):'<span style="color:#b91c1c">ဖုန်းနံပါတ်မရှိ</span>'}</td><td>${teacherPhone?`<a href="${smsHref}"><button class="green" style="padding:5px 10px;font-size:11px">📩 SMS ပို့ရန်</button></a>`:`<span class="muted">နံပါတ်ထည့်ပါ</span>`}</td></tr>`;
+    statusRows+=`<tr><td><b>${esc(cls)}</b></td><td>${students.length} ဦး</td><td>${statusBadge}</td><td>${teacherPhone?esc(teacherPhone):'<span style="color:#b91c1c">နံပါတ်မရှိ</span>'}</td><td>${teacherPhone?`<a href="${smsHref}"><button class="green" style="padding:4px 8px;font-size:11px">📩 SMS</button></a>`:`-`}</td></tr>`;
     phoneRows+=`<div class="field" style="min-width:180px"><label>${esc(cls)} အတန်းပိုင် ဖုန်း</label><input type="tel" id="tphone_${cls}" value="${esc(teacherPhone)}" placeholder="09xxxxxxxxx"></div>`;
   });
 
-  $("teacherSmsList").innerHTML=`<div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>ကျောင်းသား</th><th>အခြေအနေ</th><th>အတန်းပိုင်ဖုန်း</th><th>လုပ်ဆောင်ချက်</th></tr></thead><tbody>${statusRows}</tbody></table></div>`;
+  $("teacherSmsList").innerHTML=`<div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>ဦးရေ</th><th>အခြေအနေ</th><th>ဖုန်း</th><th>လုပ်ဆောင်ချက်</th></tr></thead><tbody>${statusRows}</tbody></table></div>`;
   $("teacherPhoneTable").innerHTML=`<div class="row">${phoneRows}</div>`;
 }
 
 function saveTeacherPhones(){
   classes.forEach(cls=>{let el=$("tphone_"+cls);if(el)db.teacherPhones[cls]=el.value.trim();});
-  save();alert("အတန်းပိုင် ဖုန်းနံပါတ်များ သိမ်းဆည်းပြီးပါပြီ။");renderRemindSms();
+  save();alert("ဖုန်းနံပါတ်များ သိမ်းဆည်းပြီးပါပြီ။");renderRemindSms();
 }
 
-// Monthly Summary & Detail
+// Monthly Summary & Detail Calculations
 function monthTally(arr,m){let t={present:0,absent:0,leave:0,unexcused:0,late:0};Object.keys(db.records).forEach(k=>{if(!k.startsWith(m+"-"))return;let id=k.split("|")[1];if(!arr.some(s=>s.id===id))return;let v=db.records[k];if(t[v]!==undefined)t[v]++});return t}
 function monthKeys(id,m){return Object.keys(db.records).filter(k=>k.startsWith(m+"-")&&k.endsWith("|"+id)&&["present","absent","leave","unexcused","late"].includes(db.records[k])).sort()}
 function pct(n,d){return d?Math.round(n/d*1000)/10:0}
@@ -390,20 +396,102 @@ function pct(n,d){return d?Math.round(n/d*1000)/10:0}
 function renderMonthly(){
   let m=$("reportMonth").value||today().slice(0,7),c=$("reportClass").value||"ALL";
   let active=list(c,false),arr=(c==="ALL"?active:active.filter(s=>s.className===c));
-  let studentRows=arr.map(s=>{let t={present:0,absent:0,leave:0,unexcused:0,late:0},keys=monthKeys(s.id,m);keys.forEach(k=>{t[db.records[k]]++});let n=keys.length,att=pct(t.present+t.late,n);return `<tr><td>${esc(s.name)}</td><td>${esc(s.className)}</td><td>${esc(s.sid)}</td><td>${t.present}</td><td>${t.absent}</td><td>${n?att+"%":"—"}</td></tr>`}).join("");
-  $("monthlyTable").innerHTML=`<div class="tablewrap"><table><thead><tr><th>ကျောင်းသားအမည်</th><th>အတန်း</th><th>အမှတ်</th><th>တက်</th><th>ပျက်</th><th>တက် %</th></tr></thead><tbody>${studentRows||'<tr><td colspan="6">စာရင်းမရှိပါ။</td></tr>'}</tbody></table></div>`;
-  let opts=arr.map(s=>`<option value="${esc(s.id)}">${esc(s.className)} · ${esc(s.name)} (${esc(s.sid)})</option>`).join("");
-  $("detailStudent").innerHTML='<option value="">ကျောင်းသားရွေးရန်</option>'+opts;
+
+  // 1. Handwritten Notes Summary Table Calculations (ကျား / မ / ပေါင်း ဇယားချုပ်)
+  let boysCount = arr.filter(s => s.gender === "ကျား").length;
+  let girlsCount = arr.filter(s => s.gender === "မ").length;
+  let totalCount = boysCount + girlsCount;
+
+  let boysPresent = 0, girlsPresent = 0;
+  let boysAbsent = 0, girlsAbsent = 0;
+  let schoolDays = 20; // ခန့်မှန်း ကျောင်းတက်ရက်
+
+  arr.forEach(s => {
+    let keys = monthKeys(s.id, m);
+    keys.forEach(k => {
+      let st = db.records[k];
+      if (s.gender === "ကျား") {
+        if (st === "present" || st === "late") boysPresent++;
+        if (st === "absent" || st === "unexcused") boysAbsent++;
+      } else {
+        if (st === "present" || st === "late") girlsPresent++;
+        if (st === "absent" || st === "unexcused") girlsAbsent++;
+      }
+    });
+  });
+
+  let totalPresent = boysPresent + girlsPresent;
+  let totalAbsent = boysAbsent + girlsAbsent;
+  let boysAvg = boysCount ? (boysPresent / schoolDays).toFixed(1) : 0;
+  let girlsAvg = girlsCount ? (girlsPresent / schoolDays).toFixed(1) : 0;
+  let totalAvg = totalCount ? (totalPresent / schoolDays).toFixed(1) : 0;
+  let boysPossible = boysCount * schoolDays;
+  let girlsPossible = girlsCount * schoolDays;
+  let totalPossible = totalCount * schoolDays;
+  let boysPct = boysPossible ? ((boysPresent / boysPossible) * 100).toFixed(1) : 0;
+  let girlsPct = girlsPossible ? ((girlsPresent / girlsPossible) * 100).toFixed(1) : 0;
+  let totalPct = totalPossible ? ((totalPresent / totalPossible) * 100).toFixed(1) : 0;
+
+  $("monthlySummaryTable").innerHTML = `
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>စဉ်</th><th>အချက်အလက်ခေါင်းစဉ်</th><th>ကျား</th><th>မ</th><th>ပေါင်း</th></tr></thead>
+        <tbody>
+          <tr><td>၁</td><td><b>စာရင်းရှိဦးရေ</b>[span_0](start_span)[span_0](end_span)</td><td>${boysCount}[span_1](start_span)[span_1](end_span)</td><td>${girlsCount}[span_2](start_span)[span_2](end_span)</td><td><b>${totalCount}</b>[span_3](start_span)[span_3](end_span)</td></tr>
+          <tr><td>၂</td><td><b>ကျောင်းတက်ကြိမ်ပေါင်း</b>[span_4](start_span)[span_4](end_span)</td><td>${boysPresent}[span_5](start_span)[span_5](end_span)</td><td>${girlsPresent}[span_6](start_span)[span_6](end_span)</td><td><b>${totalPresent}</b>[span_7](start_span)[span_7](end_span)</td></tr>
+          <tr><td>၃</td><td><b>ပျမ်းမျှလာလူ</b>[span_8](start_span)[span_8](end_span)</td><td>${boysAvg}[span_9](start_span)[span_9](end_span)</td><td>${girlsAvg}[span_10](start_span)[span_10](end_span)</td><td><b>${totalAvg}</b>[span_11](start_span)[span_11](end_span)</td></tr>
+          <tr><td>၄</td><td><b>တက်ရောက်ရာခိုင်နှုန်း (%)</b>[span_12](start_span)[span_12](end_span)</td><td>${boysPct}%[span_13](start_span)[span_13](end_span)</td><td>${girlsPct}%[span_14](start_span)[span_14](end_span)</td><td><b>${totalPct}%</b>[span_15](start_span)[span_15](end_span)</td></tr>
+          <tr><td>၅</td><td><b>ပျက်ကွက်ကြိမ်ပေါင်း</b></td><td>${boysAbsent}</td><td>${girlsAbsent}</td><td><b>${totalAbsent}</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  // 2. Original Student-by-Student Monthly Table
+  let studentRows = arr.map(s => {
+    let t = {present:0,absent:0,leave:0,unexcused:0,late:0}, keys = monthKeys(s.id, m);
+    keys.forEach(k => { t[db.records[k]]++; });
+    let n = keys.length, att = pct(t.present+t.late, n), abs = pct(t.absent+t.unexcused, n);
+    return `<tr><td>${esc(s.name)}</td><td>${esc(s.className)}</td><td>${esc(s.sid)}</td><td>${t.present}</td><td>${t.absent}</td><td>${t.leave}</td><td>${t.unexcused}</td><td>${t.late}</td><td>${n?att+"%":"—"}</td><td>${n?abs+"%":"—"}</td></tr>`;
+  }).join("");
+
+  $("monthlyTable").innerHTML = `<div class="tablewrap"><table style="min-width:900px"><thead><tr><th>ကျောင်းသားအမည်</th><th>အတန်း</th><th>အမှတ်</th><th>တက်</th><th>ပျက်</th><th>ခွင့်</th><th>ခွင့်မဲ့</th><th>နောက်ကျ</th><th>တက် %</th><th>ပျက် %</th></tr></thead><tbody>${studentRows||'<tr><td colspan="10">စာရင်းမရှိပါ။</td></tr>'}</tbody></table></div>`;
+
+  let opts = arr.map(s => `<option value="${esc(s.id)}">${esc(s.className)} · ${esc(s.name)} (${esc(s.sid)})</option>`).join("");
+  let old = $("detailStudent").value;
+  $("detailStudent").innerHTML = '<option value="">ကျောင်းသားရွေးရန်</option>' + opts;
+  if(arr.some(s => s.id === old)) $("detailStudent").value = old;
+  showDetail($("detailStudent").value, m);
+}
+
+function showDetail(id, m){
+  if(!id){ $("studentDetail").innerHTML=""; return; }
+  let s = db.students.find(x => x.id === id); if(!s) return;
+  let keys = monthKeys(id, m), t = {present:0,absent:0,leave:0,unexcused:0,late:0};
+  keys.forEach(k => t[db.records[k]]++);
+  let n = keys.length, att = pct(t.present+t.late, n), abs = pct(t.absent+t.unexcused, n);
+
+  $("studentDetail").innerHTML = `
+    <div style="margin-top:10px">
+      <h3>${esc(s.name)} (${esc(s.sid)}) - အသေးစိတ်မှတ်တမ်း</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>ရက်စွဲ</th><th>အခြေအနေ</th></tr></thead>
+          <tbody>${keys.map(k=>`<tr><td>${esc(k.split("|")[0])}</td><td>${esc(statusLabel[db.records[k]]||"-")}</td></tr>`).join("")||'<tr><td colspan="2">မှတ်တမ်းမရှိသေးပါ။</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
 }
 
 function downloadBackup(){
-  let blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);a.download="CFBS-attendance-backup.json";a.click();
+  let blob = new Blob([JSON.stringify(db,null,2)],{type:"application/json"}), a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "CFBS-attendance-backup.json"; a.click();
 }
 
 // Initial Setup
 document.addEventListener("DOMContentLoaded",()=>{
-  let t=today();
+  let t = today();
   ["homeDate","attDate","smsCheckDate"].forEach(id=>$(id).value=t);
   ["homeMonth","reportMonth"].forEach(id=>$(id).value=t.slice(0,7));
   fillSelects();
@@ -411,15 +499,16 @@ document.addEventListener("DOMContentLoaded",()=>{
   renderStudents();
   renderAttendance();
   
-  $("homeDate").onchange=renderHome;
-  $("homeMonth").onchange=renderHome;
-  $("attDate").onchange=renderAttendance;
-  $("attClass").onchange=renderAttendance;
-  $("listClass").onchange=renderStudents;
-  $("search").oninput=renderStudents;
-  $("smsCheckDate").onchange=renderRemindSms;
-  $("reportMonth").onchange=renderMonthly;
-  $("reportClass").onchange=renderMonthly;
+  $("homeDate").onchange = renderHome;
+  $("homeMonth").onchange = renderHome;
+  $("attDate").onchange = renderAttendance;
+  $("attClass").onchange = renderAttendance;
+  $("listClass").onchange = renderStudents;
+  $("search").oninput = renderStudents;
+  $("smsCheckDate").onchange = renderRemindSms;
+  $("reportMonth").onchange = renderMonthly;
+  $("reportClass").onchange = renderMonthly;
+  $("detailStudent").onchange = ()=>showDetail($("detailStudent").value, $("reportMonth").value||today().slice(0,7));
 });
 </script>
 </body>
