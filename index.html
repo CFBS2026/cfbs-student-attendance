@@ -179,7 +179,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 </div>
 </section>
 
-<!-- 5. TEACHER SMS REMINDER PAGE (NEW & ENHANCED) -->
+<!-- 5. TEACHER SMS REMINDER PAGE -->
 <section id="remind_sms" class="page hidden">
 <div class="panel">
 <h2>📲 အတန်းပိုင်ဆီသို့ SMS ဖြင့် စာရင်းတောင်းခံရန်</h2>
@@ -354,11 +354,11 @@ function parseTeacherSMS(){
 function smsField(text,labels){for(let l of labels){let m=text.match(new RegExp("^\\s*"+l+"\\s*[:：=]\\s*(.*?)\\s*$","mi"));if(m)return m[1].trim()}return ""}
 function smsDate(text){let v=smsField(text,["ရက်စွဲ","နေ့စွဲ"]);let m=v.match(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);return m?m[0]:""}
 function normalizeClass(v){let x=(v||"").toLowerCase().replace("grade","").trim();return x.includes("kg")?"KG":"Grade "+parseInt(x)}
-function parseNameList(text,labels){let v=smsField(text,labels);return v?v.split(/[,၊]+/).map(s=>s.trim()).filter(Boolean):[]}
+function parseNameList(text,labels){let v=smsField(text,labels);return v?v.split(/[,,\/၊]+/).map(s=>s.trim()).filter(Boolean):[]}
 function matchSmsStudent(name,arr){let clean=name.replace(/\s/g,"").toLowerCase();return arr.find(s=>s.name.replace(/\s/g,"").toLowerCase()===clean)}
 function clearTeacherSMS(){$("smsText").value="";$("smsReview").innerHTML="";}
 
-// ENHANCED: Remind SMS / Status Differentiation & Direct SMS Sender
+// Remind SMS
 function renderRemindSms(){
   let d=$("smsCheckDate").value||today();
   let statusRows="",phoneRows="";
@@ -367,16 +367,13 @@ function renderRemindSms(){
     let students=list(cls);
     if(students.length===0) return;
     
-    // Check if attendance submitted
     let marked=0;
     students.forEach(s=>{if(db.records[key(d,s.id)] && db.records[key(d,s.id)]!=="pending") marked++;});
     let isSubmitted=(marked>0 && marked>=students.length*0.7);
     
-    // Distinct status badge as requested
     let statusBadge=isSubmitted?'<span class="tag sent">✅ စာရင်းပို့ပြီး (Submitted)</span>':'<span class="tag pending">❌ မပို့ရသေးပါ (Pending)</span>';
     let teacherPhone=db.teacherPhones[cls]||"";
     
-    // Required SMS message template for pending teachers
     let msg=`${cls} အတန်းပိုင်ခင်ဗျား ယနေ့အတွက် တက်ရောက်မှုစာရင်းမပို့ရသေးပါသဖြင့်အမြန်ဆုံးပို့ပေးပါရန် အသိပေးအပ်ပါသည်။\nCHINDWIN FUTURE BRIGHT SCHOOL\nကျောင်းအုပ်ကြီး`;
     let smsHref=teacherPhone?`sms:${teacherPhone}?body=${encodeURIComponent(msg)}`:`#`;
 
@@ -441,10 +438,10 @@ function renderMonthly(){
       <table>
         <thead><tr><th>စဉ်</th><th>အချက်အလက်ခေါင်းစဉ်</th><th>ကျား</th><th>မ</th><th>ပေါင်း</th></tr></thead>
         <tbody>
-          <tr><td>၁</td><td><b>စာရင်းရှိဦးရေ</b>[span_0](start_span)[span_0](end_span)</td><td>${boysCount}[span_1](start_span)[span_1](end_span)</td><td>${girlsCount}[span_2](start_span)[span_2](end_span)</td><td><b>${totalCount}</b>[span_3](start_span)[span_3](end_span)</td></tr>
-          <tr><td>၂</td><td><b>ကျောင်းတက်ကြိမ်ပေါင်း</b>[span_4](start_span)[span_4](end_span)</td><td>${boysPresent}[span_5](start_span)[span_5](end_span)</td><td>${girlsPresent}[span_6](start_span)[span_6](end_span)</td><td><b>${totalPresent}</b>[span_7](start_span)[span_7](end_span)</td></tr>
-          <tr><td>၃</td><td><b>ပျမ်းမျှလာလူ</b>[span_8](start_span)[span_8](end_span)</td><td>${boysAvg}[span_9](start_span)[span_9](end_span)</td><td>${girlsAvg}[span_10](start_span)[span_10](end_span)</td><td><b>${totalAvg}</b>[span_11](start_span)[span_11](end_span)</td></tr>
-          <tr><td>၄</td><td><b>တက်ရောက်ရာခိုင်နှုန်း (%)</b>[span_12](start_span)[span_12](end_span)</td><td>${boysPct}%[span_13](start_span)[span_13](end_span)</td><td>${girlsPct}%[span_14](start_span)[span_14](end_span)</td><td><b>${totalPct}%</b>[span_15](start_span)[span_15](end_span)</td></tr>
+          <tr><td>၁</td><td><b>စာရင်းရှိဦးရေ</b></td><td>${boysCount}</td><td>${girlsCount}</td><td><b>${totalCount}</b></td></tr>
+          <tr><td>၂</td><td><b>ကျောင်းတက်ကြိမ်ပေါင်း</b></td><td>${boysPresent}</td><td>${girlsPresent}</td><td><b>${totalPresent}</b></td></tr>
+          <tr><td>၃</td><td><b>ပျမ်းမျှလာလူ</b></td><td>${boysAvg}</td><td>${girlsAvg}</td><td><b>${totalAvg}</b></td></tr>
+          <tr><td>၄</td><td><b>တက်ရောက်ရာခိုင်နှုန်း (%)</b></td><td>${boysPct}%</td><td>${girlsPct}%</td><td><b>${totalPct}%</b></td></tr>
           <tr><td>၅</td><td><b>ပျက်ကွက်ကြိမ်ပေါင်း</b></td><td>${boysAbsent}</td><td>${girlsAbsent}</td><td><b>${totalAbsent}</b></td></tr>
         </tbody>
       </table>
