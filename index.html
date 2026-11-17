@@ -179,7 +179,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 </div>
 </section>
 
-<!-- 5. TEACHER SMS REMINDER PAGE -->
+<!-- 5. TEACHER SMS REMINDER PAGE (NEW & ENHANCED) -->
 <section id="remind_sms" class="page hidden">
 <div class="panel">
 <h2>📲 အတန်းပိုင်ဆီသို့ SMS ဖြင့် စာရင်းတောင်းခံရန်</h2>
@@ -198,7 +198,7 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 </div>
 </section>
 
-<!-- 6. MONTHLY PAGE (WITH BOTH SUMMARY & DETAIL VIEWS) -->
+<!-- 6. MONTHLY PAGE -->
 <section id="monthly" class="page hidden">
 <div class="panel">
 <h2>📈 လအလိုက် အစီရင်ခံစာ</h2>
@@ -207,7 +207,6 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <div class="field"><label>အတန်းရွေးရန်</label><select id="reportClass"></select></div>
 </div>
 
-<!-- NEW: Attendance Summary Table based on handwritten notes -->
 <h3>📊 လစဉ် စာရင်းချုပ် (ကျား / မ အတန်းချုပ်)</h3>
 <div id="monthlySummaryTable"></div>
 
@@ -359,7 +358,7 @@ function parseNameList(text,labels){let v=smsField(text,labels);return v?v.split
 function matchSmsStudent(name,arr){let clean=name.replace(/\s/g,"").toLowerCase();return arr.find(s=>s.name.replace(/\s/g,"").toLowerCase()===clean)}
 function clearTeacherSMS(){$("smsText").value="";$("smsReview").innerHTML="";}
 
-// Remind SMS
+// ENHANCED: Remind SMS / Status Differentiation & Direct SMS Sender
 function renderRemindSms(){
   let d=$("smsCheckDate").value||today();
   let statusRows="",phoneRows="";
@@ -367,25 +366,31 @@ function renderRemindSms(){
   classes.forEach(cls=>{
     let students=list(cls);
     if(students.length===0) return;
+    
+    // Check if attendance submitted
     let marked=0;
     students.forEach(s=>{if(db.records[key(d,s.id)] && db.records[key(d,s.id)]!=="pending") marked++;});
     let isSubmitted=(marked>0 && marked>=students.length*0.7);
-    let statusBadge=isSubmitted?'<span class="tag sent">✅ စာရင်းပို့ပြီး</span>':'<span class="tag pending">❌ မပို့ရသေးပါ</span>';
+    
+    // Distinct status badge as requested
+    let statusBadge=isSubmitted?'<span class="tag sent">✅ စာရင်းပို့ပြီး (Submitted)</span>':'<span class="tag pending">❌ မပို့ရသေးပါ (Pending)</span>';
     let teacherPhone=db.teacherPhones[cls]||"";
+    
+    // Required SMS message template for pending teachers
     let msg=`${cls} အတန်းပိုင်ခင်ဗျား ယနေ့အတွက် တက်ရောက်မှုစာရင်းမပို့ရသေးပါသဖြင့်အမြန်ဆုံးပို့ပေးပါရန် အသိပေးအပ်ပါသည်။\nCHINDWIN FUTURE BRIGHT SCHOOL\nကျောင်းအုပ်ကြီး`;
     let smsHref=teacherPhone?`sms:${teacherPhone}?body=${encodeURIComponent(msg)}`:`#`;
 
-    statusRows+=`<tr><td><b>${esc(cls)}</b></td><td>${students.length} ဦး</td><td>${statusBadge}</td><td>${teacherPhone?esc(teacherPhone):'<span style="color:#b91c1c">နံပါတ်မရှိ</span>'}</td><td>${teacherPhone?`<a href="${smsHref}"><button class="green" style="padding:4px 8px;font-size:11px">📩 SMS</button></a>`:`-`}</td></tr>`;
+    statusRows+=`<tr><td><b>${esc(cls)}</b></td><td>${students.length} ဦး</td><td>${statusBadge}</td><td>${teacherPhone?esc(teacherPhone):'<span style="color:#b91c1c">နံပါတ်မရှိ</span>'}</td><td>${teacherPhone?`<a href="${smsHref}"><button class="green" style="padding:5px 10px;font-size:11px">📩 SMS ပို့ရန်</button></a>`:`<span class="muted">နံပါတ်ထည့်ပါ</span>`}</td></tr>`;
     phoneRows+=`<div class="field" style="min-width:180px"><label>${esc(cls)} အတန်းပိုင် ဖုန်း</label><input type="tel" id="tphone_${cls}" value="${esc(teacherPhone)}" placeholder="09xxxxxxxxx"></div>`;
   });
 
-  $("teacherSmsList").innerHTML=`<div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>ဦးရေ</th><th>အခြေအနေ</th><th>ဖုန်း</th><th>လုပ်ဆောင်ချက်</th></tr></thead><tbody>${statusRows}</tbody></table></div>`;
+  $("teacherSmsList").innerHTML=`<div class="tablewrap"><table><thead><tr><th>အတန်း</th><th>ဦးရေ</th><th>စာရင်းပေးပို့မှု အခြေအနေ</th><th>အတန်းပိုင်ဖုန်း</th><th>လုပ်ဆောင်ချက်</th></tr></thead><tbody>${statusRows}</tbody></table></div>`;
   $("teacherPhoneTable").innerHTML=`<div class="row">${phoneRows}</div>`;
 }
 
 function saveTeacherPhones(){
   classes.forEach(cls=>{let el=$("tphone_"+cls);if(el)db.teacherPhones[cls]=el.value.trim();});
-  save();alert("ဖုန်းနံပါတ်များ သိမ်းဆည်းပြီးပါပြီ။");renderRemindSms();
+  save();alert("အတန်းပိုင် ဖုန်းနံပါတ်များ သိမ်းဆည်းပြီးပါပြီ။");renderRemindSms();
 }
 
 // Monthly Summary & Detail Calculations
@@ -397,14 +402,13 @@ function renderMonthly(){
   let m=$("reportMonth").value||today().slice(0,7),c=$("reportClass").value||"ALL";
   let active=list(c,false),arr=(c==="ALL"?active:active.filter(s=>s.className===c));
 
-  // 1. Handwritten Notes Summary Table Calculations (ကျား / မ / ပေါင်း ဇယားချုပ်)
   let boysCount = arr.filter(s => s.gender === "ကျား").length;
   let girlsCount = arr.filter(s => s.gender === "မ").length;
   let totalCount = boysCount + girlsCount;
 
   let boysPresent = 0, girlsPresent = 0;
   let boysAbsent = 0, girlsAbsent = 0;
-  let schoolDays = 20; // ခန့်မှန်း ကျောင်းတက်ရက်
+  let schoolDays = 20;
 
   arr.forEach(s => {
     let keys = monthKeys(s.id, m);
@@ -447,7 +451,6 @@ function renderMonthly(){
     </div>
   `;
 
-  // 2. Original Student-by-Student Monthly Table
   let studentRows = arr.map(s => {
     let t = {present:0,absent:0,leave:0,unexcused:0,late:0}, keys = monthKeys(s.id, m);
     keys.forEach(k => { t[db.records[k]]++; });
