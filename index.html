@@ -25,6 +25,7 @@ h2{font-size:16px;margin:0 0 12px;color:#193b63}h3{font-size:13px;margin:12px 0 
 .row{display:flex;gap:10px;flex-wrap:wrap}.field{flex:1;min-width:145px;margin-bottom:8px}
 label{display:block;font-size:11px;font-weight:bold;margin:6px 0 4px}
 input,select,textarea{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;font:inherit;font-size:12px;color:#172033}
+.tablewrap select{padding:5px 8px;width:auto;min-width:110px}
 textarea{min-height:70px;resize:vertical}
 .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
 .stat{border-radius:10px;padding:12px;background:#f1f5f9;text-align:center}
@@ -45,8 +46,16 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 .tag{display:inline-block;border-radius:20px;padding:3px 8px;background:#e0f2fe;color:#075985;font-size:11px}
 .tag.sent{background:#dcfce7;color:#166534}
 .tag.pending{background:#fee2e2;color:#991b1b}
+.tag.holiday{background:#fef3c7;color:#92400e;font-weight:bold}
 .alert-box{background:#fee2e2;color:#991b1b;padding:10px;border-radius:8px;font-size:12px;margin-bottom:10px;border:1px solid #fecaca}
+.warn-box{background:#fef3c7;color:#92400e;padding:10px;border-radius:8px;font-size:12px;margin-bottom:10px;border:1px solid #fde68a}
 @media(min-width:700px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media print{
+  header,.menu-toggle,.nav-drawer,.drawer-overlay,.actions,.footer{display:none!important}
+  body{background:#fff}
+  main{max-width:100%;padding:0}
+  .panel{box-shadow:none;border:1px solid #cbd5e1;break-inside:avoid}
+}
 </style></head><body>
 
 <!-- Slide Drawer Menu -->
@@ -154,14 +163,22 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <div class="field"><label>ရက်စွဲ</label><input id="attDate" type="date"></div>
 <div class="field"><label>အတန်းရွေးမယ်</label><select id="attClass"></select></div>
 </div>
+<div id="holidayBanner"></div>
 <div class="stats">
 <div class="stat"><small>အတန်းကျောင်းသား</small><strong id="attTotal">0</strong></div>
 <div class="stat green"><small>တက်</small><strong id="attPresent">0</strong></div>
 <div class="stat red"><small>ပျက် / ခွင့်မဲ့</small><strong id="attAbsent">0</strong></div>
 <div class="stat yellow"><small>မမှတ်ရသေး</small><strong id="attPending">0</strong></div>
 </div>
+<div class="actions">
+<button class="green" onclick="markAllPresent()">✓ အားလုံး တက် မှတ်ရန်</button>
+<button class="secondary" onclick="toggleHolidayDate()">🏖️ ကျောင်းပိတ်ရက် သတ်မှတ်/ပယ်ဖျက်</button>
+<button class="danger" onclick="clearDateAttendance()">🗑️ ဤရက် မှတ်တမ်းဖျက်ရန်</button>
+<button class="danger" onclick="clearAllClassesDateAttendance()">🗑️ ဤရက် အတန်းအားလုံး ဖျက်ရန်</button>
+<button class="secondary" onclick="window.print()">🖨️ ဇယားပုံနှိပ်ရန်</button>
+</div>
 <div id="attendanceTable"></div>
-<div class="actions"><button class="secondary" onclick="window.print()">🖨️ ဇယားပုံနှိပ်ရန်</button></div>
+<div id="holidayListBox" style="margin-top:12px"></div>
 </div>
 </section>
 
@@ -227,6 +244,8 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <div class="actions" style="margin-top:15px">
   <button onclick="window.print()">🖨️ ပုံနှိပ်ရန်</button>
   <button class="secondary" onclick="downloadBackup()">Backup ထုတ်ရန်</button>
+  <button class="secondary" onclick="$('restoreFile').click()">Backup ထည့်ရန်</button>
+  <input id="restoreFile" type="file" accept="application/json,.json" style="display:none" onchange="restoreBackup(event)">
 </div>
 </div>
 </section>
@@ -240,13 +259,16 @@ const statuses=[["present","တက်"],["absent","ပျက်"],["leave","ခ�
 const statusLabel={present:"တက်",absent:"ပျက်",leave:"ခွင့်",unexcused:"ခွင့်မဲ့",late:"နောက်ကျ",pending:"မမှတ်ရသေး"};
 const names=[["မောင်မင်းခန့်","ကျား"],["မသဇင်","မ"],["မောင်ကောင်းမြတ်","ကျား"]];
 
+let pendingSmsReview = null;
+
 let db;
 try{db=JSON.parse(localStorage.getItem("CFBS_ATTENDANCE_DASHBOARD_V3")||"null")}catch(e){}
 if(!db||!Array.isArray(db.students)){
-  db={students:classes.flatMap((c,i)=>names.map((n,j)=>({id:c.replace(" ","")+"-"+(j+1),sid:""+(i+1).toString().padStart(2,"0")+(j+1).toString().padStart(2,"0"),name:n[0],gender:n[1],className:c,active:true,parentName:"",phone:"",dob:"",admissionDate:"",address:""}))),records:{},teacherPhones:{}};
+  db={students:classes.flatMap((c,i)=>names.map((n,j)=>({id:c.replace(" ","")+"-"+(j+1),sid:""+(i+1).toString().padStart(2,"0")+(j+1).toString().padStart(2,"0"),name:n[0],gender:n[1],className:c,active:true,parentName:"",phone:"",dob:"",admissionDate:"",address:""}))),records:{},teacherPhones:{},holidays:[]};
 }
 if(!db.teacherPhones) db.teacherPhones={};
 if(!db.records) db.records={};
+if(!Array.isArray(db.holidays)) db.holidays=[];
 
 const $=id=>document.getElementById(id);
 function today(){let d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
@@ -254,7 +276,8 @@ function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 function save(){try{localStorage.setItem("CFBS_ATTENDANCE_DASHBOARD_V3",JSON.stringify(db))}catch(e){alert("Storage full!");}}
 function list(c,includeInactive=false){return db.students.filter(s=>s.className===c&&(includeInactive||s.active===true||s.active===undefined))}
 function key(d,id){return d+"|"+id}
-function status(s,d){return db.records[key(d,s.id)]||"pending"}
+function isHoliday(d){return db.holidays.includes(d)}
+function status(s,d){if(isHoliday(d))return"pending";return db.records[key(d,s.id)]||"pending"}
 function tally(arr,d){let o={present:0,absent:0,leave:0,unexcused:0,late:0,pending:0};arr.forEach(s=>o[status(s,d)]++);return o}
 function pct(n,d){return d?Math.round(n/d*1000)/10:0}
 
@@ -297,7 +320,7 @@ function renderHome(){
   $("monthAbsent").textContent=ma;
   $("monthAttendPct").textContent=mn?pct(mp,mn)+"%":"0%";
   $("monthAbsentPct").textContent=mn?pct(ma,mn)+"%":"0%";
-  $("dashboardDateLabel").textContent="ရွေးထားသောရက်စွဲ: "+d+" · လ: "+m;
+  $("dashboardDateLabel").textContent="ရွေးထားသောရက်စွဲ: "+d+(isHoliday(d)?" (ကျောင်းပိတ်ရက်)":"")+" · လ: "+m;
 }
 
 // Student Management Functions
@@ -341,11 +364,90 @@ function renderStudents(){
   $("studentTable").innerHTML=arr.length?`<div class="tablewrap"><table style="min-width:950px"><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>အမည်</th><th>ကျား/မ</th><th>မွေးသက္ကရာဇ်</th><th>မိဘအမည်</th><th>မိဘဖုန်းနံပါတ်</th><th>နေရပ်လိပ်စာ</th><th>အခြေအနေ</th><th>ပြင်/ဖျက်</th></tr></thead><tbody>${arr.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.sid)}</td><td>${esc(s.name)}</td><td>${esc(s.gender)}</td><td>${esc(s.dob||"-")}</td><td>${esc(s.parentName||"-")}</td><td>${esc(s.phone||"-")}</td><td>${esc(s.address||"-")}</td><td>${statusText(s)}</td><td><button class="secondary" onclick="editStudent('${s.id}')">ပြင်</button> <button class="danger" onclick="deleteStudent('${s.id}')">ဖျက်</button></td></tr>`).join("")}</tbody></table></div>`:'<p class="muted">စာရင်းမရှိပါ။</p>';
 }
 
-// Attendance Table
+// Attendance Table, Direct Editing, Holiday & Clear Date Records
 function renderAttendance(){
   let d=$("attDate").value||today(),c=$("attClass").value||"KG",a=list(c),t=tally(a,d);
+  let holiday=isHoliday(d);
+  $("holidayBanner").innerHTML=holiday?`<div class="warn-box">🏖️ <b>${esc(d)}</b> သည် ကျောင်းပိတ်ရက်အဖြစ် သတ်မှတ်ထားပါသည်။ လစဉ်ခေါ်ကြိမ်တွက်ချက်မှုတွင် ထည့်သွင်းမည်မဟုတ်ပါ။</div>`:"";
   $("attTotal").textContent=a.length;$("attPresent").textContent=t.present;$("attAbsent").textContent=t.absent+t.unexcused;$("attPending").textContent=t.pending;
-  $("attendanceTable").innerHTML=`<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>ကျောင်းသားအမည်</th><th>အခြေအနေ</th></tr></thead><tbody>${a.map((s,i)=>`<tr><td>${i+1}</td><td>${esc(s.sid)}</td><td>${esc(s.name)}</td><td>${status(s,d)==="pending"?'<span class="tag pending">မမှတ်ရသေး</span>':`<span class="tag sent">${statusLabel[status(s,d)]}</span>`}</td></tr>`).join("")||'<tr><td colspan="4">ကျောင်းသားမရှိပါ။</td></tr>'}</tbody></table></div>`;
+  $("attendanceTable").innerHTML=`<div class="tablewrap"><table><thead><tr><th>စဉ်</th><th>ကျောင်းဝင်အမှတ်</th><th>ကျောင်းသားအမည်</th><th>လက်ရှိအခြေအနေ</th><th>မှတ်တမ်းပြောင်းရန်</th></tr></thead><tbody>${a.map((s,i)=>{
+    let st=status(s,d);
+    let badge=holiday?'<span class="tag holiday">ကျောင်းပိတ်ရက်</span>':(st==="pending"?'<span class="tag pending">မမှတ်ရသေး</span>':`<span class="tag sent">${esc(statusLabel[st])}</span>`);
+    let opts='<option value="pending"'+(st==="pending"?" selected":"")+'>မမှတ်ရသေး</option>'+statuses.map(([k,lbl])=>`<option value="${k}"${st===k?" selected":""}>${esc(lbl)}</option>`).join("");
+    return `<tr><td>${i+1}</td><td>${esc(s.sid)}</td><td>${esc(s.name)}</td><td>${badge}</td><td><select ${holiday?"disabled":""} onchange="setStudentStatus('${esc(d)}','${esc(s.id)}',this.value)">${opts}</select></td></tr>`;
+  }).join("")||'<tr><td colspan="5">ကျောင်းသားမရှိပါ။</td></tr>'}</tbody></table></div>`;
+  renderHolidayList();
+}
+
+function renderHolidayList(){
+  let sorted=[...db.holidays].sort();
+  if(!sorted.length){
+    $("holidayListBox").innerHTML=`<p class="muted">သတ်မှတ်ထားသော ကျောင်းပိတ်ရက် မရှိသေးပါ။</p>`;
+    return;
+  }
+  $("holidayListBox").innerHTML=`<h3>🏖️ သတ်မှတ်ထားသော ကျောင်းပိတ်ရက်များ</h3><div class="actions">${sorted.map(hd=>`<span class="tag holiday">${esc(hd)} <button class="secondary" style="padding:2px 6px;font-size:10px;margin-left:4px" onclick="removeHoliday('${esc(hd)}')">✕</button></span>`).join("")}</div>`;
+}
+
+function toggleHolidayDate(){
+  let d=$("attDate").value||today();
+  if(isHoliday(d)){
+    removeHoliday(d);
+    return;
+  }
+  let hasRec=Object.keys(db.records).some(k=>k.startsWith(d+"|"));
+  if(hasRec && !confirm(`${d} ရက်စွဲတွင် attendance မှတ်တမ်းများ ရှိနေပါသည်။ ကျောင်းပိတ်ရက်အဖြစ် သတ်မှတ်ပြီး ထိုရက်၏ မှတ်တမ်းများကို ဖျက်ပစ်မလား။`)) return;
+  if(hasRec){
+    Object.keys(db.records).forEach(k=>{if(k.startsWith(d+"|"))delete db.records[k];});
+  }
+  db.holidays.push(d);
+  save();
+  renderAttendance();
+  renderHome();
+  renderMonthly();
+}
+
+function removeHoliday(d){
+  db.holidays=db.holidays.filter(x=>x!==d);
+  save();
+  renderAttendance();
+  renderHome();
+  renderMonthly();
+}
+
+function clearDateAttendance(){
+  let d=$("attDate").value||today(),c=$("attClass").value||"KG",a=list(c);
+  if(!a.length){alert("ကျောင်းသားမရှိပါ။");return;}
+  let hasAny=a.some(s=>db.records[key(d,s.id)]!==undefined);
+  if(!hasAny){alert(`${c} အတန်းအတွက် ${d} ရက်စွဲတွင် ဖျက်စရာ မှတ်တမ်းမရှိပါ။`);return;}
+  if(!confirm(`${c} အတန်း၊ ရက်စွဲ (${d}) ၏ attendance မှတ်တမ်းများကို အပြီးအပိုင် ဖျက်ပစ်မလား။`))return;
+  a.forEach(s=>{delete db.records[key(d,s.id)];});
+  save();renderAttendance();renderHome();renderMonthly();
+  alert(`${c} အတန်း၊ ${d} ရက်စွဲ မှတ်တမ်းများကို ဖျက်ပြီးပါပြီ။`);
+}
+
+function clearAllClassesDateAttendance(){
+  let d=$("attDate").value||today();
+  let prefix=d+"|";
+  let keysToDelete=Object.keys(db.records).filter(k=>k.startsWith(prefix));
+  if(!keysToDelete.length){alert(`${d} ရက်စွဲအတွက် အတန်းအားလုံးတွင် ဖျက်စရာ မှတ်တမ်းမရှိပါ။`);return;}
+  if(!confirm(`ရက်စွဲ (${d}) အတွက် အတန်းအားလုံး (KG – Grade 12) ၏ attendance မှတ်တမ်း (${keysToDelete.length} ခု) ကို အပြီးအပိုင် ဖျက်ပစ်မလား။`))return;
+  keysToDelete.forEach(k=>{delete db.records[k];});
+  save();renderAttendance();renderHome();renderMonthly();
+  alert(`${d} ရက်စွဲအတွက် အတန်းအားလုံး၏ မှတ်တမ်းများကို ဖျက်ပြီးပါပြီ။`);
+}
+
+function setStudentStatus(d,id,val){
+  if(isHoliday(d))return;
+  if(val==="pending") delete db.records[key(d,id)];
+  else db.records[key(d,id)]=val;
+  save();renderAttendance();renderHome();
+}
+function markAllPresent(){
+  let d=$("attDate").value||today(),c=$("attClass").value||"KG",a=list(c);
+  if(isHoliday(d)){alert(`${d} သည် ကျောင်းပိတ်ရက် ဖြစ်ပါသည်။`);return;}
+  if(!a.length){alert("ကျောင်းသားမရှိပါ။");return;}
+  a.forEach(s=>{db.records[key(d,s.id)]="present";});
+  save();renderAttendance();renderHome();
 }
 
 function isValidDate(dateStr) {
@@ -358,6 +460,7 @@ function isValidDate(dateStr) {
 }
 
 function parseTeacherSMS(){
+  pendingSmsReview = null;
   let text=$("smsText").value.trim();if(!text){alert("SMS စာသားထည့်ပါ။");return}
   let cls=normalizeClass(smsField(text,["အတန်း","အတန်းအမည်","Class"]));
   let date=smsDate(text);
@@ -365,12 +468,14 @@ function parseTeacherSMS(){
   let errors=[];
   if(!date || !isValidDate(date)){
     errors.push(`⚠️ SMS ထဲပါသော ရက်စွဲ (${date || "မတွေ့ပါ"}) သည် တကယ်မရှိသော (သို့မဟုတ်) မှားယွင်းနေသော ရက်စွဲဖြစ်နေပါသည် (ဥပမာ - လတွင်မရှိသည့်ရက် သို့မဟုတ် 0 ရက်)။`);
+  }else if(isHoliday(date)){
+    errors.push(`⚠️ ရက်စွဲ (${date}) သည် ကျောင်းပိတ်ရက်အဖြစ် သတ်မှတ်ထားသော ရက်ဖြစ်နေပါသည်။`);
   }
 
   let smsTotalStr=smsField(text,["စာရင်းရှိ","စုစုပေါင်း","Total"]);
   let smsTotal=parseInt(smsTotalStr)||0;
 
-  if(!cls){errors.push("⚠️ အတန်းအမည် မတွေ့ပါ။");}
+  if(!cls){errors.push("⚠️ အတန်းအမည် မတွေ့ပါ သို့မဟုတ် မှားယွင်းနေပါသည်။");}
   let roster=cls?list(cls):[];
   if(cls && !roster.length){errors.push(`⚠️ ${cls} အတန်းအတွက် ကျောင်းသားစာရင်း မရှိပါ။`);}
 
@@ -389,7 +494,7 @@ function parseTeacherSMS(){
       errors.push(`⚠️ စာရင်းရှိဦးရေ မကိုက်ညီပါ (SMS ထဲတွင် ${smsTotal} ဦးဟု ပါရှိသော်လည်း၊ စာရင်းရှိသည်မှာ ${roster.length} ဦး ဖြစ်နေပါသည်)။`);
     }
     if(unmatchedNames.length>0){
-      errors.push(`⚠️ အောက်ပါပျက်ကွက်သူ အမည်များသည် ကျောင်းသားစာရင်းနှင့် မကိုက်ညီပါ:<br><b>${unmatchedNames.join(", ")}</b>`);
+      errors.push(`⚠️ အောက်ပါပျက်ကွက်သူ အမည်များသည် ကျောင်းသားစာရင်းနှင့် မကိုက်ညီပါ:<br><b>${unmatchedNames.map(esc).join(", ")}</b>`);
     }
   }
 
@@ -402,6 +507,7 @@ function parseTeacherSMS(){
       <div class="actions"><button class="danger" onclick="clearTeacherSMS()">SMS ရှင်းရန် / ပြန်ပြင်ရန်</button></div>
     </div>`;
   }else{
+    pendingSmsReview = {cls, date, recordsObj: assignments};
     reviewHtml=`<div class="panel" style="background:#f8fafc;margin-top:12px">
       <h3>✅ SMS စစ်ဆေးချက် မှန်ကန်သည် — ${esc(cls)} · ရက်စွဲ: <span style="color:#047857">${esc(date)}</span></h3>
       <p>စာရင်းရှိ: <b>${roster.length}</b> ဦး · ပျက်ကွက်သူ: <b>${absentNames.length}</b> ဦး (စာရင်း အတိအကျ ကိုက်ညီသည်)</p>
@@ -409,7 +515,7 @@ function parseTeacherSMS(){
       ${roster.map(st=>`<tr><td>${esc(st.sid)}</td><td>${esc(st.name)}</td><td>${esc(statusLabel[assignments[st.id]])}</td></tr>`).join("")}
       </tbody></table></div>
       <div class="actions" style="margin-top:10px">
-        <button class="green" onclick="confirmApplySMS('${cls}','${date}',{${roster.map(st=>`'${st.id}':'${assignments[st.id]}'`).join(',')}})">💾 ${esc(date)} ရက်စွဲအတွက် မှတ်တမ်းသိမ်းရန်</button>
+        <button class="green" onclick="confirmApplySMS()">💾 ${esc(date)} ရက်စွဲအတွက် မှတ်တမ်းသိမ်းရန်</button>
         <button class="secondary" onclick="clearTeacherSMS()">SMS ရှင်းရန်</button>
       </div>
     </div>`;
@@ -417,12 +523,15 @@ function parseTeacherSMS(){
   $("smsReview").innerHTML=reviewHtml;
 }
 
-function confirmApplySMS(cls, date, recordsObj){
+function confirmApplySMS(){
+  if(!pendingSmsReview) return;
+  let {cls, date, recordsObj} = pendingSmsReview;
   if(!confirm(`${cls} အတန်း၊ ရက်စွဲ (${date}) အတွက် တက်ရောက်မှုစာရင်းကို သိမ်းဆည်းမလား။`)) return;
   Object.keys(recordsObj).forEach(id=>{
     db.records[key(date, id)] = recordsObj[id];
   });
   save();
+  pendingSmsReview = null;
   alert(`ရက်စွဲ (${date}) အတွက် တက်ရောက်မှုစာရင်း သိမ်းဆည်းပြီးပါပြီ။`);
   renderHome();
   renderAttendance();
@@ -441,41 +550,51 @@ function smsDate(text){
   return "";
 }
 
-function normalizeClass(v){let x=(v||"").toLowerCase().replace("grade","").trim();return x.includes("kg")?"KG":"Grade "+parseInt(x)}
+function normalizeClass(v){
+  let x=(v||"").toLowerCase().replace("grade","").trim();
+  if(!x) return "";
+  if(x==="kg" || x.startsWith("kg ")) return "KG";
+  let n=parseInt(x,10);
+  if(isNaN(n) || n<1 || n>12) return "";
+  return "Grade "+n;
+}
 function parseNameList(text,labels){
   let v=smsField(text,labels);
   if(!v || v.includes("မရှိ") || v.includes("none") || v.toLowerCase().includes("no")) return [];
-  return v.split(/[,,\/၊]+/).map(s=>s.trim()).filter(Boolean);
+  return v.split(/[,،\/၊]+/).map(s=>s.trim()).filter(Boolean);
 }
 function matchSmsStudent(name,arr){
   let clean=name.replace(/\s/g,"").toLowerCase();
   return arr.find(s=>s.name.replace(/\s/g,"").toLowerCase()===clean);
 }
-function clearTeacherSMS(){$("smsText").value="";$("smsReview").innerHTML="";}
+function clearTeacherSMS(){pendingSmsReview=null;$("smsText").value="";$("smsReview").innerHTML="";}
 
 // Remind SMS
 function renderRemindSms(){
   let d=$("smsCheckDate").value||today();
   let statusRows="",phoneRows="",submittedCount=0,pendingCount=0;
+  let holiday=isHoliday(d);
 
   classes.forEach(cls=>{
     let students=list(cls);
     if(students.length===0) return;
     
     let marked=0;
-    students.forEach(s=>{if(db.records[key(d,s.id)] && db.records[key(d,s.id)]!=="pending") marked++;});
-    let isSubmitted=(marked>0 && marked>=students.length*0.7);
+    if(!holiday){
+      students.forEach(s=>{if(db.records[key(d,s.id)] && db.records[key(d,s.id)]!=="pending") marked++;});
+    }
+    let isSubmitted=!holiday && (marked>0 && marked>=students.length*0.7);
     
-    if(isSubmitted) submittedCount++; else pendingCount++;
+    if(isSubmitted) submittedCount++; else if(!holiday) pendingCount++;
 
-    let statusBadge=isSubmitted?'<span class="tag sent">✅ စာရင်းပို့ပြီး (Submitted)</span>':'<span class="tag pending">❌ မပို့ရသေးပါ (Pending)</span>';
+    let statusBadge=holiday?'<span class="tag holiday">🏖️ ကျောင်းပိတ်ရက်</span>':(isSubmitted?'<span class="tag sent">✅ စာရင်းပို့ပြီး (Submitted)</span>':'<span class="tag pending">❌ မပို့ရသေးပါ (Pending)</span>');
     let teacherPhone=db.teacherPhones[cls]||"";
     
     let msg=`${cls} အတန်းပိုင်ခင်ဗျား ယနေ့အတွက် တက်ရောက်မှုစာရင်းမပို့ရသေးပါသဖြင့်အမြန်ဆုံးပို့ပေးပါရန် အသိပေးအပ်ပါသည်။\nCHINDWIN FUTURE BRIGHT SCHOOL\nကျောင်းအုပ်ကြီး`;
-    let smsHref=teacherPhone?`sms:${teacherPhone}?body=${encodeURIComponent(msg)}`:`#`;
+    let smsHref=teacherPhone?`sms:${encodeURIComponent(teacherPhone)}?body=${encodeURIComponent(msg)}`:`#`;
 
-    statusRows+=`<tr><td><b>${esc(cls)}</b></td><td>${students.length} ဦး</td><td>${statusBadge}</td><td>${teacherPhone?esc(teacherPhone):'<span style="color:#b91c1c">နံပါတ်မရှိ</span>'}</td><td>${teacherPhone?`<a href="${smsHref}"><button class="green" style="padding:5px 10px;font-size:11px">📩 SMS ပို့ရန်</button></a>`:`<span class="muted">နံပါတ်ထည့်ပါ</span>`}</td></tr>`;
-    phoneRows+=`<div class="field" style="min-width:180px"><label>${esc(cls)} အတန်းပိုင် ဖုန်း</label><input type="tel" id="tphone_${cls}" value="${esc(teacherPhone)}" placeholder="09xxxxxxxxx"></div>`;
+    statusRows+=`<tr><td><b>${esc(cls)}</b></td><td>${students.length} ဦး</td><td>${statusBadge}</td><td>${teacherPhone?esc(teacherPhone):'<span style="color:#b91c1c">နံပါတ်မရှိ</span>'}</td><td>${(!holiday && teacherPhone)?`<a href="${smsHref}"><button class="green" style="padding:5px 10px;font-size:11px">📩 SMS ပို့ရန်</button></a>`:`<span class="muted">${holiday?"ပိတ်ရက်":"နံပါတ်ထည့်ပါ"}</span>`}</td></tr>`;
+    phoneRows+=`<div class="field" style="min-width:180px"><label>${esc(cls)} အတန်းပိုင် ဖုန်း</label><input type="tel" id="tphone_${esc(cls)}" value="${esc(teacherPhone)}" placeholder="09xxxxxxxxx"></div>`;
   });
 
   $("teacherSmsList").innerHTML=`
@@ -492,19 +611,18 @@ function saveTeacherPhones(){
   save();alert("အတန်းပိုင် ဖုန်းနံပါတ်များ သိမ်းဆည်းပြီးပါပြီ။");renderRemindSms();
 }
 
-// Monthly Summary Calculations
-function monthTally(arr,m){let t={present:0,absent:0,leave:0,unexcused:0,late:0};Object.keys(db.records).forEach(k=>{if(!k.startsWith(m+"-"))return;let id=k.split("|")[1];if(!arr.some(s=>s.id===id))return;let v=db.records[k];if(t[v]!==undefined)t[v]++});return t}
-function monthKeys(id,m){return Object.keys(db.records).filter(k=>k.startsWith(m+"-")&&k.endsWith("|"+id)&&["present","absent","leave","unexcused","late"].includes(db.records[k])).sort()}
+// Monthly Summary Calculations (Excludes Holidays)
+function monthTally(arr,m){let t={present:0,absent:0,leave:0,unexcused:0,late:0};Object.keys(db.records).forEach(k=>{let d=k.split("|")[0];if(!d.startsWith(m+"-")||isHoliday(d))return;let id=k.split("|")[1];if(!arr.some(s=>s.id===id))return;let v=db.records[k];if(t[v]!==undefined)t[v]++});return t}
+function monthKeys(id,m){return Object.keys(db.records).filter(k=>{let d=k.split("|")[0];return d.startsWith(m+"-")&&!isHoliday(d)&&k.endsWith("|"+id)&&["present","absent","leave","unexcused","late"].includes(db.records[k])}).sort()}
 
 function renderMonthly(){
   let m=$("reportMonth").value||today().slice(0,7);
   let selectedClass=$("reportClass").value;
   let isAll = (selectedClass === "all");
 
-  $("monthlyInfoLabel").textContent = `ရွေးထားသောလ: ${m} · အတန်း: ${isAll ? "အတန်းအားလုံး" : selectedClass} · မှတ်တမ်းမရှိသေးသောရက်များကို ပျက်ကွက်ဟု မတွက်ပါ။`;
+  $("monthlyInfoLabel").textContent = `ရွေးထားသောလ: ${m} · အတန်း: ${isAll ? "အတန်းအားလုံး" : selectedClass} · ကျောင်းပိတ်ရက်များကို ဖယ်ထုတ်ထားပါသည်။`;
   $("singleClassDetailContainer").style.display = isAll ? "none" : "block";
 
-  // 1. Render Overall Class-wise Monthly Summary Table with TOTAL Row at Bottom
   let totalStCount = 0, totalP = 0, totalAb = 0, totalLv = 0, totalUn = 0, totalLt = 0;
 
   let classSummaryRows = classes.map(cls => {
@@ -589,7 +707,6 @@ function renderMonthly(){
 
   if(isAll) return;
 
-  // 2. Render Single Class Detailed Monthly Report
   let c = selectedClass;
   $("selectedClassNameTitle").textContent = c;
   let arr = list(c, false);
@@ -620,7 +737,8 @@ function renderMonthly(){
 
   let daysInMonthSet = new Set();
   Object.keys(db.records).forEach(k=>{
-    if(k.startsWith(m+"-")) daysInMonthSet.add(k.split("|")[0]);
+    let d=k.split("|")[0];
+    if(d.startsWith(m+"-") && !isHoliday(d)) daysInMonthSet.add(d);
   });
   let schoolDays = Math.max(daysInMonthSet.size, 1);
   let monthTotalCalls = schoolDays * 2;
@@ -691,6 +809,40 @@ function showDetail(id, m){
 function downloadBackup(){
   let blob = new Blob([JSON.stringify(db,null,2)],{type:"application/json"}), a = document.createElement("a");
   a.href = URL.createObjectURL(blob); a.download = "CFBS-attendance-backup.json"; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+}
+
+function restoreBackup(event){
+  let file = event.target.files && event.target.files[0];
+  if(!file) return;
+  let reader = new FileReader();
+  reader.onload = function(){
+    try{
+      let parsed = JSON.parse(reader.result);
+      if(!parsed || !Array.isArray(parsed.students)){
+        alert("မှန်ကန်သော Backup JSON ဖိုင်မဟုတ်ပါ။");
+        return;
+      }
+      if(!confirm("လက်ရှိဒေတာများကို Backup ဖိုင်ထဲမှ ဒေတာဖြင့် အစားထိုးမလား။")) return;
+      db = {
+        students: parsed.students,
+        records: (parsed.records && typeof parsed.records === "object") ? parsed.records : {},
+        teacherPhones: (parsed.teacherPhones && typeof parsed.teacherPhones === "object") ? parsed.teacherPhones : {},
+        holidays: Array.isArray(parsed.holidays) ? parsed.holidays : []
+      };
+      save();
+      alert("Backup ပြန်လည်ထည့်သွင်းပြီးပါပြီ။");
+      renderHome();
+      renderStudents();
+      renderAttendance();
+      renderRemindSms();
+      renderMonthly();
+    }catch(e){
+      alert("JSON ဖိုင်ဖတ်မရပါ။");
+    }
+    event.target.value = "";
+  };
+  reader.readAsText(file);
 }
 
 // Initial Setup
