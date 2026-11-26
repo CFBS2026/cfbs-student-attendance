@@ -49,9 +49,10 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 .tag.holiday{background:#fef3c7;color:#92400e;font-weight:bold}
 .alert-box{background:#fee2e2;color:#991b1b;padding:10px;border-radius:8px;font-size:12px;margin-bottom:10px;border:1px solid #fecaca}
 .warn-box{background:#fef3c7;color:#92400e;padding:10px;border-radius:8px;font-size:12px;margin-bottom:10px;border:1px solid #fde68a}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;padding:12px}
 @media(min-width:700px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media print{
-  header,.menu-toggle,.nav-drawer,.drawer-overlay,.actions,.footer{display:none!important}
+  header,.menu-toggle,.nav-drawer,.drawer-overlay,.actions,.footer,.modal-backdrop{display:none!important}
   body{background:#fff}
   main{max-width:100%;padding:0}
   .panel{box-shadow:none;border:1px solid #cbd5e1;break-inside:avoid}
@@ -171,11 +172,10 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <div class="stat yellow"><small>မမှတ်ရသေး</small><strong id="attPending">0</strong></div>
 </div>
 <div class="actions">
-<button class="green" onclick="markAllPresent()">✓ အားလုံး တက် မှတ်ရန်</button>
 <button class="secondary" onclick="toggleHolidayDate()">🏖️ ကျောင်းပိတ်ရက် သတ်မှတ်/ပယ်ဖျက်</button>
 <button class="danger" onclick="clearDateAttendance()">🗑️ ဤရက် မှတ်တမ်းဖျက်ရန်</button>
 <button class="danger" onclick="clearAllClassesDateAttendance()">🗑️ ဤရက် အတန်းအားလုံး ဖျက်ရန်</button>
-<button class="secondary" onclick="window.print()">🖨️ ဇယားပုံနှိပ်ရန်</button>
+<button class="secondary" onclick="printReport()">🖨️ ဇယားပုံနှိပ်ရန်</button>
 </div>
 <div id="attendanceTable"></div>
 <div id="holidayListBox" style="margin-top:12px"></div>
@@ -242,9 +242,9 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 </div>
 
 <div class="actions" style="margin-top:15px">
-  <button onclick="window.print()">🖨️ ပုံနှိပ်ရန်</button>
+  <button onclick="printReport()">🖨️ ပုံနှိပ်ရန်</button>
   <button class="secondary" onclick="downloadBackup()">Backup ထုတ်ရန်</button>
-  <button class="secondary" onclick="$('restoreFile').click()">Backup ထည့်ရန်</button>
+  <button class="secondary" onclick="triggerRestoreBackup()">Backup ထည့်ရန်</button>
   <input id="restoreFile" type="file" accept="application/json,.json" style="display:none" onchange="restoreBackup(event)">
 </div>
 </div>
@@ -253,6 +253,19 @@ button.secondary{background:#e2e8f0;color:#172033}button.green{background:#04785
 <div class="footer">CFBS Attendance Dashboard · Offline Local Storage</div>
 </main>
 
+<!-- Backup Text Fallback Modal -->
+<div id="backupModal" class="modal-backdrop hidden">
+  <div class="panel" style="max-width:600px;width:100%;max-height:85vh;overflow:auto;margin:0">
+    <h3 id="backupModalTitle" style="margin-top:0">Backup JSON</h3>
+    <p id="backupModalDesc" class="muted"></p>
+    <textarea id="backupModalArea" rows="10" style="font-family:monospace;font-size:11px"></textarea>
+    <div class="actions">
+      <button class="green" id="backupModalPrimaryBtn" onclick="backupModalAction()">လုပ်ဆောင်ရန်</button>
+      <button class="secondary" onclick="closeBackupModal()">ပိတ်ရန်</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const classes=["KG",...Array.from({length:12},(_,i)=>"Grade "+(i+1))];
 const statuses=[["present","တက်"],["absent","ပျက်"],["leave","ခွင့်"],["unexcused","ခွင့်မဲ့"],["late","နောက်ကျ"]];
@@ -260,6 +273,7 @@ const statusLabel={present:"တက်",absent:"ပျက်",leave:"ခွင့
 const names=[["မောင်မင်းခန့်","ကျား"],["မသဇင်","မ"],["မောင်ကောင်းမြတ်","ကျား"]];
 
 let pendingSmsReview = null;
+let backupModalMode = "export";
 
 let db;
 try{db=JSON.parse(localStorage.getItem("CFBS_ATTENDANCE_DASHBOARD_V3")||"null")}catch(e){}
@@ -440,13 +454,6 @@ function setStudentStatus(d,id,val){
   if(isHoliday(d))return;
   if(val==="pending") delete db.records[key(d,id)];
   else db.records[key(d,id)]=val;
-  save();renderAttendance();renderHome();
-}
-function markAllPresent(){
-  let d=$("attDate").value||today(),c=$("attClass").value||"KG",a=list(c);
-  if(isHoliday(d)){alert(`${d} သည် ကျောင်းပိတ်ရက် ဖြစ်ပါသည်။`);return;}
-  if(!a.length){alert("ကျောင်းသားမရှိပါ။");return;}
-  a.forEach(s=>{db.records[key(d,s.id)]="present";});
   save();renderAttendance();renderHome();
 }
 
@@ -806,10 +813,130 @@ function showDetail(id, m){
   `;
 }
 
+// Print, Backup Export & Restore with WebView Fallbacks
+function printReport(){
+  if(window.Android && typeof window.Android.printPage === "function"){
+    try{ window.Android.printPage(); return; }catch(e){}
+  }
+  if(typeof window.print === "function"){
+    try{ window.print(); }catch(e){}
+  }
+  let activeSec = document.querySelector(".page:not(.hidden)");
+  let title = document.title || "CFBS Attendance Report";
+  let plain = activeSec ? activeSec.innerText.trim() : "";
+  if(navigator.share && plain){
+    navigator.share({ title, text: plain }).catch(()=>{});
+  }else if(plain){
+    openBackupModal("export", plain);
+  }
+}
+
+function openBackupModal(mode, text){
+  backupModalMode = mode;
+  $("backupModalArea").value = text || "";
+  if(mode === "export"){
+    $("backupModalTitle").textContent = "📤 Backup / Report စာသား ထုတ်ယူရန်";
+    $("backupModalDesc").textContent = "အောက်ပါ စာသားကို Copy ယူ၍ မှတ်စု (Notes) သို့မဟုတ် ဖိုင်တစ်ခုခုတွင် သိမ်းဆည်းထားပါ။";
+    $("backupModalPrimaryBtn").textContent = "📋 Copy ကူးရန်";
+    $("backupModalPrimaryBtn").className = "green";
+  }else{
+    $("backupModalTitle").textContent = "📥 Backup JSON ထည့်သွင်းရန်";
+    $("backupModalDesc").textContent = "သိမ်းဆည်းထားသော Backup JSON စာသားကို ဤနေရာတွင် Paste ထည့်ပြီး Restore နှိပ်ပါ။";
+    $("backupModalPrimaryBtn").textContent = "♻️ Restore ပြန်ထည့်ရန်";
+    $("backupModalPrimaryBtn").className = "danger";
+  }
+  $("backupModal").classList.remove("hidden");
+}
+
+function closeBackupModal(){
+  $("backupModal").classList.add("hidden");
+}
+
+function backupModalAction(){
+  let raw = $("backupModalArea").value.trim();
+  if(backupModalMode === "export"){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(raw).then(()=>alert("Clipboard ထဲ ကူးယူပြီးပါပြီ။")).catch(()=>{
+        $("backupModalArea").select();
+        document.execCommand("copy");
+        alert("ကူးယူပြီးပါပြီ။");
+      });
+    }else{
+      $("backupModalArea").select();
+      document.execCommand("copy");
+      alert("ကူးယူပြီးပါပြီ။");
+    }
+  }else{
+    applyBackupJsonString(raw);
+  }
+}
+
+function applyBackupJsonString(raw){
+  try{
+    let parsed = JSON.parse(raw);
+    if(!parsed || !Array.isArray(parsed.students)){
+      alert("မှန်ကန်သော Backup JSON မဟုတ်ပါ။");
+      return;
+    }
+    if(!confirm("လက်ရှိဒေတာများကို Backup ထဲမှ ဒေတာဖြင့် အစားထိုးမလား။")) return;
+    db = {
+      students: parsed.students,
+      records: (parsed.records && typeof parsed.records === "object") ? parsed.records : {},
+      teacherPhones: (parsed.teacherPhones && typeof parsed.teacherPhones === "object") ? parsed.teacherPhones : {},
+      holidays: Array.isArray(parsed.holidays) ? parsed.holidays : []
+    };
+    save();
+    closeBackupModal();
+    alert("Backup ပြန်လည်ထည့်သွင်းပြီးပါပြီ။");
+    renderHome();
+    renderStudents();
+    renderAttendance();
+    renderRemindSms();
+    renderMonthly();
+  }catch(e){
+    alert("JSON စာသား မှားယွင်းနေပါသည် (သို့မဟုတ်) ဖတ်မရပါ။");
+  }
+}
+
 function downloadBackup(){
-  let blob = new Blob([JSON.stringify(db,null,2)],{type:"application/json"}), a = document.createElement("a");
-  a.href = URL.createObjectURL(blob); a.download = "CFBS-attendance-backup.json"; a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  let jsonStr = JSON.stringify(db, null, 2);
+  if(window.Android && typeof window.Android.saveBackupJson === "function"){
+    try{
+      window.Android.saveBackupJson(jsonStr, "CFBS-attendance-backup.json");
+      return;
+    }catch(e){}
+  }
+  try{
+    let blob = new Blob([jsonStr], {type:"application/json"});
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "CFBS-attendance-backup.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  }catch(e){}
+  openBackupModal("export", jsonStr);
+}
+
+function triggerRestoreBackup(){
+  if(window.Android && typeof window.Android.pickBackupJson === "function"){
+    try{
+      window.Android.pickBackupJson();
+      return;
+    }catch(e){}
+  }
+  let inp = $("restoreFile");
+  if(inp){
+    inp.value = "";
+    inp.click();
+  }
+  setTimeout(()=>{
+    if($("backupModal").classList.contains("hidden")){
+      openBackupModal("import", "");
+    }
+  }, 400);
 }
 
 function restoreBackup(event){
@@ -817,29 +944,7 @@ function restoreBackup(event){
   if(!file) return;
   let reader = new FileReader();
   reader.onload = function(){
-    try{
-      let parsed = JSON.parse(reader.result);
-      if(!parsed || !Array.isArray(parsed.students)){
-        alert("မှန်ကန်သော Backup JSON ဖိုင်မဟုတ်ပါ။");
-        return;
-      }
-      if(!confirm("လက်ရှိဒေတာများကို Backup ဖိုင်ထဲမှ ဒေတာဖြင့် အစားထိုးမလား။")) return;
-      db = {
-        students: parsed.students,
-        records: (parsed.records && typeof parsed.records === "object") ? parsed.records : {},
-        teacherPhones: (parsed.teacherPhones && typeof parsed.teacherPhones === "object") ? parsed.teacherPhones : {},
-        holidays: Array.isArray(parsed.holidays) ? parsed.holidays : []
-      };
-      save();
-      alert("Backup ပြန်လည်ထည့်သွင်းပြီးပါပြီ။");
-      renderHome();
-      renderStudents();
-      renderAttendance();
-      renderRemindSms();
-      renderMonthly();
-    }catch(e){
-      alert("JSON ဖိုင်ဖတ်မရပါ။");
-    }
+    applyBackupJsonString(reader.result);
     event.target.value = "";
   };
   reader.readAsText(file);
